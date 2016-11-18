@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">音乐理发师</string>
+
+    <!-- MainActivity -->
+    <string name="音乐">main_music</string>
+    <string name="打开">open_music</string>
+</resources>
