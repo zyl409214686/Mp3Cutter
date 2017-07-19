@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+
     android:background="@color/cutter_theme_white">
 
     <TextView
@@ -21,9 +22,9 @@
 
     <LinearLayout
         android:id="@+id/ll_bottombar"
-        android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
@@ -53,6 +54,29 @@
         android:id="@+id/iv_cut"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_sure_btn"
-        android:layout_centerInParent="true"/>
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentRight="true"
+        android:layout_above="@id/ll_bottombar"
+        android:background="@drawable/bg_sure_btn" />
+
+    <mp3cutter.zyl.com.mp3cutter.common.ui.view.RippleView
+        android:id="@+id/rl_folders"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/ll_bottombar"
+        android:background="@color/yes_theme_green2"
+        android:layout_alignTop="@id/iv_cut"
+        android:layout_alignBottom="@id/iv_cut"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        android:gravity="center"
+        android:layout_marginLeft="30dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Folders"
+            android:textSize="16dp"
+            android:textColor="#101010"/>
+    </mp3cutter.zyl.com.mp3cutter.common.ui.view.RippleView>
+
 </RelativeLayout>

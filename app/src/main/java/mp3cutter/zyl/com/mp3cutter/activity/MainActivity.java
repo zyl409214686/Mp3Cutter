@@ -29,6 +29,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         mForwardIv.setOnClickListener(this);
         mBackwardIv.setOnClickListener(this);
         mCutIv.setOnClickListener(this);
+        findViewById(R.id.rl_folders).setOnClickListener(this);
     }
 
     @Override
@@ -42,6 +43,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             case R.id.iv_backward:
                 break;
             case R.id.iv_cut:
+                break;
+            case R.id.rl_folders:
                 break;
         }
     }
