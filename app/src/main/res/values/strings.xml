@@ -4,4 +4,7 @@
     <!-- MainActivity -->
     <string name="main_music">音乐</string>
     <string name="open_music">打开</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

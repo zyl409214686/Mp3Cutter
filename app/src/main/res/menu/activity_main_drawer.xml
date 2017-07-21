@@ -2,13 +2,21 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_city"
+            android:id="@+id/item_folder"
             android:icon="@mipmap/ic_launcher"
-            android:title="菜单1" />
+            android:title="文件夹" />
         <item
-            android:id="@+id/nav_multi_cities"
+            android:id="@+id/item_play"
             android:icon="@mipmap/ic_launcher"
-            android:title="菜单2" />
+            android:title="音乐播放" />
+        <item
+            android:id="@+id/item_setting"
+            android:icon="@mipmap/ic_launcher"
+            android:title="个人设置" />
+        <item
+            android:id="@+id/item_about"
+            android:icon="@mipmap/ic_launcher"
+            android:title="关于" />
     </group>
 
     <!--<item android:title="@string/app_name">-->

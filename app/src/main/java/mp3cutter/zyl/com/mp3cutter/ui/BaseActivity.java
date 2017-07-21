@@ -1,4 +1,4 @@
-package mp3cutter.zyl.com.mp3cutter.activity;
+package mp3cutter.zyl.com.mp3cutter.ui;
 
 import android.support.v4.app.FragmentActivity;
 
