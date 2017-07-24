@@ -25,7 +25,9 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
         initView();
         switchToPlay();
-        StatusBarUtil.setTransparent(HomeActivity.this);
+//        StatusBarUtil.setTransparent(HomeActivity.this);
+        StatusBarUtil.setColorForDrawerLayout(HomeActivity.this,
+                mDrawerLayout, Color.TRANSPARENT);
     }
 
     private void initView() {
@@ -50,6 +52,7 @@ public class HomeActivity extends AppCompatActivity {
 
     private void initNavigationView() {
         mNavigationView = (NavigationView) findViewById(R.id.nav_view);
+        mNavigationView.setItemIconTintList(null);
         mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {

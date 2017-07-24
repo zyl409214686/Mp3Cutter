@@ -3,7 +3,7 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/item_folder"
-            android:icon="@mipmap/ic_launcher"
+            android:icon="@mipmap/player_backward_normal"
             android:title="文件夹" />
         <item
             android:id="@+id/item_play"
