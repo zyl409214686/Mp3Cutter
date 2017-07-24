@@ -10,6 +10,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
+import com.jaeger.library.StatusBarUtil;
+
 import mp3cutter.zyl.com.mp3cutter.R;
 
 public class HomeActivity extends AppCompatActivity {
@@ -23,6 +25,7 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
         initView();
         switchToPlay();
+        StatusBarUtil.setTransparent(HomeActivity.this);
     }
 
     private void initView() {
