@@ -60,7 +60,7 @@ public class HomeActivity extends AppCompatActivity {
                     case R.id.item_about:
                         switchToAbout();
                         break;
-                    case R.id.item_folder:
+                    case R.id.item_home:
                         switchToFolder();
                         break;
                     case R.id.item_setting:
