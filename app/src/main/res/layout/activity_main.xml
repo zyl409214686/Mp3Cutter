@@ -33,21 +33,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@drawable/bg_forward_btn" />
+            android:background="@drawable/selector_forward_btn" />
 
         <ImageView
             android:id="@+id/iv_play"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@drawable/bg_play_btn" />
+            android:background="@drawable/selector_play_btn" />
 
         <ImageView
             android:id="@+id/iv_backward"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@drawable/bg_backward_btn" />
+            android:background="@drawable/selector_backward_btn" />
     </LinearLayout>
 
     <ImageView
@@ -57,7 +57,7 @@
         android:layout_centerHorizontal="true"
         android:layout_alignParentRight="true"
         android:layout_above="@id/ll_bottombar"
-        android:background="@drawable/bg_sure_btn" />
+        android:background="@drawable/selector_sure_btn" />
 
     <mp3cutter.zyl.com.mp3cutter.common.ui.view.RippleView
         android:id="@+id/rl_folders"

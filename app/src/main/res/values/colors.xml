@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="translucence">#b0000000</color>
+    <color name="dialog_line">#8F999999</color>
+    <color name="list_divider">#8F999999</color>
+    <color name="menu_bg_normal">#FF666666</color>
+    <color name="menu_bg_focus">#C8000000</color>
+
+
     <color name="cutter_theme_white">#ffffff</color>
     <color name="cutter_theme_black">#101010</color>
     <color name="cutter_theme_gray">#acacac</color>
@@ -12,4 +19,7 @@
     <color name="Indigo_colorPrimaryDark">#303f9f</color>
     <color name="Indigo_colorPrimary">#3f51b5</color>
     <color name="Indigo_nav_color">#4675FF</color>
+
+
+
 </resources>

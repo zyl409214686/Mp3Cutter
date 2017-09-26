@@ -1,5 +1,5 @@
 apply plugin: 'com.android.application'
-
+apply plugin: 'com.antfortune.freeline'
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
@@ -15,6 +15,16 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    freeline {
+        hack true
+    }
+
+    sourceSets {
+        main {
+            //jni库的调用会到资源文件夹下libs里面找so文件
+            jniLibs.srcDirs = ['libs']
         }
     }
 }
@@ -33,4 +43,5 @@ dependencies {
 
     //透明状态栏
     compile 'com.jaeger.statusbarutil:library:1.4.0'
+    compile 'com.antfortune.freeline:runtime:0.7.2'
 }

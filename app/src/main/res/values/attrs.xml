@@ -17,4 +17,12 @@
         <attr name="rv_zoom" format="boolean" />
         <attr name="rv_zoomScale" format="float" />
     </declare-styleable>
+
+
+    <declare-styleable name="RangeSeekBar">
+        <attr name="min" format="float" />
+        <attr name="max" format="float" />
+        <attr name="startingMin" format="float" />
+        <attr name="startingMax" format="float" />
+    </declare-styleable>
 </resources>

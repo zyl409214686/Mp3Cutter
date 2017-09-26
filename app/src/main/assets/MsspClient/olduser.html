@@ -1,0 +1,33 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=1, user-scalable=no">
+<link rel="stylesheet" href="css/sdk20.css" />
+<script src="js/jquery.js"></script>
+<script src="js/sdk20.js"></script>
+<script src="js/MsspClient.js"></script>
+</head>
+
+<body>
+<div class="sdk_title">
+	<p class="sdk_title_return"><a href="Javascript:signSettingBack();">取消</a></p>
+	身份验证
+</div>
+<div class="clear"><p class="sdk_title_down_p_olduser"><span class="grey999">为了确认您的身份，保障您的合法权益，请填写真实的身份信息进行登录</span></p></div>
+<div class="sdk_content">
+	<div class="sdk_content_line">
+    	<div class="sdk_content_l_1">姓名</div>
+        <div class="sdk_content_l_r"><input type="text" name="name" id="name" placeholder="输入您的真实姓名" class="sdk_input5" maxlength="16" oninput="sdkOlduserPuanduan(5)"></div>
+        <div class="sdk_tishi sdk_ts5">请输入您的真实姓名</div>
+    </div>
+    <div class="sdk_content_line">
+    	<div class="sdk_content_l_1">身份证</div>
+        <div class="sdk_content_l_r"><input type="text" name="paperid" id="paperid" placeholder="输入有效的身份证号" class="idcardinput" maxlength="18" oninput="checkIdCard()"></div>
+        <div class="sdk_tishi sdk_ts_idcard">请输入18位有效身份证号码</div>
+    </div>
+    <div class="clearkit"></div>
+</div>
+<div class="sdk_content_btn"><input type="button" onclick="oldUserCheck()" value="下一步" class="btn-primary" disabled="disabled"></div>
+</body>
+</html>

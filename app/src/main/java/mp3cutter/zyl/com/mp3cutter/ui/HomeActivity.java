@@ -9,6 +9,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.jaeger.library.StatusBarUtil;
 
@@ -23,6 +24,7 @@ public class HomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        Toast.makeText(this, "main", Toast.LENGTH_LONG).show();
         initView();
         switchToPlay();
 //        StatusBarUtil.setTransparent(HomeActivity.this);
@@ -88,7 +90,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void switchToPlay() {
-        getSupportFragmentManager().beginTransaction().replace(R.id.frame_content, new MusicPlayFragment()).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.frame_content, MusicPlayFragment.newInstance("", "")).commit();
         mToolBar.setTitle("音乐播放~~~");
     }
 

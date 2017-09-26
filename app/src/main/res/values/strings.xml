@@ -7,4 +7,29 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+
+
+    <!-- 弹出窗口 -->
+    <string name="dialog_title">提示</string>
+    <string name="dialog_exit_msg">是否要退出？</string>
+    <string name="dialog_btn_sure">确定</string>
+    <string name="dialog_btn_cancel">取消</string>
+    <string name="dialog_cutter_msg">确定剪切当前歌曲？</string>
+    <string name="dialog_cutter_success">音乐已经剪切成功，路径为/sdcard/MUSIC_CUTTER/，是否设置为手机铃声?</string>
+    <string name="dialog_cutter_warning_length">截取音乐文件时间长度必须大于0!</string>
+    <string name="dialog_cutter_warning_sel">请选择音乐！</string>
+
+    <string name="open">打开</string>
+    <string name="setting">设置</string>
+
+
+    <!-- 文件选择器 -->
+    <string name="title_activity_main">MainActivity</string>
+    <string name="open_file_failed">文件打开失败</string>
+    <string name="open_file_error_format">文件格式不正确</string>
+    <string name="open_file_none">您没有选择任何文件</string>
+    <string name="empty_hint">文件夹为空</string>
+    <string name="sdcard_unmonted_hint">请先挂载SD卡</string>
+
 </resources>
