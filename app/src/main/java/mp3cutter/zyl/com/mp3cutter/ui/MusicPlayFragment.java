@@ -5,6 +5,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -30,16 +32,21 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.IOException;
 
 import mp3cutter.zyl.com.mp3cutter.R;
 import mp3cutter.zyl.com.mp3cutter.common.ui.view.RangeSeekBar;
 import mp3cutter.zyl.com.mp3cutter.common.ui.view.XfDialog;
 import mp3cutter.zyl.com.mp3cutter.common.ui.view.visualizer.VisualizerView;
+import mp3cutter.zyl.com.mp3cutter.common.ui.view.visualizer.renderer.CircleBarRenderer;
 import mp3cutter.zyl.com.mp3cutter.common.utils.FileUtils;
 import mp3cutter.zyl.com.mp3cutter.common.utils.SystemTools;
 import mp3cutter.zyl.com.mp3cutter.common.utils.TimeUtils;
 import mp3cutter.zyl.com.mp3cutter.common.utils.ViewUtils;
 import mp3cutter.zyl.com.mp3cutter.cutter.Mp3Fenge;
+
+import static android.app.Activity.RESULT_CANCELED;
+import static android.app.Activity.RESULT_OK;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -682,4 +689,76 @@ public class MusicPlayFragment extends Fragment implements View.OnClickListener 
         // }
         // });
     }
+
+
+    /**
+     * 选择文件返回
+     */
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_CANCELED) {
+            return;
+        }
+        // 文件选择返回结果
+        if (resultCode == RESULT_OK && requestCode == REQUEST_CODE) {
+            mSelMusicPath = data
+                    .getStringExtra(FileChooserActivity.EXTRA_FILE_CHOOSER);
+            try {
+                if (!TextUtils.isEmpty(mSelMusicPath)) {
+                    mPlaySeekBar.setSelectedMinValue(0);
+                    mPlaySeekBar.setSelectedCurValue(0);
+                    mChangStatusHandler.sendEmptyMessage(STATUS_PAUSE);
+
+                    myMediaPlayer.pause();
+                    myMediaPlayer.reset();
+                    myMediaPlayer.setDataSource(mSelMusicPath);
+                    myMediaPlayer.prepare();
+                    mPlaySeekBar.setAbsoluteMaxValue(myMediaPlayer
+                            .getDuration());
+                    mVisualView.link(myMediaPlayer);
+                    addBarGraphRenderers();
+                    // String albumPic = SystemTools.getImage(mSelMusicPath,
+                    // PlayerMainActivity.this);
+                    // Toast.makeText(PlayerMainActivity.this, "path:"+albumPic,
+                    // Toast.LENGTH_LONG).show();
+                    // if(albumPic!=null){
+                    // Bundle b = new Bundle();
+                    // b.putString("setPIC", albumPic);
+                    // Message msg = new Message();
+                    // msg.what = 100;
+                    // msg.setData(b);
+                    // mPlayerProgressHandler.sendMessage(msg);
+                    // }
+
+                }
+            } catch (IllegalArgumentException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (SecurityException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (IllegalStateException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * 添加柱状频谱渲染
+     */
+    private void addBarGraphRenderers() {
+        Paint paint2 = new Paint();
+        paint2.setStrokeWidth(12f);
+        paint2.setAntiAlias(true);
+        paint2.setColor(Color.argb(240, 172, 175, 64));
+        // BarGraphRenderer barGraphRendererTop = new BarGraphRenderer(4,
+        // paint2, false);
+        CircleBarRenderer barGraphRendererTop = new CircleBarRenderer(paint2, 4);
+        mVisualView.clearRenderers();
+        mVisualView.addRenderer(barGraphRendererTop);
+    }
+
 }
