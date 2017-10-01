@@ -6,10 +6,6 @@
             android:icon="@mipmap/home"
             android:title="主页" />
         <item
-            android:id="@+id/item_play"
-            android:icon="@mipmap/ic_launcher"
-            android:title="音乐播放" />
-        <item
             android:id="@+id/item_setting"
             android:icon="@mipmap/ic_launcher"
             android:title="个人设置" />

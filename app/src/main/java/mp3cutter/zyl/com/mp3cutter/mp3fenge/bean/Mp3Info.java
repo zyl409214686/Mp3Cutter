@@ -1,4 +1,4 @@
-package mp3cutter.zyl.com.mp3cutter.cutter;
+package mp3cutter.zyl.com.mp3cutter.mp3fenge.bean;
 
 public class Mp3Info
 {

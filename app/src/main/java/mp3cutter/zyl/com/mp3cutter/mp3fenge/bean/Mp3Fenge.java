@@ -1,4 +1,4 @@
-package mp3cutter.zyl.com.mp3cutter.cutter;
+package mp3cutter.zyl.com.mp3cutter.mp3fenge.bean;
 
 import org.jaudiotagger.audio.mp3.MP3AudioHeader;
 import org.jaudiotagger.audio.mp3.MP3File;
@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import mp3cutter.zyl.com.mp3cutter.cutter.util.FileUtil;
-import mp3cutter.zyl.com.mp3cutter.cutter.util.StringUtil;
+import mp3cutter.zyl.com.mp3cutter.mp3fenge.util.FileUtil;
+import mp3cutter.zyl.com.mp3cutter.mp3fenge.util.StringUtil;
 
 
 public class Mp3Fenge

@@ -1,4 +1,4 @@
-package mp3cutter.zyl.com.mp3cutter.cutter.util;
+package mp3cutter.zyl.com.mp3cutter.mp3fenge.util;
 
 import java.io.UnsupportedEncodingException;
 

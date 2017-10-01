@@ -1,8 +1,9 @@
-package mp3cutter.zyl.com.mp3cutter.ui;
+package mp3cutter.zyl.com.mp3cutter.home.ui;
 
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -15,7 +16,10 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -43,20 +47,17 @@ import mp3cutter.zyl.com.mp3cutter.common.utils.FileUtils;
 import mp3cutter.zyl.com.mp3cutter.common.utils.SystemTools;
 import mp3cutter.zyl.com.mp3cutter.common.utils.TimeUtils;
 import mp3cutter.zyl.com.mp3cutter.common.utils.ViewUtils;
-import mp3cutter.zyl.com.mp3cutter.cutter.Mp3Fenge;
+import mp3cutter.zyl.com.mp3cutter.mp3fenge.bean.Mp3Fenge;
+import mp3cutter.zyl.com.mp3cutter.ui.FileChooserActivity;
 
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 
+
 /**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link MusicPlayFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link MusicPlayFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * 音乐剪切功能页面（Home页 fragment）
  */
-public class MusicPlayFragment extends Fragment implements View.OnClickListener {
+public class HomeFragment extends Fragment implements View.OnClickListener {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -66,7 +67,7 @@ public class MusicPlayFragment extends Fragment implements View.OnClickListener 
     private String mParam2;
     private OnFragmentInteractionListener mListener;
 
-    public MusicPlayFragment() {
+    public HomeFragment() {
         // Required empty public constructor
     }
 
@@ -196,8 +197,8 @@ public class MusicPlayFragment extends Fragment implements View.OnClickListener 
      * @return A new instance of fragment MusicPlayFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static MusicPlayFragment newInstance(String param1, String param2) {
-        MusicPlayFragment fragment = new MusicPlayFragment();
+    public static HomeFragment newInstance(String param1, String param2) {
+        HomeFragment fragment = new HomeFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -460,7 +461,13 @@ public class MusicPlayFragment extends Fragment implements View.OnClickListener 
                     // 暂停
                     myMediaPlayer.pause();
                     mPlayerProgressHandler.removeMessages(UPDATE_PLAY_PROGRESS);
-                    mVisualView.setEnabled(false);
+                    if(ContextCompat.checkSelfPermission(getActivity(), android.Manifest.permission.RECORD_AUDIO)
+                            != PackageManager.PERMISSION_GRANTED){
+                        ActivityCompat.requestPermissions(getActivity(),new String[]{
+                                android.Manifest.permission.RECORD_AUDIO},1);
+                    }
+                    else
+                        mVisualView.setEnabled(false);
                     mChangStatusHandler.sendEmptyMessage(STATUS_PAUSE);
                 } else {
                     // 播放
@@ -474,7 +481,13 @@ public class MusicPlayFragment extends Fragment implements View.OnClickListener 
                     Number tmpNumber = mPlaySeekBar.getSelectedCurValue();
                     myMediaPlayer.seekTo(tmpNumber.intValue());
                     myMediaPlayer.start();
-                    mVisualView.setEnabled(true);
+                    if(ContextCompat.checkSelfPermission(getActivity(), android.Manifest.permission.RECORD_AUDIO)
+                            != PackageManager.PERMISSION_GRANTED){
+                        ActivityCompat.requestPermissions(getActivity(),new String[]{
+                                android.Manifest.permission.RECORD_AUDIO},1);
+                    }
+                    else
+                        mVisualView.setEnabled(true);
                     Message message = new Message();
                     message.what = UPDATE_PLAY_PROGRESS;
                     mPlayerProgressHandler.sendMessage(message);
@@ -714,7 +727,13 @@ public class MusicPlayFragment extends Fragment implements View.OnClickListener 
                     myMediaPlayer.prepare();
                     mPlaySeekBar.setAbsoluteMaxValue(myMediaPlayer
                             .getDuration());
-                    mVisualView.link(myMediaPlayer);
+                    if(ContextCompat.checkSelfPermission(getActivity(), android.Manifest.permission.RECORD_AUDIO)
+                            != PackageManager.PERMISSION_GRANTED){
+                        ActivityCompat.requestPermissions(getActivity(),new String[]{
+                                android.Manifest.permission.RECORD_AUDIO},1);
+                    }
+                    else
+                        mVisualView.link(myMediaPlayer);
                     addBarGraphRenderers();
                     // String albumPic = SystemTools.getImage(mSelMusicPath,
                     // PlayerMainActivity.this);
@@ -761,4 +780,32 @@ public class MusicPlayFragment extends Fragment implements View.OnClickListener 
         mVisualView.addRenderer(barGraphRendererTop);
     }
 
+    /**
+     * ⑨重写onRequestPermissionsResult方法
+     * 获取动态权限请求的结果,再开启录制音频
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if(requestCode==1&&grantResults[0]== PackageManager.PERMISSION_GRANTED){
+
+        }else {
+            Toast.makeText(getActivity(),"用户拒绝了权限",Toast.LENGTH_SHORT).show();
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        myMediaPlayer.pause();
+        mPlayerProgressHandler.removeMessages(UPDATE_PLAY_PROGRESS);
+        if(ContextCompat.checkSelfPermission(getActivity(), android.Manifest.permission.RECORD_AUDIO)
+                != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(getActivity(),new String[]{
+                    android.Manifest.permission.RECORD_AUDIO},1);
+        }
+        else
+            mVisualView.setEnabled(false);
+        mChangStatusHandler.sendEmptyMessage(STATUS_PAUSE);
+    }
 }
