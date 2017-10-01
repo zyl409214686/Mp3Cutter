@@ -1,4 +1,5 @@
-package com.zyl.mp3cutter.home.ui;
+package com.zyl.mp3cutter.home;
+
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -18,7 +19,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -36,6 +36,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.zyl.mp3cutter.R;
+import com.zyl.mp3cutter.common.mvp.MVPBaseFragment;
 import com.zyl.mp3cutter.common.ui.view.RangeSeekBar;
 import com.zyl.mp3cutter.common.ui.view.XfDialog;
 import com.zyl.mp3cutter.common.ui.view.visualizer.VisualizerView;
@@ -53,11 +54,12 @@ import java.io.IOException;
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 
-
 /**
- * 音乐剪切功能页面（Home页 fragment）
+ * MVPPlugin
+ *  邮箱 784787081@qq.com
  */
-public class HomeFragment extends Fragment implements View.OnClickListener {
+
+public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresenter> implements HomeContract.View {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -333,10 +335,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         mListener = null;
     }
 
-    @Override
-    public void onClick(View v) {
-
-    }
 
     /**
      * This interface must be implemented by activities that contain this

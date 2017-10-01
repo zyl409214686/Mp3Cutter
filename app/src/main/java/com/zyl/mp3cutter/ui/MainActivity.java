@@ -13,7 +13,7 @@ import android.widget.Toast;
 
 import com.jaeger.library.StatusBarUtil;
 import com.zyl.mp3cutter.R;
-import com.zyl.mp3cutter.home.ui.HomeFragment;
+import com.zyl.mp3cutter.home.HomeFragment;
 
 
 public class MainActivity extends AppCompatActivity {
