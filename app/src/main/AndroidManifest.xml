@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="mp3cutter.zyl.com.mp3cutter">
+    package="com.zyl.mp3cutter">
 
     <application
         android:allowBackup="true"
