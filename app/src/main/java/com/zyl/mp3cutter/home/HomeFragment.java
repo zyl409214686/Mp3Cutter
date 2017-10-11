@@ -17,10 +17,10 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -29,7 +29,6 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -49,14 +48,15 @@ import com.zyl.mp3cutter.mp3fenge.bean.Mp3Fenge;
 import com.zyl.mp3cutter.ui.FileChooserActivity;
 
 import java.io.File;
-import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
-import static android.app.Activity.RESULT_CANCELED;
-import static android.app.Activity.RESULT_OK;
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
 
 /**
  * MVPPlugin
- *  邮箱 784787081@qq.com
+ * 邮箱 784787081@qq.com
  */
 
 public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresenter> implements HomeContract.View {
@@ -74,15 +74,13 @@ public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresent
     }
 
 
-    private ImageButton mPlayBtn, mCutterBtn, mSpeedBtn, mBackwardBtn,
-            mResetBtn;
+    private ImageButton mPlayBtn, mCutterBtn, mSpeedBtn, mBackwardBtn;
 
     private TextView mPlayerTimeTV, mPlayerDurationTV;
     private VisualizerView mVisualView;
     private RelativeLayout mRlMain;
     private RangeSeekBar<Integer> mPlaySeekBar;
-    private MediaPlayer myMediaPlayer;
-    private ImageView test;
+    //    private MediaPlayer myMediaPlayer;
     private TextView mVoiceBtn, mChooseBtn;
     // intent返回动作
     private static final int REQUEST_CODE = 0;
@@ -102,19 +100,15 @@ public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresent
     private Animation showVoicePanelAnimation;
     private Animation hiddenVoicePanelAnimation;
     // 调节音量
-    private SeekBar mSeekBarVoice;
+    private SeekBar mVoiceSeekBar;
     // 获取系统音频对象
     private AudioManager mAudioManager;
     // 铃声地址
     private static String RING_FOLDER = "/sdcard/MUSIC_CUTTER";
     // 铃声格式
     private static final String RING_FORMAT = ".mp3";
-    // 频谱数据
-    private static final String WAVE_FORM = "WAVE_FORM";
     // 铃声路径
     private static final String RANG_PATH = "RANG_PATH";
-
-    private long mExitTime;
 
     /**
      * 声音滑块滑动事件
@@ -154,22 +148,18 @@ public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresent
         @Override
         public void handleMessage(Message msg) {
             if (msg.what == UPDATE_PLAY_PROGRESS) {
-                mPlaySeekBar.setSelectedCurValue(myMediaPlayer
-                        .getCurrentPosition());
-                mPlayerTimeTV.setText(TimeUtils.formatSecondTime(myMediaPlayer
-                        .getCurrentPosition()));
-                mPlayerDurationTV.setText(TimeUtils.formatSecondTime(myMediaPlayer
-                        .getDuration()));
+                mPlaySeekBar.setSelectedCurValue(mPresenter.getCurPosition());
+                mPlayerTimeTV.setText(TimeUtils.formatSecondTime(mPresenter.getCurPosition()));
+                mPlayerDurationTV.setText(TimeUtils.formatSecondTime(mPresenter.getCurPosition()));
                 Number maxValue = mPlaySeekBar.getSelectedMaxValue();
                 // 播放完暂停处理
-                if (myMediaPlayer.getCurrentPosition() >= maxValue.intValue()) {
-                    myMediaPlayer.pause();
+                if (mPresenter.getCurPosition() >= maxValue.intValue()) {
+                    mPresenter.pause();
                     mChangStatusHandler.sendEmptyMessage(STATUS_PAUSE);
                 }
                 // 消息处理
-                if (myMediaPlayer.getCurrentPosition() >= myMediaPlayer
-                        .getDuration()
-                        || myMediaPlayer.getCurrentPosition() >= maxValue
+                if (mPresenter.getCurPosition() >= mPresenter.getCurPosition()
+                        || mPresenter.getCurPosition() >= maxValue
                         .intValue())
                     mPlayerProgressHandler.removeMessages(UPDATE_PLAY_PROGRESS);
                 else
@@ -185,11 +175,11 @@ public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresent
                 Bitmap bitmap = BitmapFactory.decodeFile(albumPic);
                 BitmapDrawable bmpDraw = new BitmapDrawable(bitmap);
                 mRlMain.setBackgroundDrawable(bmpDraw);
-                test.setImageDrawable(bmpDraw);
             }
             super.handleMessage(msg);
         }
     };
+
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -228,23 +218,9 @@ public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresent
         return view;
     }
 
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-//        if (context instanceof OnFragmentInteractionListener) {
-//            mListener = (OnFragmentInteractionListener) context;
-//        } else {
-//            throw new RuntimeException(context.toString()
-//                    + " must implement OnFragmentInteractionListener");
-//        }
     }
 
     private void initView(View view) {
@@ -258,17 +234,38 @@ public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresent
         mPlayerDurationTV = (TextView) view.findViewById(R.id.tv_player_playering_duration);
         rl_player_voice = (RelativeLayout) view.findViewById(R.id.rl_player_voice);
         mVoiceBtn = (TextView) view.findViewById(R.id.btn_player_voice);
-        mSeekBarVoice = (SeekBar) view.findViewById(R.id.sb_player_voice);
+        mVoiceSeekBar = (SeekBar) view.findViewById(R.id.sb_player_voice);
         // mResetBtn = (ImageButton) findViewById(R.id.btn_reset);
         // 频谱视图
         mVisualView = (VisualizerView) view.findViewById(R.id.visual_view);
         mRlMain = (RelativeLayout) view.findViewById(R.id.rl_main);
-        // test = (ImageView) findViewById(R.id.test);
+        Observable.interval(0,5, TimeUnit.SECONDS).subscribe(new Observer<Long>() {
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+
+            @Override
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
+            public void onNext(Long aLong) {
+                Log.d("HomeFragment", "------>along："+aLong+" time:"+ SystemClock.elapsedRealtime());
+            }
+        });
     }
 
 
     private void init() {
-        myMediaPlayer = new MediaPlayer();
+//        myMediaPlayer = new MediaPlayer();
         mPlaySeekBar.setSelectedMinValue(0);
         mPlaySeekBar.setSelectedMaxValue(100);
         mPlaySeekBar.setSelectedCurValue(0);
@@ -278,9 +275,9 @@ public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresent
         // 获取系统音乐当前音量
         int currentVolume = mAudioManager
                 .getStreamVolume(AudioManager.STREAM_MUSIC);
-        mSeekBarVoice.setMax(mAudioManager
+        mVoiceSeekBar.setMax(mAudioManager
                 .getStreamMaxVolume(AudioManager.STREAM_MUSIC));
-        mSeekBarVoice.setProgress(currentVolume);
+        mVoiceSeekBar.setProgress(currentVolume);
 
         showVoicePanelAnimation = AnimationUtils.loadAnimation(
                 getActivity(), R.anim.push_up_in);
@@ -335,6 +332,82 @@ public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresent
         mListener = null;
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mPresenter.onDestroy();
+    }
+
+    @Override
+    public void setVisualizerViewEnaled(boolean enabled) {
+        mVisualView.setEnabled(false);
+    }
+
+    @Override
+    public int getSeekbarCurValue() {
+        Number number = mPlaySeekBar.getSelectedCurValue();
+        return number.intValue();
+    }
+
+    @Override
+    public int getSeekbarMaxValue() {
+        Number number = mPlaySeekBar.getSelectedMaxValue();
+        return number.intValue();
+    }
+
+    @Override
+    public int getSeekbarMinValue() {
+        Number number = mPlaySeekBar.getSelectedMinValue();
+        return number.intValue();
+    }
+
+    @Override
+    public void setPlayBtnStatus(boolean isPlayingStatus) {
+        if (isPlayingStatus) {
+            mPlayBtn.setBackgroundResource(R.drawable.selector_pause_btn);
+        } else {
+            mPlayBtn.setBackgroundResource(R.drawable.selector_play_btn);
+        }
+    }
+
+    @Override
+    public void refreshSeekBarForValue(int value) {
+        mPlaySeekBar.setSelectedCurValue(value);
+        mPlayerTimeTV.setText(TimeUtils.formatSecondTime(value));
+        mPlayerDurationTV.setText(TimeUtils.formatSecondTime(value));
+    }
+
+    @Override
+    public void setSeekbarValue(int selmin, int selcur){
+        mPlaySeekBar.setSelectedMinValue(selmin);
+        mPlaySeekBar.setSelectedCurValue(selcur);
+    }
+
+    @Override
+    public void setSeekbarMax(int max){
+        mPlaySeekBar.setAbsoluteMaxValue(max);
+    }
+
+    @Override
+    public void linkMediaPlayerForVisualView(MediaPlayer player) {
+        mVisualView.link(player);
+    }
+
+    /**
+     * 添加柱状频谱渲染
+     */
+    @Override
+    public void addBarGraphRenderers() {
+        Paint paint2 = new Paint();
+        paint2.setStrokeWidth(12f);
+        paint2.setAntiAlias(true);
+        paint2.setColor(Color.argb(240, 172, 175, 64));
+        // BarGraphRenderer barGraphRendererTop = new BarGraphRenderer(4,
+        // paint2, false);
+        CircleBarRenderer barGraphRendererTop = new CircleBarRenderer(paint2, 4);
+        mVisualView.clearRenderers();
+        mVisualView.addRenderer(barGraphRendererTop);
+    }
 
     /**
      * This interface must be implemented by activities that contain this
@@ -349,6 +422,7 @@ public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresent
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+
     }
 
     /**
@@ -404,7 +478,7 @@ public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresent
         Mp3Fenge helper = new Mp3Fenge(new File(mSelMusicPath));
         if (FileUtils.bFolder(RING_FOLDER)) {
             if (!TextUtils.isEmpty(fileName)) {
-                String rangPath = RING_FOLDER + "/"+fileName + RING_FORMAT;
+                String rangPath = RING_FOLDER + "/" + fileName + RING_FORMAT;
                 if (helper.generateNewMp3ByTime(new File(rangPath), minValue, maxValue)) {
                     Message msg = new Message();
                     msg.what = CUTTER_SUCCESS;
@@ -455,44 +529,43 @@ public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresent
         mPlayBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (myMediaPlayer.isPlaying()) {
-                    // 暂停
-                    myMediaPlayer.pause();
-                    mPlayerProgressHandler.removeMessages(UPDATE_PLAY_PROGRESS);
-                    if(ContextCompat.checkSelfPermission(getActivity(), android.Manifest.permission.RECORD_AUDIO)
-                            != PackageManager.PERMISSION_GRANTED){
-                        ActivityCompat.requestPermissions(getActivity(),new String[]{
-                                android.Manifest.permission.RECORD_AUDIO},1);
-                    }
-                    else
-                        mVisualView.setEnabled(false);
-                    mChangStatusHandler.sendEmptyMessage(STATUS_PAUSE);
-                } else {
-                    // 播放
-                    if (TextUtils.isEmpty(mSelMusicPath)) {
-                        Toast.makeText(getActivity(),
-                                getString(R.string.dialog_cutter_warning_sel),
-                                Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    mChangStatusHandler.sendEmptyMessage(STATUS_PLAYING);
-                    Number tmpNumber = mPlaySeekBar.getSelectedCurValue();
-                    myMediaPlayer.seekTo(tmpNumber.intValue());
-                    myMediaPlayer.start();
-                    if(ContextCompat.checkSelfPermission(getActivity(), android.Manifest.permission.RECORD_AUDIO)
-                            != PackageManager.PERMISSION_GRANTED){
-                        ActivityCompat.requestPermissions(getActivity(),new String[]{
-                                android.Manifest.permission.RECORD_AUDIO},1);
-                    }
-                    else
-                        mVisualView.setEnabled(true);
-                    Message message = new Message();
-                    message.what = UPDATE_PLAY_PROGRESS;
-                    mPlayerProgressHandler.sendMessage(message);
-                }
-
-            }
-        });
+                mPresenter.playToggle(getActivity());
+//                if (mPresenter.isPlaying()) {
+//                    // 暂停
+//                    mPresenter.pause();
+//                    mPlayerProgressHandler.removeMessages(UPDATE_PLAY_PROGRESS);
+//                    if (ContextCompat.checkSelfPermission(getActivity(), android.Manifest.permission.RECORD_AUDIO)
+//                            != PackageManager.PERMISSION_GRANTED) {
+//                        ActivityCompat.requestPermissions(getActivity(), new String[]{
+//                                android.Manifest.permission.RECORD_AUDIO}, 1);
+//                    } else
+//                        mVisualView.setEnabled(false);
+//                    mChangStatusHandler.sendEmptyMessage(STATUS_PAUSE);
+//                } else {
+//                    // 播放
+//                    if (TextUtils.isEmpty(mSelMusicPath)) {
+//                        Toast.makeText(getActivity(),
+//                                getString(R.string.dialog_cutter_warning_sel),
+//                                Toast.LENGTH_SHORT).show();
+//                        return;
+//                    }
+//                    mChangStatusHandler.sendEmptyMessage(STATUS_PLAYING);
+//                    Number tmpNumber = mPlaySeekBar.getSelectedCurValue();
+//                    mPresenter.seekTo(tmpNumber.intValue());
+//                    mPresenter.play();
+//                    if (ContextCompat.checkSelfPermission(getActivity(), android.Manifest.permission.RECORD_AUDIO)
+//                            != PackageManager.PERMISSION_GRANTED) {
+//                        ActivityCompat.requestPermissions(getActivity(), new String[]{
+//                                android.Manifest.permission.RECORD_AUDIO}, 1);
+//                    } else
+//                        mVisualView.setEnabled(true);
+//                    Message message = new Message();
+//                    message.what = UPDATE_PLAY_PROGRESS;
+//                    mPlayerProgressHandler.sendMessage(message);
+//                }
+//
+//            }
+        }});
 
         /**
          * 剪切音乐
@@ -522,13 +595,13 @@ public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresent
                                 while (mIsTouching) {
                                     Number curNumber = mPlaySeekBar
                                             .getSelectedMaxValue();
-                                    if (myMediaPlayer.getCurrentPosition() + 500 < curNumber
+                                    if (mPresenter.getCurPosition() + 500 < curNumber
                                             .doubleValue())
-                                        myMediaPlayer.seekTo(myMediaPlayer
-                                                .getCurrentPosition() + 500);
-                                    else if (myMediaPlayer.getCurrentPosition() + 500 == curNumber
+                                        mPresenter.seekTo(mPresenter
+                                                .getCurPosition() + 500);
+                                    else if (mPresenter.getCurPosition() + 500 == curNumber
                                             .doubleValue()) {
-                                        myMediaPlayer.seekTo(myMediaPlayer
+                                        mPresenter.seekTo(mPresenter
                                                 .getDuration());
                                         mIsTouching = false;
                                     } else {
@@ -570,13 +643,13 @@ public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresent
                                 while (mIsTouching) {
                                     Number minNumber = mPlaySeekBar
                                             .getSelectedMinValue();
-                                    if (myMediaPlayer.getCurrentPosition() - 500 > minNumber
+                                    if (mPresenter.getCurPosition() - 500 > minNumber
                                             .doubleValue())
-                                        myMediaPlayer.seekTo(myMediaPlayer
-                                                .getCurrentPosition() - 500);
-                                    else if (myMediaPlayer.getCurrentPosition() - 500 == minNumber
+                                        mPresenter.seekTo(mPresenter
+                                                .getCurPosition() - 500);
+                                    else if (mPresenter.getCurPosition() - 500 == minNumber
                                             .doubleValue()) {
-                                        myMediaPlayer.seekTo(myMediaPlayer
+                                        mPresenter.seekTo(mPresenter
                                                 .getDuration());
                                         mIsTouching = false;
                                     } else {
@@ -615,7 +688,7 @@ public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresent
         /**
          * 音量滑块滑动事件
          */
-        mSeekBarVoice.setOnSeekBarChangeListener(seekBarChangeListener);
+        mVoiceSeekBar.setOnSeekBarChangeListener(seekBarChangeListener);
 
         /**
          * 音乐滑块点击事件
@@ -625,7 +698,7 @@ public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresent
             @Override
             public void onClickMinThumb(Number max, Number min, Number cur) {
                 if (min.intValue() >= cur.intValue()) {
-                    myMediaPlayer.pause();
+                    mPresenter.pause();
                     mChangStatusHandler.sendEmptyMessage(STATUS_PAUSE);
                 }
             }
@@ -640,7 +713,7 @@ public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresent
             public void onMinMove(Number max, Number min, Number cur) {
                 // TODO Auto-generated method stub
                 if (min.intValue() > cur.intValue()) {
-                    myMediaPlayer.seekTo(min.intValue());
+                    mPresenter.seekTo(min.intValue());
                     mPlaySeekBar.setSelectedCurValue(min.intValue());
                 }
             }
@@ -649,7 +722,7 @@ public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresent
             public void onMaxMove(Number max, Number min, Number cur) {
                 // TODO Auto-generated method stub
                 if (max.intValue() < cur.intValue()) {
-                    myMediaPlayer.seekTo(max.intValue());
+                    mPresenter.seekTo(max.intValue());
                     mPlaySeekBar.setSelectedCurValue(max.intValue());
                 }
             }
@@ -657,7 +730,7 @@ public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresent
             @Override
             public void onUpMinThumb(Number max, Number min, Number cur) {
                 if (min.intValue() >= cur.intValue()) {
-                    myMediaPlayer.start();
+                    mPresenter.play();
                     mChangStatusHandler.sendEmptyMessage(STATUS_PLAYING);
                 }
             }
@@ -706,76 +779,58 @@ public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresent
      * 选择文件返回
      */
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_CANCELED) {
-            return;
-        }
-        // 文件选择返回结果
-        if (resultCode == RESULT_OK && requestCode == REQUEST_CODE) {
-            mSelMusicPath = data
-                    .getStringExtra(FileChooserActivity.EXTRA_FILE_CHOOSER);
-            try {
-                if (!TextUtils.isEmpty(mSelMusicPath)) {
-                    mPlaySeekBar.setSelectedMinValue(0);
-                    mPlaySeekBar.setSelectedCurValue(0);
-                    mChangStatusHandler.sendEmptyMessage(STATUS_PAUSE);
-
-                    myMediaPlayer.pause();
-                    myMediaPlayer.reset();
-                    myMediaPlayer.setDataSource(mSelMusicPath);
-                    myMediaPlayer.prepare();
-                    mPlaySeekBar.setAbsoluteMaxValue(myMediaPlayer
-                            .getDuration());
-                    if(ContextCompat.checkSelfPermission(getActivity(), android.Manifest.permission.RECORD_AUDIO)
-                            != PackageManager.PERMISSION_GRANTED){
-                        ActivityCompat.requestPermissions(getActivity(),new String[]{
-                                android.Manifest.permission.RECORD_AUDIO},1);
-                    }
-                    else
-                        mVisualView.link(myMediaPlayer);
-                    addBarGraphRenderers();
-                    // String albumPic = SystemTools.getImage(mSelMusicPath,
-                    // PlayerMainActivity.this);
-                    // Toast.makeText(PlayerMainActivity.this, "path:"+albumPic,
-                    // Toast.LENGTH_LONG).show();
-                    // if(albumPic!=null){
-                    // Bundle b = new Bundle();
-                    // b.putString("setPIC", albumPic);
-                    // Message msg = new Message();
-                    // msg.what = 100;
-                    // msg.setData(b);
-                    // mPlayerProgressHandler.sendMessage(msg);
-                    // }
-
-                }
-            } catch (IllegalArgumentException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (SecurityException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (IllegalStateException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-    }
-
-    /**
-     * 添加柱状频谱渲染
-     */
-    private void addBarGraphRenderers() {
-        Paint paint2 = new Paint();
-        paint2.setStrokeWidth(12f);
-        paint2.setAntiAlias(true);
-        paint2.setColor(Color.argb(240, 172, 175, 64));
-        // BarGraphRenderer barGraphRendererTop = new BarGraphRenderer(4,
-        // paint2, false);
-        CircleBarRenderer barGraphRendererTop = new CircleBarRenderer(paint2, 4);
-        mVisualView.clearRenderers();
-        mVisualView.addRenderer(barGraphRendererTop);
+        mPresenter.onActivityResult(requestCode, resultCode, data);
+//        if (resultCode == RESULT_CANCELED) {
+//            return;
+//        }
+//        // 文件选择返回结果
+//        if (resultCode == RESULT_OK && requestCode == REQUEST_CODE) {
+//            mSelMusicPath = data
+//                    .getStringExtra(FileChooserActivity.EXTRA_FILE_CHOOSER);
+//            try {
+//                if (!TextUtils.isEmpty(mSelMusicPath)) {
+//                    mPlaySeekBar.setSelectedMinValue(0);
+//                    mPlaySeekBar.setSelectedCurValue(0);
+//                    mChangStatusHandler.sendEmptyMessage(STATUS_PAUSE);
+//
+//                    mPresenter.pause();
+//                    mPresenter.reset();
+//                    mPresenter.setDataSource(mSelMusicPath);
+//                    mPresenter.prepare();
+//                    mPlaySeekBar.setAbsoluteMaxValue(mPresenter
+//                            .getDuration());
+//                    if (ContextCompat.checkSelfPermission(getActivity(), android.Manifest.permission.RECORD_AUDIO)
+//                            != PackageManager.PERMISSION_GRANTED) {
+//                        ActivityCompat.requestPermissions(getActivity(), new String[]{
+//                                android.Manifest.permission.RECORD_AUDIO}, 1);
+//                    } else
+//                        mVisualView.link(mPresenter.getMediaPlayer());
+//                    addBarGraphRenderers();
+//                    // String albumPic = SystemTools.getImage(mSelMusicPath,
+//                    // PlayerMainActivity.this);
+//                    // Toast.makeText(PlayerMainActivity.this, "path:"+albumPic,
+//                    // Toast.LENGTH_LONG).show();
+//                    // if(albumPic!=null){
+//                    // Bundle b = new Bundle();
+//                    // b.putString("setPIC", albumPic);
+//                    // Message msg = new Message();
+//                    // msg.what = 100;
+//                    // msg.setData(b);
+//                    // mPlayerProgressHandler.sendMessage(msg);
+//                    // }
+//
+//                }
+//            } catch (IllegalArgumentException e) {
+//                // TODO Auto-generated catch block
+//                e.printStackTrace();
+//            } catch (SecurityException e) {
+//                // TODO Auto-generated catch block
+//                e.printStackTrace();
+//            } catch (IllegalStateException e) {
+//                // TODO Auto-generated catch block
+//                e.printStackTrace();
+//            }
+//        }
     }
 
     /**
@@ -784,10 +839,10 @@ public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresent
      */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if(requestCode==1&&grantResults[0]== PackageManager.PERMISSION_GRANTED){
+        if (requestCode == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-        }else {
-            Toast.makeText(getActivity(),"用户拒绝了权限",Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getActivity(), "用户拒绝了权限", Toast.LENGTH_SHORT).show();
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
@@ -795,15 +850,8 @@ public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresent
     @Override
     public void onStop() {
         super.onStop();
-        myMediaPlayer.pause();
+        mPresenter.pause();
         mPlayerProgressHandler.removeMessages(UPDATE_PLAY_PROGRESS);
-//        if(ContextCompat.checkSelfPermission(getActivity(), android.Manifest.permission.RECORD_AUDIO)
-//                != PackageManager.PERMISSION_GRANTED){
-//            ActivityCompat.requestPermissions(getActivity(),new String[]{
-//                    android.Manifest.permission.RECORD_AUDIO},1);
-//        }
-//        else
-//            mVisualView.setEnabled(false);
         mChangStatusHandler.sendEmptyMessage(STATUS_PAUSE);
     }
 }

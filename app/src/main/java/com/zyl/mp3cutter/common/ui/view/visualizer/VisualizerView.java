@@ -187,7 +187,7 @@ public void setEnabled(boolean enabled){
   boolean mFlash = false;
 
   /**
-   * Call this to make the visualizer flash. Useful for flashing at the start
+   * Call this to make the visualizer flash. Useful for flashing at the play
    * of a song/loop etc...
    */
   public void flash() {
