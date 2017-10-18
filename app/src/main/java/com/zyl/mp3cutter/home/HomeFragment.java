@@ -5,22 +5,14 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.drawable.BitmapDrawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.Message;
-import android.os.SystemClock;
 import android.support.annotation.NonNull;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -44,15 +36,9 @@ import com.zyl.mp3cutter.common.utils.FileUtils;
 import com.zyl.mp3cutter.common.utils.SystemTools;
 import com.zyl.mp3cutter.common.utils.TimeUtils;
 import com.zyl.mp3cutter.common.utils.ViewUtils;
-import com.zyl.mp3cutter.mp3fenge.bean.Mp3Fenge;
 import com.zyl.mp3cutter.ui.FileChooserActivity;
 
-import java.io.File;
-import java.util.concurrent.TimeUnit;
-
-import io.reactivex.Observable;
-import io.reactivex.Observer;
-import io.reactivex.disposables.Disposable;
+import static com.zyl.mp3cutter.common.constant.CommonConstant.RING_FOLDER;
 
 /**
  * MVPPlugin
@@ -64,36 +50,19 @@ public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresent
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    private OnFragmentInteractionListener mListener;
 
     public HomeFragment() {
         // Required empty public constructor
     }
-
-
     private ImageButton mPlayBtn, mCutterBtn, mSpeedBtn, mBackwardBtn;
-
-    private TextView mPlayerTimeTV, mPlayerDurationTV;
+    private TextView mPlayerStartTimeTV, mPlayerEndTimeTV;
     private VisualizerView mVisualView;
-    private RelativeLayout mRlMain;
     private RangeSeekBar<Integer> mPlaySeekBar;
-    //    private MediaPlayer myMediaPlayer;
     private TextView mVoiceBtn, mChooseBtn;
     // intent返回动作
     private static final int REQUEST_CODE = 0;
-    // handler 处理
-    private int UPDATE_PLAY_PROGRESS = 0;
-    private int CUTTER_SUCCESS = 1;
-
-    // 播放状态
-    private int STATUS_PLAYING = 2;
-    private int STATUS_PAUSE = 3;
-    private String mSelMusicPath;
-    // 频谱对象
-    // private Visualizer mVisualizer;
     private boolean mIsTouching;
     private RelativeLayout rl_player_voice;
     // 音量面板显示和隐藏动画
@@ -103,12 +72,6 @@ public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresent
     private SeekBar mVoiceSeekBar;
     // 获取系统音频对象
     private AudioManager mAudioManager;
-    // 铃声地址
-    private static String RING_FOLDER = "/sdcard/MUSIC_CUTTER";
-    // 铃声格式
-    private static final String RING_FORMAT = ".mp3";
-    // 铃声路径
-    private static final String RANG_PATH = "RANG_PATH";
 
     /**
      * 声音滑块滑动事件
@@ -132,54 +95,6 @@ public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresent
         }
     };
 
-
-    private Handler mChangStatusHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            if (msg.what == STATUS_PLAYING) {
-                mPlayBtn.setBackgroundResource(R.drawable.selector_pause_btn);
-            } else if (msg.what == STATUS_PAUSE) {
-                mPlayBtn.setBackgroundResource(R.drawable.selector_play_btn);
-            }
-        }
-    };
-
-    private Handler mPlayerProgressHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            if (msg.what == UPDATE_PLAY_PROGRESS) {
-                mPlaySeekBar.setSelectedCurValue(mPresenter.getCurPosition());
-                mPlayerTimeTV.setText(TimeUtils.formatSecondTime(mPresenter.getCurPosition()));
-                mPlayerDurationTV.setText(TimeUtils.formatSecondTime(mPresenter.getCurPosition()));
-                Number maxValue = mPlaySeekBar.getSelectedMaxValue();
-                // 播放完暂停处理
-                if (mPresenter.getCurPosition() >= maxValue.intValue()) {
-                    mPresenter.pause();
-                    mChangStatusHandler.sendEmptyMessage(STATUS_PAUSE);
-                }
-                // 消息处理
-                if (mPresenter.getCurPosition() >= mPresenter.getCurPosition()
-                        || mPresenter.getCurPosition() >= maxValue
-                        .intValue())
-                    mPlayerProgressHandler.removeMessages(UPDATE_PLAY_PROGRESS);
-                else
-                    mPlayerProgressHandler
-                            .sendEmptyMessage(UPDATE_PLAY_PROGRESS);
-            } else if (msg.what == CUTTER_SUCCESS) {
-                Bundle b = msg.getData();
-                String path = b.getString(RANG_PATH);
-                showCutterSuccessDialog(path);
-            } else if (msg.what == 100) {
-                Bundle b = msg.getData();
-                String albumPic = b.getString("setPIC") + ".png";
-                Bitmap bitmap = BitmapFactory.decodeFile(albumPic);
-                BitmapDrawable bmpDraw = new BitmapDrawable(bitmap);
-                mRlMain.setBackgroundDrawable(bmpDraw);
-            }
-            super.handleMessage(msg);
-        }
-    };
-
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -188,7 +103,6 @@ public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresent
      * @param param2 Parameter 2.
      * @return A new instance of fragment MusicPlayFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static HomeFragment newInstance(String param1, String param2) {
         HomeFragment fragment = new HomeFragment();
         Bundle args = new Bundle();
@@ -230,37 +144,13 @@ public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresent
         mCutterBtn = (ImageButton) view.findViewById(R.id.btn_cutter_sure);
         mSpeedBtn = (ImageButton) view.findViewById(R.id.btn_speed);
         mBackwardBtn = (ImageButton) view.findViewById(R.id.btn_backward);
-        mPlayerTimeTV = (TextView) view.findViewById(R.id.tv_player_playing_time);
-        mPlayerDurationTV = (TextView) view.findViewById(R.id.tv_player_playering_duration);
+        mPlayerStartTimeTV = (TextView) view.findViewById(R.id.tv_player_playing_time);
+        mPlayerEndTimeTV = (TextView) view.findViewById(R.id.tv_player_playering_end);
         rl_player_voice = (RelativeLayout) view.findViewById(R.id.rl_player_voice);
         mVoiceBtn = (TextView) view.findViewById(R.id.btn_player_voice);
         mVoiceSeekBar = (SeekBar) view.findViewById(R.id.sb_player_voice);
-        // mResetBtn = (ImageButton) findViewById(R.id.btn_reset);
         // 频谱视图
         mVisualView = (VisualizerView) view.findViewById(R.id.visual_view);
-        mRlMain = (RelativeLayout) view.findViewById(R.id.rl_main);
-        Observable.interval(0,5, TimeUnit.SECONDS).subscribe(new Observer<Long>() {
-
-            @Override
-            public void onError(Throwable e) {
-
-            }
-
-            @Override
-            public void onComplete() {
-
-            }
-
-            @Override
-            public void onSubscribe(Disposable d) {
-
-            }
-
-            @Override
-            public void onNext(Long aLong) {
-                Log.d("HomeFragment", "------>along："+aLong+" time:"+ SystemClock.elapsedRealtime());
-            }
-        });
     }
 
 
@@ -269,7 +159,6 @@ public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresent
         mPlaySeekBar.setSelectedMinValue(0);
         mPlaySeekBar.setSelectedMaxValue(100);
         mPlaySeekBar.setSelectedCurValue(0);
-        mPlaySeekBar.setEnabled(false);
         // 获取系统音乐音量
         mAudioManager = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
         // 获取系统音乐当前音量
@@ -286,23 +175,9 @@ public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresent
     }
 
     /**
-     * 判断当前是否有音乐
-     */
-    private boolean isSelMusice() {
-        if (TextUtils.isEmpty(mSelMusicPath)) {
-            Toast.makeText(getActivity(),
-                    getString(R.string.dialog_cutter_warning_sel),
-                    Toast.LENGTH_SHORT).show();
-            return false;
-        }
-        return true;
-    }
-
-
-    /**
      * 显示剪切成功窗口
      */
-    public void showCutterSuccessDialog(final String path) {
+    private void showCutterSuccessDialog(final String path) {
         new XfDialog.Builder(getActivity())
                 .setTitle(getString(R.string.dialog_title))
                 .setMessage(getString(R.string.dialog_cutter_success))
@@ -329,7 +204,6 @@ public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresent
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
     }
 
     @Override
@@ -371,21 +245,9 @@ public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresent
     }
 
     @Override
-    public void refreshSeekBarForValue(int value) {
-        mPlaySeekBar.setSelectedCurValue(value);
-        mPlayerTimeTV.setText(TimeUtils.formatSecondTime(value));
-        mPlayerDurationTV.setText(TimeUtils.formatSecondTime(value));
-    }
-
-    @Override
-    public void setSeekbarValue(int selmin, int selcur){
+    public void setSeekbarValue(int selmin, int selcur) {
         mPlaySeekBar.setSelectedMinValue(selmin);
         mPlaySeekBar.setSelectedCurValue(selcur);
-    }
-
-    @Override
-    public void setSeekbarMax(int max){
-        mPlaySeekBar.setAbsoluteMaxValue(max);
     }
 
     @Override
@@ -409,6 +271,22 @@ public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresent
         mVisualView.addRenderer(barGraphRendererTop);
     }
 
+    @Override
+    public void setPlayCurValue(int value) {
+        mPlayerStartTimeTV.setText(TimeUtils.formatSecondTime(value));
+    }
+
+    @Override
+    public void setDuration(int value) {
+        mPlaySeekBar.setAbsoluteMaxValue(value);
+        mPlayerEndTimeTV.setText(TimeUtils.formatSecondTime(value));
+    }
+
+    @Override
+    public void doCutterSucc(String path) {
+        showCutterSuccessDialog(path);
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -428,7 +306,7 @@ public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresent
     /**
      * 剪切提示弹出窗口
      */
-    private void showCutterDialog() {
+    private void showCutterPromptDialog() {
         final Number minNumber = mPlaySeekBar.getSelectedMinValue();
         final Number maxNumber = mPlaySeekBar.getSelectedMaxValue();
         if (maxNumber.intValue() <= minNumber.intValue()) {
@@ -452,43 +330,13 @@ public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresent
                                                 int which) {
                                 final String newFileNameStr = et_fileName
                                         .getText().toString().trim();
-                                new Thread() {
-                                    public void run() {
-                                        try {
-                                            cutterRingtone(newFileNameStr,
-                                                    minNumber.intValue(),
-                                                    maxNumber.intValue());
-                                        } catch (Exception e) {
-                                            // TODO: handle exception
-                                        }
-                                    }
-                                }.start();
-                                dialog.cancel();
+                                mPresenter.doCutter(newFileNameStr, minNumber.intValue(),
+                                        maxNumber.intValue());
                                 dialog.dismiss();
                             }
                         })
                 .setNegativeButton(getString(R.string.dialog_btn_cancel), null)
                 .create().show();
-    }
-
-    /**
-     * 剪切音乐
-     */
-    private void cutterRingtone(String fileName, int minValue, int maxValue) {
-        Mp3Fenge helper = new Mp3Fenge(new File(mSelMusicPath));
-        if (FileUtils.bFolder(RING_FOLDER)) {
-            if (!TextUtils.isEmpty(fileName)) {
-                String rangPath = RING_FOLDER + "/" + fileName + RING_FORMAT;
-                if (helper.generateNewMp3ByTime(new File(rangPath), minValue, maxValue)) {
-                    Message msg = new Message();
-                    msg.what = CUTTER_SUCCESS;
-                    Bundle b = new Bundle();
-                    b.putString(RANG_PATH, rangPath);
-                    msg.setData(b);
-                    mPlayerProgressHandler.sendMessage(msg);
-                }
-            }
-        }
     }
 
     /**
@@ -530,42 +378,8 @@ public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresent
             @Override
             public void onClick(View v) {
                 mPresenter.playToggle(getActivity());
-//                if (mPresenter.isPlaying()) {
-//                    // 暂停
-//                    mPresenter.pause();
-//                    mPlayerProgressHandler.removeMessages(UPDATE_PLAY_PROGRESS);
-//                    if (ContextCompat.checkSelfPermission(getActivity(), android.Manifest.permission.RECORD_AUDIO)
-//                            != PackageManager.PERMISSION_GRANTED) {
-//                        ActivityCompat.requestPermissions(getActivity(), new String[]{
-//                                android.Manifest.permission.RECORD_AUDIO}, 1);
-//                    } else
-//                        mVisualView.setEnabled(false);
-//                    mChangStatusHandler.sendEmptyMessage(STATUS_PAUSE);
-//                } else {
-//                    // 播放
-//                    if (TextUtils.isEmpty(mSelMusicPath)) {
-//                        Toast.makeText(getActivity(),
-//                                getString(R.string.dialog_cutter_warning_sel),
-//                                Toast.LENGTH_SHORT).show();
-//                        return;
-//                    }
-//                    mChangStatusHandler.sendEmptyMessage(STATUS_PLAYING);
-//                    Number tmpNumber = mPlaySeekBar.getSelectedCurValue();
-//                    mPresenter.seekTo(tmpNumber.intValue());
-//                    mPresenter.play();
-//                    if (ContextCompat.checkSelfPermission(getActivity(), android.Manifest.permission.RECORD_AUDIO)
-//                            != PackageManager.PERMISSION_GRANTED) {
-//                        ActivityCompat.requestPermissions(getActivity(), new String[]{
-//                                android.Manifest.permission.RECORD_AUDIO}, 1);
-//                    } else
-//                        mVisualView.setEnabled(true);
-//                    Message message = new Message();
-//                    message.what = UPDATE_PLAY_PROGRESS;
-//                    mPlayerProgressHandler.sendMessage(message);
-//                }
-//
-//            }
-        }});
+            }
+        });
 
         /**
          * 剪切音乐
@@ -573,8 +387,8 @@ public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresent
         mCutterBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isSelMusice())
-                    showCutterDialog();
+                if (mPresenter.isSelectedMp3(getActivity()))
+                    showCutterPromptDialog();
             }
         });
 
@@ -699,7 +513,7 @@ public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresent
             public void onClickMinThumb(Number max, Number min, Number cur) {
                 if (min.intValue() >= cur.intValue()) {
                     mPresenter.pause();
-                    mChangStatusHandler.sendEmptyMessage(STATUS_PAUSE);
+                    setPlayBtnStatus(false);
                 }
             }
 
@@ -731,7 +545,7 @@ public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresent
             public void onUpMinThumb(Number max, Number min, Number cur) {
                 if (min.intValue() >= cur.intValue()) {
                     mPresenter.play();
-                    mChangStatusHandler.sendEmptyMessage(STATUS_PLAYING);
+                    setPlayBtnStatus(true);
                 }
             }
 
@@ -757,21 +571,6 @@ public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresent
                     }
 
                 });
-
-        /**
-         * 重置功能
-         */
-        // mResetBtn.setOnClickListener(new OnClickListener() {
-        //
-        // @Override
-        // public void onClick(View v) {
-        // // TODO Auto-generated method stub
-        // if(isSelMusice()){
-        // mPlaySeekBar.setSelectedMinValue(0);
-        // mPlaySeekBar.setSelectedMaxValue(myMediaPlayer.getDuration());
-        // }
-        // }
-        // });
     }
 
 
@@ -780,57 +579,6 @@ public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresent
      */
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         mPresenter.onActivityResult(requestCode, resultCode, data);
-//        if (resultCode == RESULT_CANCELED) {
-//            return;
-//        }
-//        // 文件选择返回结果
-//        if (resultCode == RESULT_OK && requestCode == REQUEST_CODE) {
-//            mSelMusicPath = data
-//                    .getStringExtra(FileChooserActivity.EXTRA_FILE_CHOOSER);
-//            try {
-//                if (!TextUtils.isEmpty(mSelMusicPath)) {
-//                    mPlaySeekBar.setSelectedMinValue(0);
-//                    mPlaySeekBar.setSelectedCurValue(0);
-//                    mChangStatusHandler.sendEmptyMessage(STATUS_PAUSE);
-//
-//                    mPresenter.pause();
-//                    mPresenter.reset();
-//                    mPresenter.setDataSource(mSelMusicPath);
-//                    mPresenter.prepare();
-//                    mPlaySeekBar.setAbsoluteMaxValue(mPresenter
-//                            .getDuration());
-//                    if (ContextCompat.checkSelfPermission(getActivity(), android.Manifest.permission.RECORD_AUDIO)
-//                            != PackageManager.PERMISSION_GRANTED) {
-//                        ActivityCompat.requestPermissions(getActivity(), new String[]{
-//                                android.Manifest.permission.RECORD_AUDIO}, 1);
-//                    } else
-//                        mVisualView.link(mPresenter.getMediaPlayer());
-//                    addBarGraphRenderers();
-//                    // String albumPic = SystemTools.getImage(mSelMusicPath,
-//                    // PlayerMainActivity.this);
-//                    // Toast.makeText(PlayerMainActivity.this, "path:"+albumPic,
-//                    // Toast.LENGTH_LONG).show();
-//                    // if(albumPic!=null){
-//                    // Bundle b = new Bundle();
-//                    // b.putString("setPIC", albumPic);
-//                    // Message msg = new Message();
-//                    // msg.what = 100;
-//                    // msg.setData(b);
-//                    // mPlayerProgressHandler.sendMessage(msg);
-//                    // }
-//
-//                }
-//            } catch (IllegalArgumentException e) {
-//                // TODO Auto-generated catch block
-//                e.printStackTrace();
-//            } catch (SecurityException e) {
-//                // TODO Auto-generated catch block
-//                e.printStackTrace();
-//            } catch (IllegalStateException e) {
-//                // TODO Auto-generated catch block
-//                e.printStackTrace();
-//            }
-//        }
     }
 
     /**
@@ -851,7 +599,6 @@ public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresent
     public void onStop() {
         super.onStop();
         mPresenter.pause();
-        mPlayerProgressHandler.removeMessages(UPDATE_PLAY_PROGRESS);
-        mChangStatusHandler.sendEmptyMessage(STATUS_PAUSE);
+        setPlayBtnStatus(false);
     }
 }

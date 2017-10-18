@@ -129,12 +129,12 @@
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
                 android:text="00:00"
-                android:textColor="@android:color/white"
-                android:textSize="12dp"
+                android:textColor="#000000"
+                android:textSize="10dp"
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/tv_player_playering_duration"
+                android:id="@+id/tv_player_playering_end"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
@@ -142,8 +142,8 @@
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
                 android:text="00:00"
-                android:textColor="@android:color/white"
-                android:textSize="12dp"
+                android:textColor="#000000"
+                android:textSize="10dp"
                 android:textStyle="bold" />
 
             <com.zyl.mp3cutter.common.ui.view.RangeSeekBar
@@ -151,6 +151,8 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
+                android:layout_toRightOf="@id/tv_player_playing_time"
+                android:layout_toLeftOf="@id/tv_player_playering_end"
                 android:progressDrawable="@mipmap/seekbar_bg"
                 rangeseekbar:max="100.0"
                 rangeseekbar:min="0.0"

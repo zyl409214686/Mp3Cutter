@@ -1,6 +1,7 @@
 package com.zyl.mp3cutter.home;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
@@ -11,18 +12,26 @@ import android.widget.Toast;
 
 import com.zyl.mp3cutter.R;
 import com.zyl.mp3cutter.common.mvp.BasePresenterImpl;
+import com.zyl.mp3cutter.common.utils.FileUtils;
+import com.zyl.mp3cutter.mp3fenge.bean.Mp3Fenge;
 import com.zyl.mp3cutter.ui.FileChooserActivity;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
+import static com.zyl.mp3cutter.common.constant.CommonConstant.RING_FOLDER;
+import static com.zyl.mp3cutter.common.constant.CommonConstant.RING_FORMAT;
 
 /**
  * MVPPlugin
@@ -43,14 +52,15 @@ public class HomePresenter extends BasePresenterImpl<HomeContract.View> implemen
     private Consumer mUpdateProgressConsumer = new Consumer() {
         @Override
         public void accept(Object o) throws Exception {
-            mView.refreshSeekBarForValue(getCurPosition());
+            if(mView==null)
+                return;
+            mView.setPlayCurValue(getCurPosition());
             Number maxValue = mView.getSeekbarMaxValue();
             // 播放完暂停处理
             int curPosition = getCurPosition();
             if (curPosition >= maxValue.intValue()) {
                 pause();
                 mView.setPlayBtnStatus(false);
-//                mChangStatusHandler.sendEmptyMessage(STATUS_PAUSE);
             }
             // 消息处理
             if (getCurPosition() >= maxValue
@@ -59,15 +69,39 @@ public class HomePresenter extends BasePresenterImpl<HomeContract.View> implemen
                     mDisposable.dispose();
                     mDisposable = null;
                 }
-//                mPlayerProgressHandler.removeMessages(UPDATE_PLAY_PROGRESS);
             }
-//            else {
-//                mDisposable = mUpdateProgressObservable.observeOn(AndroidSchedulers.mainThread()).subscribe(mUpdateProgressConsumer);
-////                mPlayerProgressHandler
-////                        .sendEmptyMessage(UPDATE_PLAY_PROGRESS);
-//            }
         }
     };
+
+    /**
+     * 剪切音乐
+     */
+    @Override
+    public void doCutter(final String fileName, final int minValue, final int maxValue) {
+        Observable.create(new ObservableOnSubscribe() {
+            @Override
+            public void subscribe(ObservableEmitter e) throws Exception {
+                Mp3Fenge helper = new Mp3Fenge(new File(mSelMusicPath));
+                if (FileUtils.bFolder(RING_FOLDER)) {
+                    if (!TextUtils.isEmpty(fileName)) {
+                        String cutterPath = RING_FOLDER + "/" + fileName + RING_FORMAT;
+                        if (helper.generateNewMp3ByTime(new File(cutterPath), minValue, maxValue)) {
+                            e.onNext(cutterPath);
+                        }
+                    }
+                }
+            }
+        }).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.newThread())
+                .subscribe(new Consumer() {
+            @Override
+            public void accept(Object o) throws Exception {
+                String cutterPath = (String)o;
+                if(mView!=null){
+                    mView.doCutterSucc(cutterPath);
+                }
+            }
+        });
+    }
 
     @Override
     public void playToggle(Activity activity) {
@@ -78,7 +112,6 @@ public class HomePresenter extends BasePresenterImpl<HomeContract.View> implemen
                 mDisposable.dispose();
                 mDisposable = null;
             }
-//            mPlayerProgressHandler.removeMessages(UPDATE_PLAY_PROGRESS);
             if(ContextCompat.checkSelfPermission(activity, android.Manifest.permission.RECORD_AUDIO)
                     != PackageManager.PERMISSION_GRANTED){
                 ActivityCompat.requestPermissions(activity,new String[]{
@@ -107,9 +140,6 @@ public class HomePresenter extends BasePresenterImpl<HomeContract.View> implemen
             else {
                 mView.setVisualizerViewEnaled(true);
             }
-//            Message message = new Message();
-//            message.what = UPDATE_PLAY_PROGRESS;
-//            mPlayerProgressHandler.sendMessage(message);
             mDisposable = mUpdateProgressObservable.observeOn(AndroidSchedulers.mainThread()).subscribe(mUpdateProgressConsumer);
         }
 
@@ -173,6 +203,21 @@ public class HomePresenter extends BasePresenterImpl<HomeContract.View> implemen
         return mMediaPlayer.getCurrentPosition();
     }
 
+
+    /**
+     * 判断当前是否已选择mp3
+     */
+    @Override
+    public boolean isSelectedMp3(Context context) {
+        if (TextUtils.isEmpty(mSelMusicPath)) {
+            Toast.makeText(context,
+                    context.getString(R.string.dialog_cutter_warning_sel),
+                    Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        return true;
+    }
+
     /**
      * 选择文件返回
      */
@@ -188,14 +233,12 @@ public class HomePresenter extends BasePresenterImpl<HomeContract.View> implemen
             try {
                 if (!TextUtils.isEmpty(mSelMusicPath)) {
                     mView.setSeekbarValue(0, 0);
-//                    mChangStatusHandler.sendEmptyMessage(STATUS_PAUSE);
                     mView.setPlayBtnStatus(false);
-
                     pause();
                     reset();
                     setDataSource(mSelMusicPath);
                     prepare();
-                    mView.setSeekbarMax(getDuration());
+                    mView.setDuration(getDuration());
                     if (ContextCompat.checkSelfPermission(mView.getContext(), android.Manifest.permission.RECORD_AUDIO)
                             != PackageManager.PERMISSION_GRANTED) {
                         ActivityCompat.requestPermissions((Activity) mView.getContext(), new String[]{
