@@ -13,12 +13,14 @@ import android.widget.Toast;
 import com.zyl.mp3cutter.R;
 import com.zyl.mp3cutter.common.mvp.BasePresenterImpl;
 import com.zyl.mp3cutter.common.utils.FileUtils;
-import com.zyl.mp3cutter.mp3fenge.bean.Mp3Fenge;
+import com.zyl.mp3cutter.mp3separate.bean.Mp3Fenge;
 import com.zyl.mp3cutter.ui.FileChooserActivity;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
+
+import javax.inject.Inject;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
@@ -34,17 +36,19 @@ import static com.zyl.mp3cutter.common.constant.CommonConstant.RING_FOLDER;
 import static com.zyl.mp3cutter.common.constant.CommonConstant.RING_FORMAT;
 
 /**
- * MVPPlugin
- *  邮箱 784787081@qq.com
+ * Description: degger2 module类
+ * Created by zouyulong on 2017/10/22.
+ * Person in charge :  zouyulong
  */
-
 public class HomePresenter extends BasePresenterImpl<HomeContract.View> implements HomeContract.Presenter{
-    private MediaPlayer mMediaPlayer;
-    private String mSelMusicPath;
+    @Inject
+    public MediaPlayer mMediaPlayer;
+    private String mSelMusicPath = "";
     private static final int REQUEST_CODE = 0;
 
     public HomePresenter() {
-        mMediaPlayer = new MediaPlayer();
+//        mMediaPlayer = new MediaPlayer();
+        DaggerHomeComponent.builder().build().inject(this);
     }
 
     private Disposable mDisposable;

@@ -1,4 +1,4 @@
-package com.zyl.mp3cutter.mp3fenge.util;
+package com.zyl.mp3cutter.mp3separate.util;
 
 import java.io.BufferedOutputStream;
 import java.io.File;

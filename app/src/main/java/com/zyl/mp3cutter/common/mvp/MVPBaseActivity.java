@@ -10,7 +10,6 @@ import java.lang.reflect.ParameterizedType;
 
 /**
  * MVPPlugin
- *  邮箱 784787081@qq.com
  */
 
 public abstract class MVPBaseActivity<V extends BaseView,T extends BasePresenterImpl<V>> extends AppCompatActivity implements BaseView{

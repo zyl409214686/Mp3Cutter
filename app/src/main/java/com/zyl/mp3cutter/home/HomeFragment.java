@@ -39,12 +39,11 @@ import com.zyl.mp3cutter.common.utils.ViewUtils;
 import com.zyl.mp3cutter.ui.FileChooserActivity;
 
 import static com.zyl.mp3cutter.common.constant.CommonConstant.RING_FOLDER;
-
 /**
- * MVPPlugin
- * 邮箱 784787081@qq.com
+ * Description: 主页 fragment类
+ * Created by zouyulong on 2017/10/22.
+ * Person in charge :  zouyulong
  */
-
 public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresenter> implements HomeContract.View {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";

@@ -71,8 +71,6 @@ public class FileChooserAdapter extends BaseAdapter {
 		}
 
 		Music fileInfo = getItem(position);
-		// TODO
-
 		holder.tvFileName.setText(fileInfo.getFilename());
 
 //		if (fileInfo.isDirectory()) {

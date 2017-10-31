@@ -9,8 +9,9 @@ import com.zyl.mp3cutter.common.mvp.BasePresenter;
 import com.zyl.mp3cutter.common.mvp.BaseView;
 
 /**
- * MVPPlugin
- * 邮箱 784787081@qq.com
+ * Description: mvp contract契约类
+ * Created by zouyulong on 2017/10/22.
+ * Person in charge :  zouyulong
  */
 
 public class HomeContract {

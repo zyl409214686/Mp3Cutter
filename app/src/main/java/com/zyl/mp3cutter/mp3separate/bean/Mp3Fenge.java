@@ -1,7 +1,7 @@
-package com.zyl.mp3cutter.mp3fenge.bean;
+package com.zyl.mp3cutter.mp3separate.bean;
 
-import com.zyl.mp3cutter.mp3fenge.util.FileUtil;
-import com.zyl.mp3cutter.mp3fenge.util.StringUtil;
+import com.zyl.mp3cutter.mp3separate.util.FileUtil;
+import com.zyl.mp3cutter.mp3separate.util.StringUtil;
 
 import org.jaudiotagger.audio.mp3.MP3AudioHeader;
 import org.jaudiotagger.audio.mp3.MP3File;

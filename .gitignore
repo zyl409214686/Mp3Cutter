@@ -8,3 +8,6 @@
 /build
 /captures
 .externalNativeBuild
+freeline_project_description.json
+freeline.py
+/freeline

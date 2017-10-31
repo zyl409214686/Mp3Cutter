@@ -2,7 +2,6 @@ package com.zyl.mp3cutter.common.mvp;
 
 /**
  * MVPPlugin
- *  邮箱 784787081@qq.com
  */
 
 public class BasePresenterImpl<V extends BaseView> implements BasePresenter<V>{
