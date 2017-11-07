@@ -1,4 +1,4 @@
-package com.zyl.mp3cutter.home;
+package com.zyl.mp3cutter.home.presenter;
 
 import android.app.Activity;
 import android.content.Context;
@@ -15,7 +15,7 @@ import com.zyl.mp3cutter.common.mvp.BaseView;
  */
 
 public class HomeContract {
-    interface View extends BaseView {
+    public interface View extends BaseView {
         void setVisualizerViewEnaled(boolean enabled);
 
         int getSeekbarCurValue();

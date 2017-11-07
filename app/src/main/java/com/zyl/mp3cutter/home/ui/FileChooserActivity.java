@@ -1,8 +1,9 @@
-package com.zyl.mp3cutter.ui;
+package com.zyl.mp3cutter.home.ui;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -16,8 +17,8 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.zyl.mp3cutter.R;
-import com.zyl.mp3cutter.entity.Music;
-import com.zyl.mp3cutter.ui.adapter.FileChooserAdapter;
+import com.zyl.mp3cutter.databinding.ActivityFilechooserShowBinding;
+import com.zyl.mp3cutter.home.bean.MusicInfo;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ public class FileChooserActivity extends Activity {
 
 	private String mSdcardRootPath;
 	private String mLastFilePath;
-	private ArrayList<Music> mFileLists = new ArrayList<Music>();
+	private ArrayList<MusicInfo> mFileLists = new ArrayList<MusicInfo>();
 	private FileChooserAdapter mAdatper;
 	public static final String EXTRA_FILE_CHOOSER = "file_chooser";
 	private ProgressDialog dialog;
@@ -43,7 +44,7 @@ public class FileChooserActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		setContentView(R.layout.activity_filechooser_show);
+		ActivityFilechooserShowBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_filechooser_show);
 
 		mSdcardRootPath = Environment.getExternalStorageDirectory()
 				.getAbsolutePath();
@@ -100,7 +101,7 @@ public class FileChooserActivity extends Activity {
 		// mTvPath.setText(mLastFilePath);
 
 		if (mFileLists == null)
-			mFileLists = new ArrayList<Music>();
+			mFileLists = new ArrayList<MusicInfo>();
 		// if(!mFileLists.isEmpty())
 		// mFileLists.clear() ;
 
@@ -123,7 +124,7 @@ public class FileChooserActivity extends Activity {
 			if (fileInfo.isDirectory())
 				updateFileItems(fileInfo.getFilePath());
 			else if (fileInfo.isMUSICFile()) {
-				Music music = new Music();
+				MusicInfo music = new MusicInfo();
 				music.setFilename(fileInfo.getFileName());
 				music.setFilepath(fileInfo.getFilePath());
 				mFileLists.add(music);
@@ -156,7 +157,7 @@ public class FileChooserActivity extends Activity {
 	private OnItemClickListener mItemClickListener = new OnItemClickListener() {
 		public void onItemClick(AdapterView<?> adapterView, View view,
 				int position, long id) {
-			Music fileInfo = (Music) (((FileChooserAdapter) adapterView
+			MusicInfo fileInfo = (MusicInfo) (((FileChooserAdapter) adapterView
 					.getAdapter()).getItem(position));
 			// if(fileInfo.isDirectory())
 			// updateFileItems(fileInfo.getFilePath()) ;

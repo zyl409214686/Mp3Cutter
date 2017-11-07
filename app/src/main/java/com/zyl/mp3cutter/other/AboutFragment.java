@@ -1,14 +1,13 @@
-package com.zyl.mp3cutter.ui;
+package com.zyl.mp3cutter.other;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.zyl.mp3cutter.R;
 
@@ -16,12 +15,12 @@ import com.zyl.mp3cutter.R;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link FolderFragment.OnFragmentInteractionListener} interface
+ * {@link AboutFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link FolderFragment#newInstance} factory method to
+ * Use the {@link AboutFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class FolderFragment extends Fragment {
+public class AboutFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -32,8 +31,7 @@ public class FolderFragment extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
-
-    public FolderFragment() {
+    public AboutFragment() {
         // Required empty public constructor
     }
 
@@ -43,11 +41,11 @@ public class FolderFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment FolderFragment.
+     * @return A new instance of fragment AboutFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static FolderFragment newInstance(String param1, String param2) {
-        FolderFragment fragment = new FolderFragment();
+    public static AboutFragment newInstance(String param1, String param2) {
+        AboutFragment fragment = new AboutFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -62,28 +60,17 @@ public class FolderFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-        choosePhoto(getActivity(), 10010);
-    }
 
-    /**
-     * 选择相册图片（调用系统方法）
-     *
-     * @param activity    当前页面
-     * @param requestCode 请求码
-     */
-    public void choosePhoto(Activity activity, int requestCode) {
-        // 从相簿中获得照片（自定义）
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType("audio/*");
-        activity.startActivityForResult(intent, requestCode);
+        Toast.makeText(getActivity(), "test222", Toast.LENGTH_LONG).show();
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_folder, container, false);
+        View view = inflater.inflate(R.layout.fragment_about, container, false);
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event

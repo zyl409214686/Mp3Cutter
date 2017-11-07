@@ -1,4 +1,4 @@
-package com.zyl.mp3cutter.home;
+package com.zyl.mp3cutter.home.di;
 
 import android.media.MediaPlayer;
 

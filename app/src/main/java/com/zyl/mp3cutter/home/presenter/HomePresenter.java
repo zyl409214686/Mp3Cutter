@@ -1,4 +1,4 @@
-package com.zyl.mp3cutter.home;
+package com.zyl.mp3cutter.home.presenter;
 
 import android.app.Activity;
 import android.content.Context;
@@ -13,8 +13,9 @@ import android.widget.Toast;
 import com.zyl.mp3cutter.R;
 import com.zyl.mp3cutter.common.mvp.BasePresenterImpl;
 import com.zyl.mp3cutter.common.utils.FileUtils;
+import com.zyl.mp3cutter.home.di.DaggerHomeComponent;
+import com.zyl.mp3cutter.home.ui.FileChooserActivity;
 import com.zyl.mp3cutter.mp3separate.bean.Mp3Fenge;
-import com.zyl.mp3cutter.ui.FileChooserActivity;
 
 import java.io.File;
 import java.io.IOException;

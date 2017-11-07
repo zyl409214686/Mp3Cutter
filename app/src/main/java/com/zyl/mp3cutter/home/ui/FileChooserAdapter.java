@@ -1,4 +1,4 @@
-package com.zyl.mp3cutter.ui.adapter;
+package com.zyl.mp3cutter.home.ui;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -9,14 +9,14 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.zyl.mp3cutter.R;
-import com.zyl.mp3cutter.entity.Music;
+import com.zyl.mp3cutter.home.bean.MusicInfo;
 
 import java.util.ArrayList;
 
 
 public class FileChooserAdapter extends BaseAdapter {
 
-	private ArrayList<Music> data = new ArrayList<Music>();
+	private ArrayList<MusicInfo> data = new ArrayList<MusicInfo>();
 	private LayoutInflater mLayoutInflater = null;
 
 	private static ArrayList<String> MUSIC_SUFFIX = new ArrayList<String>();
@@ -32,7 +32,7 @@ public class FileChooserAdapter extends BaseAdapter {
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	}
 
-	public void setData(ArrayList<Music> data) {
+	public void setData(ArrayList<MusicInfo> data) {
 		this.data.clear();
 		this.data.addAll(data);
 	}
@@ -44,7 +44,7 @@ public class FileChooserAdapter extends BaseAdapter {
 	}
 
 	@Override
-	public Music getItem(int position) {
+	public MusicInfo getItem(int position) {
 		// TODO Auto-generated method stub
 		return data.get(position);
 	}
@@ -70,7 +70,7 @@ public class FileChooserAdapter extends BaseAdapter {
 			holder = (ViewHolder) convertView.getTag();
 		}
 
-		Music fileInfo = getItem(position);
+		MusicInfo fileInfo = getItem(position);
 		holder.tvFileName.setText(fileInfo.getFilename());
 
 //		if (fileInfo.isDirectory()) {

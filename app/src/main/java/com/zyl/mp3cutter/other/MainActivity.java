@@ -1,4 +1,4 @@
-package com.zyl.mp3cutter.ui;
+package com.zyl.mp3cutter.other;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -13,7 +13,7 @@ import android.widget.Toast;
 
 import com.jaeger.library.StatusBarUtil;
 import com.zyl.mp3cutter.R;
-import com.zyl.mp3cutter.home.HomeFragment;
+import com.zyl.mp3cutter.home.ui.HomeFragment;
 
 
 public class MainActivity extends AppCompatActivity {

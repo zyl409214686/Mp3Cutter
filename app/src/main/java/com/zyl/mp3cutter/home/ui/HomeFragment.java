@@ -1,10 +1,11 @@
-package com.zyl.mp3cutter.home;
+package com.zyl.mp3cutter.home.ui;
 
 
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.media.AudioManager;
@@ -36,7 +37,9 @@ import com.zyl.mp3cutter.common.utils.FileUtils;
 import com.zyl.mp3cutter.common.utils.SystemTools;
 import com.zyl.mp3cutter.common.utils.TimeUtils;
 import com.zyl.mp3cutter.common.utils.ViewUtils;
-import com.zyl.mp3cutter.ui.FileChooserActivity;
+import com.zyl.mp3cutter.databinding.FragmentHomeBinding;
+import com.zyl.mp3cutter.home.presenter.HomeContract;
+import com.zyl.mp3cutter.home.presenter.HomePresenter;
 
 import static com.zyl.mp3cutter.common.constant.CommonConstant.RING_FOLDER;
 /**
@@ -124,7 +127,9 @@ public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresent
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_home, container, false);
+        FragmentHomeBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false);
+//        View view = inflater.inflate(R.layout.fragment_home, container, false);
+        View view = binding.getRoot();
         initView(view);
         init();
         initListener();
