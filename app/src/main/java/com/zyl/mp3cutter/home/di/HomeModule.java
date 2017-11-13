@@ -1,6 +1,6 @@
 package com.zyl.mp3cutter.home.di;
 
-import android.media.MediaPlayer;
+import com.zyl.mp3cutter.home.presenter.HomeContract;
 
 import dagger.Module;
 import dagger.Provides;
@@ -12,8 +12,12 @@ import dagger.Provides;
  */
 @Module
 public class HomeModule {
+    private HomeContract.View view;
+    public HomeModule(HomeContract.View view){
+        this.view = view;
+    }
     @Provides
-    public MediaPlayer providerMediaPlayer(){
-        return new MediaPlayer();
+    public HomeContract.View providerHomeView(){
+        return this.view;
     }
 }

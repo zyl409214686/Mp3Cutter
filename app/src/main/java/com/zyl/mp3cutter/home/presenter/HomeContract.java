@@ -5,8 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 
-import com.zyl.mp3cutter.common.mvp.BasePresenter;
-import com.zyl.mp3cutter.common.mvp.BaseView;
+import com.zyl.mp3cutter.common.base.IBasePresenter;
+import com.zyl.mp3cutter.common.base.IBaseView;
 
 /**
  * Description: mvp contract契约类
@@ -15,7 +15,7 @@ import com.zyl.mp3cutter.common.mvp.BaseView;
  */
 
 public class HomeContract {
-    public interface View extends BaseView {
+    public interface View extends IBaseView {
         void setVisualizerViewEnaled(boolean enabled);
 
         int getSeekbarCurValue();
@@ -49,7 +49,7 @@ public class HomeContract {
         void doCutterSucc(String path);
     }
 
-    interface Presenter extends BasePresenter<View> {
+    interface Presenter extends IBasePresenter {
         void playToggle(Activity activity);
 
         void pause();

@@ -1,4 +1,4 @@
-package com.zyl.mp3cutter.common.mvp;
+package com.zyl.mp3cutter.common.base;
 
 import android.content.Context;
 
@@ -6,6 +6,6 @@ import android.content.Context;
  * MVPPlugin
  */
 
-public interface BaseView {
+public interface IBaseView {
      Context getContext();
 }

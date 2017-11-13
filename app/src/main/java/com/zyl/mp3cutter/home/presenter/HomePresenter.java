@@ -11,9 +11,8 @@ import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.zyl.mp3cutter.R;
-import com.zyl.mp3cutter.common.mvp.BasePresenterImpl;
+import com.zyl.mp3cutter.common.base.BasePresenter;
 import com.zyl.mp3cutter.common.utils.FileUtils;
-import com.zyl.mp3cutter.home.di.DaggerHomeComponent;
 import com.zyl.mp3cutter.home.ui.FileChooserActivity;
 import com.zyl.mp3cutter.mp3separate.bean.Mp3Fenge;
 
@@ -41,15 +40,15 @@ import static com.zyl.mp3cutter.common.constant.CommonConstant.RING_FORMAT;
  * Created by zouyulong on 2017/10/22.
  * Person in charge :  zouyulong
  */
-public class HomePresenter extends BasePresenterImpl<HomeContract.View> implements HomeContract.Presenter{
-    @Inject
+public class HomePresenter extends BasePresenter<HomeContract.View> implements HomeContract.Presenter{
     public MediaPlayer mMediaPlayer;
     private String mSelMusicPath = "";
     private static final int REQUEST_CODE = 0;
 
-    public HomePresenter() {
-//        mMediaPlayer = new MediaPlayer();
-        DaggerHomeComponent.builder().build().inject(this);
+    @Inject
+    public HomePresenter(HomeContract.View view) {
+        super(view);
+        mMediaPlayer = new MediaPlayer();
     }
 
     private Disposable mDisposable;

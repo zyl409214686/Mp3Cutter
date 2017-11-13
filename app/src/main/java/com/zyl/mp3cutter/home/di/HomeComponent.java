@@ -1,6 +1,8 @@
 package com.zyl.mp3cutter.home.di;
 
-import com.zyl.mp3cutter.home.presenter.HomePresenter;
+import com.zyl.mp3cutter.common.app.di.ActivityScope;
+import com.zyl.mp3cutter.common.app.di.AppComponent;
+import com.zyl.mp3cutter.home.ui.HomeFragment;
 
 import dagger.Component;
 
@@ -10,7 +12,8 @@ import dagger.Component;
  * Job number:147490
  * Person in charge :  zouyulong
  */
-@Component(modules = HomeModule.class)
+@ActivityScope
+@Component(modules = HomeModule.class, dependencies = AppComponent.class)
 public interface HomeComponent {
-    void inject(HomePresenter presenter);
+    void inject(HomeFragment fragment);
 }

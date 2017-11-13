@@ -28,7 +28,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.zyl.mp3cutter.R;
-import com.zyl.mp3cutter.common.mvp.MVPBaseFragment;
+import com.zyl.mp3cutter.common.app.di.AppComponent;
+import com.zyl.mp3cutter.common.base.BaseFragment;
 import com.zyl.mp3cutter.common.ui.view.RangeSeekBar;
 import com.zyl.mp3cutter.common.ui.view.XfDialog;
 import com.zyl.mp3cutter.common.ui.view.visualizer.VisualizerView;
@@ -38,6 +39,8 @@ import com.zyl.mp3cutter.common.utils.SystemTools;
 import com.zyl.mp3cutter.common.utils.TimeUtils;
 import com.zyl.mp3cutter.common.utils.ViewUtils;
 import com.zyl.mp3cutter.databinding.FragmentHomeBinding;
+import com.zyl.mp3cutter.home.di.DaggerHomeComponent;
+import com.zyl.mp3cutter.home.di.HomeModule;
 import com.zyl.mp3cutter.home.presenter.HomeContract;
 import com.zyl.mp3cutter.home.presenter.HomePresenter;
 
@@ -47,7 +50,7 @@ import static com.zyl.mp3cutter.common.constant.CommonConstant.RING_FOLDER;
  * Created by zouyulong on 2017/10/22.
  * Person in charge :  zouyulong
  */
-public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresenter> implements HomeContract.View {
+public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter> implements HomeContract.View {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -121,19 +124,6 @@ public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresent
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        FragmentHomeBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false);
-//        View view = inflater.inflate(R.layout.fragment_home, container, false);
-        View view = binding.getRoot();
-        initView(view);
-        init();
-        initListener();
-        return view;
     }
 
     @Override
@@ -214,6 +204,29 @@ public class HomeFragment extends MVPBaseFragment<HomeContract.View, HomePresent
     public void onDestroy() {
         super.onDestroy();
         mPresenter.onDestroy();
+    }
+
+    @Override
+    protected void ComponentInject(AppComponent appComponent) {
+        DaggerHomeComponent
+                .builder()
+                .appComponent(appComponent)
+                .homeModule(new HomeModule(this)) //请将TempLateModule()第一个首字母改为小写
+                .build()
+                .inject(this);
+
+    }
+
+    @Override
+    protected View initView(LayoutInflater inflater, ViewGroup container) {
+        // Inflate the layout for this fragment
+        FragmentHomeBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false);
+//        View view = inflater.inflate(R.layout.fragment_home, container, false);
+        View view = binding.getRoot();
+        initView(view);
+        init();
+        initListener();
+        return view;
     }
 
     @Override
