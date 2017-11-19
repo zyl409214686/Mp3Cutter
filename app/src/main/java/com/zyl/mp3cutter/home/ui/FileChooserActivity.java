@@ -198,4 +198,11 @@ public class FileChooserActivity extends Activity {
 	private void toast(CharSequence hint) {
 		Toast.makeText(this, hint, Toast.LENGTH_SHORT).show();
 	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		if(dialog!=null)
+			dialog.dismiss();
+	}
 }

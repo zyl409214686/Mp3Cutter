@@ -1,153 +1,85 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/parentPanel"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="3dip" >
-
-    <!-- 图标和标题 -->
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <LinearLayout
-        android:id="@+id/topPanel"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:minHeight="45dip"
-        android:orientation="vertical" >
+        android:layout_centerInParent="true"
+        android:layout_margin="20dip"
+        android:background="@drawable/commondialog_bg"
+        android:orientation="vertical">
 
-        <LinearLayout
-            android:id="@+id/title_template"
-            android:layout_width="fill_parent"
+        <TextView
+            android:id="@+id/tv_dialog_title"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="3dip"
-            android:gravity="center_vertical"
-            android:orientation="horizontal" >
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="20dp"
+            android:textColor="#202020"
+            android:textSize="18dp"
+            android:visibility="gone" />
 
-            <ImageView
-                android:id="@+id/icon"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_gravity="top"
-                android:layout_margin="3dip"
-                android:src="@mipmap/ic_dialog" />
-
-            <com.android.internal.widget.DialogTitle
-                android:id="@+id/alertTitle"
-                style="@style/textAppearanceDialogWindowTitle"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:singleLine="true" />
-        </LinearLayout>
-
-        <ImageView
-            android:id="@+id/titleDivider"
-            android:layout_width="fill_parent"
-            android:layout_height="1dip"
-            android:layout_marginLeft="5dip"
-            android:layout_marginRight="5dip"
-            android:background="@color/dialog_line"
-            android:gravity="fill_horizontal"
-            android:scaleType="fitXY" />
-    </LinearLayout>
-
-    <!-- 显示内容消息 -->
-
-    <LinearLayout
-        android:id="@+id/contentPanel"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:layout_weight="1"
-        android:orientation="vertical" >
-
-<!--         <ScrollView
-            android:id="@+id/scrollView"
-            android:layout_width="fill_parent"
+        <TextView
+            android:id="@+id/tv_dialog_content"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="5dip"
-             > -->
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="18dp"
+            android:layout_marginTop="12dp"
+            android:textColor="#202020"
+            android:textSize="15dp" />
+
+        <EditText
+            android:id="@+id/et_dialog_input"
+            android:layout_width="fill_parent"
+            android:layout_height="32dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="12dp"
+            android:background="@mipmap/commondialog_et_bg"
+            android:inputType="textPassword"
+            android:maxLength="20"
+            android:paddingLeft="15dp"
+            android:singleLine="true"
+            android:textColor="#000000"
+            android:textColorHint="#ACB3BF"
+            android:textSize="13dp"
+            android:visibility="gone" />
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="12dp">
+
             <TextView
-                android:id="@+id/message"
-                style="@style/textAppearanceDialogWindowTitle"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:padding="5dip" />
-   <!--      </ScrollView> -->
-    </LinearLayout>
-    <!-- 显示内容布局 -->
+                android:id="@+id/tv_dialog_confirm"
+                android:layout_width="75dp"
+                android:layout_height="36dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="12dp"
+                android:gravity="center"
+                android:textColor="#009688"
+                android:text="确定"
+                android:textSize="14dp" />
 
-    <FrameLayout
-        android:id="@+id/customPanel"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:paddingBottom="5dip"
-        android:paddingTop="5dip" >
-    </FrameLayout>
-    <!-- 按钮 -->
+            <TextView
+                android:id="@+id/tv_dialog_cancle"
+                android:layout_width="75dp"
+                android:layout_height="36dp"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="12dp"
+                android:layout_toLeftOf="@id/tv_dialog_confirm"
+                android:text="取消"
+                android:gravity="center"
+                android:textColor="#009688"
+                android:textSize="14dp" />
 
-    <LinearLayout
-        android:id="@+id/buttonPanel"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="50dip"
-        android:orientation="vertical" >
+        </RelativeLayout>
 
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:orientation="horizontal"
-            android:paddingLeft="2dip"
-            android:paddingRight="2dip"
-            android:paddingTop="4dip" >
 
-            <LinearLayout
-                style="@style/btn_dialog"
-                android:orientation="horizontal"
-                android:id="@+id/leftSpacer"
-                android:layout_width="0dip"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.25"
-                android:visibility="gone" />
-
-            <Button
-                android:id="@+id/button1"
-                style="@style/btn_dialog"
-                android:layout_width="0dip"
-                android:layout_height="wrap_content"
-                android:layout_gravity="left"
-                android:layout_weight="1"
-                android:maxLines="2" />
-
-            <Button
-                android:id="@+id/button3"
-                style="@style/btn_dialog"
-                android:layout_width="0dip"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_weight="1"
-                android:maxLines="2" />
-
-            <Button
-                android:id="@+id/button2"
-                style="@style/btn_dialog"
-                android:layout_width="0dip"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:layout_weight="1"
-                android:maxLines="2" />
-
-            <LinearLayout
-                style="@style/btn_style"
-                android:orientation="horizontal"
-                android:id="@+id/rightSpacer"
-                android:layout_width="0dip"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.25"
-                android:visibility="gone" />
-        </LinearLayout>
     </LinearLayout>
 
-</LinearLayout>
+</RelativeLayout>

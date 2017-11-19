@@ -8,14 +8,15 @@ import org.jaudiotagger.audio.mp3.MP3File;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.id3.ID3v1Tag;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 
 
 public class Mp3Fenge
@@ -60,7 +61,7 @@ public class Mp3Fenge
     return this.mp3Info;
   }
 
-  private byte[] getDataByBitRate(int beginTime, int endTime)
+  private byte[] getDataByBitRate(File newMp3, int beginTime, int endTime)
   {
     byte[] result = (byte[])null;
     RandomAccessFile rMp3File = null;
@@ -82,8 +83,27 @@ public class Mp3Fenge
         rMp3File = new RandomAccessFile(this.mp3File, "r");
         rMp3File.seek(beginIndex);
         int size = (int)(endIndex - beginIndex);
-        result = new byte[size];
-        rMp3File.read(result);
+        int readSize = 1024;
+        if(size<1024){
+          readSize = size;
+        }
+        result = new byte[readSize];
+        int bytereadSum = 0;
+        int byteread = 0;
+        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(newMp3));
+        try {
+          while ((byteread = rMp3File.read(result, bytereadSum, readSize)) != -1) {
+            bytereadSum += byteread;
+            bos.write(result);
+            if (bytereadSum >= size)
+              break;
+            if (bytereadSum + readSize > size)
+              readSize = size - bytereadSum;
+          }
+          rMp3File.read(result);
+        }finally {
+          bos.close();
+        }
       }
     } catch (Exception e) {
       e.printStackTrace();
@@ -118,20 +138,21 @@ public class Mp3Fenge
     return 0;
   }
 
-  public byte[] getDataByTime(int beginTime, int endTime)
+  public byte[] getDataByTime(File newMp3, int beginTime, int endTime)
   {
-    return getDataByBitRate(beginTime, endTime);
+    return getDataByBitRate(newMp3, beginTime, endTime);
   }
 
   public boolean generateNewMp3ByTime(File newMp3, int beginTime, int endTime)
   {
-    byte[] frames = getDataByTime(beginTime, endTime);
+    byte[] frames = getDataByTime(newMp3, beginTime, endTime);
     if ((frames == null) || (frames.length < 1)) {
       return false;
     }
-    List mp3datas = new ArrayList();
-    mp3datas.add(frames);
-    return FileUtil.generateFile(newMp3, mp3datas);
+//    List mp3datas = new ArrayList();
+//    mp3datas.add(frames);
+//    return FileUtil.generateFile(newMp3, mp3datas);
+    return true;
   }
 
   public static void main(String[] args) {
@@ -139,7 +160,7 @@ public class Mp3Fenge
 
     helper.generateNewMp3ByTime(new File("testdata/e1.mp3"), 307000, 315000);
 
-    byte[] e2 = helper.getDataByTime(70000, 76000);
+    byte[] e2 = helper.getDataByTime(new File("testdata/e1.mp3"), 70000, 76000);
     List mp3datas = new ArrayList();
     mp3datas.add(e2);
     FileUtil.generateFile(new File("testdata/e2.mp3"), mp3datas);

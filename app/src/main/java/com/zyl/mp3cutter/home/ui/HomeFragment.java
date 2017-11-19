@@ -2,7 +2,6 @@ package com.zyl.mp3cutter.home.ui;
 
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
@@ -20,7 +19,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
@@ -30,14 +28,13 @@ import android.widget.Toast;
 import com.zyl.mp3cutter.R;
 import com.zyl.mp3cutter.common.app.di.AppComponent;
 import com.zyl.mp3cutter.common.base.BaseFragment;
+import com.zyl.mp3cutter.common.ui.view.CommonDialog;
 import com.zyl.mp3cutter.common.ui.view.RangeSeekBar;
-import com.zyl.mp3cutter.common.ui.view.XfDialog;
 import com.zyl.mp3cutter.common.ui.view.visualizer.VisualizerView;
 import com.zyl.mp3cutter.common.ui.view.visualizer.renderer.CircleBarRenderer;
 import com.zyl.mp3cutter.common.utils.FileUtils;
 import com.zyl.mp3cutter.common.utils.SystemTools;
 import com.zyl.mp3cutter.common.utils.TimeUtils;
-import com.zyl.mp3cutter.common.utils.ViewUtils;
 import com.zyl.mp3cutter.databinding.FragmentHomeBinding;
 import com.zyl.mp3cutter.home.di.DaggerHomeComponent;
 import com.zyl.mp3cutter.home.di.HomeModule;
@@ -45,6 +42,7 @@ import com.zyl.mp3cutter.home.presenter.HomeContract;
 import com.zyl.mp3cutter.home.presenter.HomePresenter;
 
 import static com.zyl.mp3cutter.common.constant.CommonConstant.RING_FOLDER;
+
 /**
  * Description: 主页 fragment类
  * Created by zouyulong on 2017/10/22.
@@ -61,6 +59,7 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
     public HomeFragment() {
         // Required empty public constructor
     }
+
     private ImageButton mPlayBtn, mCutterBtn, mSpeedBtn, mBackwardBtn;
     private TextView mPlayerStartTimeTV, mPlayerEndTimeTV;
     private VisualizerView mVisualView;
@@ -172,24 +171,17 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
      * 显示剪切成功窗口
      */
     private void showCutterSuccessDialog(final String path) {
-        new XfDialog.Builder(getActivity())
-                .setTitle(getString(R.string.dialog_title))
-                .setMessage(getString(R.string.dialog_cutter_success))
-                .setPositiveButton(getString(R.string.dialog_btn_sure),
-                        new DialogInterface.OnClickListener() {
-
-                            public void onClick(DialogInterface dialog,
-                                                int which) {
-                                if (FileUtils.bFolder(RING_FOLDER)) {
-                                    SystemTools.setMyRingtone(path,
-                                            getActivity());
-                                }
-                                dialog.cancel();
-                                dialog.dismiss();
-                            }
-                        })
-                .setNegativeButton(getString(R.string.dialog_btn_cancel), null)
-                .create().show();
+        new CommonDialog.Builder().setContext(getActivity()).setContentStr(getString(R.string.dialog_cutter_success))
+                .setOnDialogListener(new CommonDialog.OnDialogClickListener() {
+                    @Override
+                    public void doOk() {
+                        if (FileUtils.bFolder(RING_FOLDER)) {
+                            SystemTools.setMyRingtone(path,
+                                    getActivity());
+                        }
+                    }
+                })
+                .build().show();
         //ad
 //        AppConnect.getInstance(this).showPopAd(this);
     }
@@ -332,28 +324,17 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
                     Toast.LENGTH_LONG).show();
             return;
         }
-        final EditText et_fileName = new EditText(getActivity());
-        new XfDialog.Builder(getActivity())
-                .setTitle(getString(R.string.dialog_title))
-                .setMessage(getString(R.string.dialog_cutter_msg))
-                .setView(et_fileName, ViewUtils.dp2px(getActivity(), 10), ViewUtils.dp2px(getActivity(), 10),
-                        ViewUtils.dp2px(getActivity(), 10), ViewUtils.dp2px(getActivity(), 10))
-                .setPositiveButton(getString(R.string.dialog_btn_sure),
-                        new DialogInterface.OnClickListener() {
-                            /**
-                             * 设置铃声
-                             */
-                            public void onClick(DialogInterface dialog,
-                                                int which) {
-                                final String newFileNameStr = et_fileName
-                                        .getText().toString().trim();
-                                mPresenter.doCutter(newFileNameStr, minNumber.intValue(),
-                                        maxNumber.intValue());
-                                dialog.dismiss();
-                            }
-                        })
-                .setNegativeButton(getString(R.string.dialog_btn_cancel), null)
-                .create().show();
+//        final EditText et_fileName = new EditText(getActivity());
+        new CommonDialog.Builder().setContext(getActivity()).setContentStr(getString(R.string.dialog_cutter_msg))
+                .setIsShowInput(true)
+                .setOnDialogListener(new CommonDialog.OnDialogClickListener() {
+                    @Override
+                    public void doOk(String text) {
+                        mPresenter.doCutter(text, minNumber.intValue(),
+                                maxNumber.intValue());
+                    }
+                })
+                .build().show();
     }
 
     /**
