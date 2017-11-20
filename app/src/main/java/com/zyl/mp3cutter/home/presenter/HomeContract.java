@@ -18,6 +18,8 @@ public class HomeContract {
     public interface View extends IBaseView {
         void setVisualizerViewEnaled(boolean enabled);
 
+        void checkRecordPermission(MediaPlayer mediaPlayer);
+
         int getSeekbarCurValue();
 
         int getSeekbarMaxValue();

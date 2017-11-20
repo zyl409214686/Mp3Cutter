@@ -1,6 +1,6 @@
 /**
  * Copyright 2011, Felix Palmer
- *
+ * <p>
  * Licensed under the MIT license:
  * http://creativecommons.org/licenses/MIT/
  */
@@ -29,214 +29,197 @@ import java.util.HashSet;
 import java.util.Set;
 
 
-
 /**
  * A class that draws visualizations of data received from a
  * {@link Visualizer.OnDataCaptureListener#onWaveFormDataCapture } and
  * {@link Visualizer.OnDataCaptureListener#onFftDataCapture }
  */
 public class VisualizerView extends View {
-  private static final String TAG = "VisualizerView";
+    private static final String TAG = "VisualizerView";
 
-  private byte[] mBytes;
-  private byte[] mFFTBytes;
-  private Rect mRect = new Rect();
-  private Visualizer mVisualizer;
+    private byte[] mBytes;
+    private byte[] mFFTBytes;
+    private Rect mRect = new Rect();
+    private Visualizer mVisualizer;
 
-  private Set<Renderer> mRenderers;
+    private Set<Renderer> mRenderers;
 
-  private Paint mFlashPaint = new Paint();
-  private Paint mFadePaint = new Paint();
+    private Paint mFlashPaint = new Paint();
+    private Paint mFadePaint = new Paint();
 
-  public VisualizerView(Context context, AttributeSet attrs, int defStyle)
-  {
-    super(context, attrs);
-    init();
-  }
-
-  public VisualizerView(Context context, AttributeSet attrs)
-  {
-    this(context, attrs, 0);
-  }
-
-  public VisualizerView(Context context)
-  {
-    this(context, null, 0);
-  }
-
-  private void init() {
-    mBytes = null;
-    mFFTBytes = null;
-
-    mFlashPaint.setColor(Color.argb(122, 255, 255, 255));
-    mFadePaint.setColor(Color.argb(238, 255, 255, 255)); // Adjust alpha to change how quickly the image fades
-    mFadePaint.setXfermode(new PorterDuffXfermode(Mode.MULTIPLY));
-
-    mRenderers = new HashSet<Renderer>();
-  }
-
-  /**
-   * Links the visualizer to a player
-   * @param player - MediaPlayer instance to link to
-   */
-  @SuppressLint("NewApi")
-public void link(MediaPlayer player)
-  {
-    if(player == null)
-    {
-      throw new NullPointerException("Cannot link to null MediaPlayer");
-    }
-    
-    // Create the Visualizer object and attach it to our media player.
-    try {
-		mVisualizer = new Visualizer(player.getAudioSessionId());
-		Log.d("mp3cutter:", "size:"+Visualizer.getCaptureSizeRange()[1]);
-		mVisualizer.setCaptureSize(Visualizer.getCaptureSizeRange()[1]);
-
-		// Pass through Visualizer data to VisualizerView
-
-		mVisualizer.setDataCaptureListener(new Visualizer.OnDataCaptureListener()
-		{
-			  @Override
-			  public void onWaveFormDataCapture(Visualizer visualizer, byte[] bytes,
-			      int samplingRate)
-			  {
-			    updateVisualizer(bytes);
-			  }
-
-			  @Override
-			  public void onFftDataCapture(Visualizer visualizer, byte[] bytes,
-			      int samplingRate)
-			  {
-			    updateVisualizerFFT(bytes);
-			  }
-			},
-		    Visualizer.getMaxCaptureRate() / 2, true, true);
-
-		// Enabled Visualizer and disable when we're done with the stream
-		//mVisualizer.setEnabled(false);
-		player.setOnCompletionListener(new MediaPlayer.OnCompletionListener()
-		{
-		  @Override
-		  public void onCompletion(MediaPlayer mediaPlayer)
-		  {
-		    //mVisualizer.setEnabled(false);
-		  }
-		});
-	} catch (UnsupportedOperationException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	} catch (IllegalStateException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	} catch (RuntimeException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
-  }
-  
-  @SuppressLint("NewApi")
-public void setEnabled(boolean enabled){
-	  mVisualizer.setEnabled(enabled);
-  }
-
-  public void addRenderer(Renderer renderer)
-  {
-    if(renderer != null)
-    {
-      mRenderers.add(renderer);
-    }
-  }
-
-  public void clearRenderers()
-  {
-    mRenderers.clear();
-  }
-
-  /**
-   * Call to release the resources used by VisualizerView. Like with the
-   * MediaPlayer it is good practice to call this method
-   */
-  public void release()
-  {
-    mVisualizer.release();
-  }
-
-  /**
-   * Pass data to the visualizer. Typically this will be obtained from the
-   * Android Visualizer.OnDataCaptureListener call back. See
-   * {@link Visualizer.OnDataCaptureListener#onWaveFormDataCapture }
-   * @param bytes
-   */
-  public void updateVisualizer(byte[] bytes) {
-    mBytes = bytes;
-    invalidate();
-  }
-
-  /**
-   * Pass FFT data to the visualizer. Typically this will be obtained from the
-   * Android Visualizer.OnDataCaptureListener call back. See
-   * {@link Visualizer.OnDataCaptureListener#onFftDataCapture }
-   * @param bytes
-   */
-  public void updateVisualizerFFT(byte[] bytes) {
-    mFFTBytes = bytes;
-    invalidate();
-  }
-
-  boolean mFlash = false;
-
-  /**
-   * Call this to make the visualizer flash. Useful for flashing at the play
-   * of a song/loop etc...
-   */
-  public void flash() {
-    mFlash = true;
-    invalidate();
-  }
-
-  Bitmap mCanvasBitmap;
-  Canvas mCanvas;
-
-
-  @Override
-  protected void onDraw(Canvas canvas) {
-    super.onDraw(canvas);
-    if(isInEditMode()){
-    	
-    }
-    // Create canvas once we're ready to draw
-    mRect.set(0, 0, getWidth(), getHeight());
-
-    if(mCanvasBitmap == null)
-    {
-      mCanvasBitmap = Bitmap.createBitmap(canvas.getWidth(), canvas.getHeight(), Config.ARGB_8888);
-    }
-    if(mCanvas == null)
-    {
-      mCanvas = new Canvas(mCanvasBitmap);
+    public VisualizerView(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs);
+        init();
     }
 
-    if (mBytes != null) {
-      // Render all audio renderers
-      AudioData audioData = new AudioData(mBytes);
-      for(Renderer r : mRenderers)
-      {
-        r.render(mCanvas, audioData, mRect);
-      }
+    public VisualizerView(Context context, AttributeSet attrs) {
+        this(context, attrs, 0);
     }
 
-    if (mFFTBytes != null) {
-      // Render all FFT renderers
-      FFTData fftData = new FFTData(mFFTBytes);
-      for(Renderer r : mRenderers)
-      {
-        r.render(mCanvas, fftData, mRect);
-      }
+    public VisualizerView(Context context) {
+        this(context, null, 0);
     }
 
-    // Fade out old contents
-    mCanvas.drawPaint(mFadePaint);
+    private void init() {
+        mBytes = null;
+        mFFTBytes = null;
+
+        mFlashPaint.setColor(Color.argb(122, 255, 255, 255));
+        mFadePaint.setColor(Color.argb(238, 255, 255, 255)); // Adjust alpha to change how quickly the image fades
+        mFadePaint.setXfermode(new PorterDuffXfermode(Mode.MULTIPLY));
+
+        mRenderers = new HashSet<Renderer>();
+    }
+
+    /**
+     * Links the visualizer to a player
+     * @param player - MediaPlayer instance to link to
+     */
+    @SuppressLint("NewApi")
+    public void link(MediaPlayer player) {
+        if (player == null) {
+            throw new NullPointerException("Cannot link to null MediaPlayer");
+        }
+
+        // Create the Visualizer object and attach it to our media player.
+        try {
+            mVisualizer = new Visualizer(player.getAudioSessionId());
+            Log.d("mp3cutter:", "size:" + Visualizer.getCaptureSizeRange()[1]);
+            mVisualizer.setCaptureSize(Visualizer.getCaptureSizeRange()[1]);
+
+            // Pass through Visualizer data to VisualizerView
+
+            mVisualizer.setDataCaptureListener(new Visualizer.OnDataCaptureListener() {
+                                                   @Override
+                                                   public void onWaveFormDataCapture(Visualizer visualizer, byte[] bytes,
+                                                                                     int samplingRate) {
+                                                       updateVisualizer(bytes);
+                                                   }
+
+                                                   @Override
+                                                   public void onFftDataCapture(Visualizer visualizer, byte[] bytes,
+                                                                                int samplingRate) {
+                                                       updateVisualizerFFT(bytes);
+                                                   }
+                                               },
+                    Visualizer.getMaxCaptureRate() / 2, true, true);
+
+            // Enabled Visualizer and disable when we're done with the stream
+            //mVisualizer.setEnabled(false);
+            player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mediaPlayer) {
+                    //mVisualizer.setEnabled(false);
+                }
+            });
+        } catch (UnsupportedOperationException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IllegalStateException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (RuntimeException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    @SuppressLint("NewApi")
+    public void setEnabled(boolean enabled) {
+        if(mVisualizer==null)
+            return;
+        mVisualizer.setEnabled(enabled);
+    }
+
+    public void addRenderer(Renderer renderer) {
+        if (renderer != null) {
+            mRenderers.add(renderer);
+        }
+    }
+
+    public void clearRenderers() {
+        mRenderers.clear();
+    }
+
+    /**
+     * Call to release the resources used by VisualizerView. Like with the
+     * MediaPlayer it is good practice to call this method
+     */
+    public void release() {
+        mVisualizer.release();
+    }
+
+    /**
+     * Pass data to the visualizer. Typically this will be obtained from the
+     * Android Visualizer.OnDataCaptureListener call back. See
+     * {@link Visualizer.OnDataCaptureListener#onWaveFormDataCapture }
+     * @param bytes
+     */
+    public void updateVisualizer(byte[] bytes) {
+        mBytes = bytes;
+        invalidate();
+    }
+
+    /**
+     * Pass FFT data to the visualizer. Typically this will be obtained from the
+     * Android Visualizer.OnDataCaptureListener call back. See
+     * {@link Visualizer.OnDataCaptureListener#onFftDataCapture }
+     * @param bytes
+     */
+    public void updateVisualizerFFT(byte[] bytes) {
+        mFFTBytes = bytes;
+        invalidate();
+    }
+
+    boolean mFlash = false;
+
+    /**
+     * Call this to make the visualizer flash. Useful for flashing at the play
+     * of a song/loop etc...
+     */
+    public void flash() {
+        mFlash = true;
+        invalidate();
+    }
+
+    Bitmap mCanvasBitmap;
+    Canvas mCanvas;
+
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        if (isInEditMode()) {
+
+        }
+        // Create canvas once we're ready to draw
+        mRect.set(0, 0, getWidth(), getHeight());
+
+        if (mCanvasBitmap == null) {
+            mCanvasBitmap = Bitmap.createBitmap(canvas.getWidth(), canvas.getHeight(), Config.ARGB_8888);
+        }
+        if (mCanvas == null) {
+            mCanvas = new Canvas(mCanvasBitmap);
+        }
+
+        if (mBytes != null) {
+            // Render all audio renderers
+            AudioData audioData = new AudioData(mBytes);
+            for (Renderer r : mRenderers) {
+                r.render(mCanvas, audioData, mRect);
+            }
+        }
+
+        if (mFFTBytes != null) {
+            // Render all FFT renderers
+            FFTData fftData = new FFTData(mFFTBytes);
+            for (Renderer r : mRenderers) {
+                r.render(mCanvas, fftData, mRect);
+            }
+        }
+
+        // Fade out old contents
+        mCanvas.drawPaint(mFadePaint);
 
 //    if(mFlash)
 //    {
@@ -244,6 +227,6 @@ public void setEnabled(boolean enabled){
 //      mCanvas.drawPaint(mFlashPaint);
 //    }
 
-    canvas.drawBitmap(mCanvasBitmap, new Matrix(), null);
-  }
+        canvas.drawBitmap(mCanvasBitmap, new Matrix(), null);
+    }
 }

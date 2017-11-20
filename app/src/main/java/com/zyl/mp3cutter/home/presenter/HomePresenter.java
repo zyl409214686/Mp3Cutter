@@ -3,10 +3,7 @@ package com.zyl.mp3cutter.home.presenter;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.widget.Toast;
 
@@ -116,14 +113,15 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
                 mDisposable.dispose();
                 mDisposable = null;
             }
-            if(ContextCompat.checkSelfPermission(activity, android.Manifest.permission.RECORD_AUDIO)
-                    != PackageManager.PERMISSION_GRANTED){
-                ActivityCompat.requestPermissions(activity,new String[]{
-                        android.Manifest.permission.RECORD_AUDIO},1);
-            }
-            else {
-                mView.setVisualizerViewEnaled(false);
-            }
+//            if(ContextCompat.checkSelfPermission(activity, android.Manifest.permission.RECORD_AUDIO)
+//                    != PackageManager.PERMISSION_GRANTED){
+//                ActivityCompat.requestPermissions(activity,new String[]{
+//                        android.Manifest.permission.RECORD_AUDIO},1);
+//            }
+//            else {
+//                mView.setVisualizerViewEnaled(false);
+//            }
+            mView.setVisualizerViewEnaled(false);
             mView.setPlayBtnStatus(false);
         } else {
             // 播放
@@ -136,14 +134,15 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
             mView.setPlayBtnStatus(true);
             seekTo(mView.getSeekbarCurValue());
             play();
-            if(ContextCompat.checkSelfPermission(activity, android.Manifest.permission.RECORD_AUDIO)
-                    != PackageManager.PERMISSION_GRANTED){
-                ActivityCompat.requestPermissions(activity, new String[]{
-                        android.Manifest.permission.RECORD_AUDIO},1);
-            }
-            else {
-                mView.setVisualizerViewEnaled(true);
-            }
+//            if(ContextCompat.checkSelfPermission(activity, android.Manifest.permission.RECORD_AUDIO)
+//                    != PackageManager.PERMISSION_GRANTED){
+//                ActivityCompat.requestPermissions(activity, new String[]{
+//                        android.Manifest.permission.RECORD_AUDIO},1);
+//            }
+//            else {
+//                mView.setVisualizerViewEnaled(true);
+//            }
+            mView.setVisualizerViewEnaled(true);
             mDisposable = mUpdateProgressObservable.observeOn(AndroidSchedulers.mainThread()).subscribe(mUpdateProgressConsumer);
         }
 
@@ -243,13 +242,14 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
                     setDataSource(mSelMusicPath);
                     prepare();
                     mView.setDuration(getDuration());
-                    if (ContextCompat.checkSelfPermission(mView.getContext(), android.Manifest.permission.RECORD_AUDIO)
-                            != PackageManager.PERMISSION_GRANTED) {
-                        ActivityCompat.requestPermissions((Activity) mView.getContext(), new String[]{
-                                android.Manifest.permission.RECORD_AUDIO}, 1);
-                    } else {
-                        mView.linkMediaPlayerForVisualView(getMediaPlayer());
-                    }
+//                    if (ContextCompat.checkSelfPermission(mView.getContext(), android.Manifest.permission.RECORD_AUDIO)
+//                            != PackageManager.PERMISSION_GRANTED) {
+//                        ActivityCompat.requestPermissions((Activity) mView.getContext(), new String[]{
+//                                android.Manifest.permission.RECORD_AUDIO}, 1);
+//                    } else {
+//                        mView.linkMediaPlayerForVisualView(getMediaPlayer());
+//                    }
+                    mView.checkRecordPermission(getMediaPlayer());
                     mView.addBarGraphRenderers();
                 }
             } catch (IllegalArgumentException e) {

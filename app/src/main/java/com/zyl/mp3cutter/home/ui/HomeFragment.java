@@ -1,9 +1,9 @@
 package com.zyl.mp3cutter.home.ui;
 
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -41,6 +41,13 @@ import com.zyl.mp3cutter.home.di.HomeModule;
 import com.zyl.mp3cutter.home.presenter.HomeContract;
 import com.zyl.mp3cutter.home.presenter.HomePresenter;
 
+import permissions.dispatcher.NeedsPermission;
+import permissions.dispatcher.OnNeverAskAgain;
+import permissions.dispatcher.OnPermissionDenied;
+import permissions.dispatcher.OnShowRationale;
+import permissions.dispatcher.PermissionRequest;
+import permissions.dispatcher.RuntimePermissions;
+
 import static com.zyl.mp3cutter.common.constant.CommonConstant.RING_FOLDER;
 
 /**
@@ -48,6 +55,7 @@ import static com.zyl.mp3cutter.common.constant.CommonConstant.RING_FOLDER;
  * Created by zouyulong on 2017/10/22.
  * Person in charge :  zouyulong
  */
+@RuntimePermissions
 public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter> implements HomeContract.View {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -223,7 +231,12 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
 
     @Override
     public void setVisualizerViewEnaled(boolean enabled) {
-        mVisualView.setEnabled(false);
+        mVisualView.setEnabled(enabled);
+    }
+
+    @Override
+    public void checkRecordPermission(MediaPlayer mediaPlayer){
+        HomeFragmentPermissionsDispatcher.linkMediaPlayerForVisualViewWithPermissionCheck(this, mediaPlayer);
     }
 
     @Override
@@ -259,6 +272,7 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
         mPlaySeekBar.setSelectedCurValue(selcur);
     }
 
+    @NeedsPermission(Manifest.permission.RECORD_AUDIO)
     @Override
     public void linkMediaPlayerForVisualView(MediaPlayer player) {
         mVisualView.link(player);
@@ -372,6 +386,7 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
         /**
          * 播放音乐
          */
+
         mPlayBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -583,20 +598,54 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
      * ⑨重写onRequestPermissionsResult方法
      * 获取动态权限请求的结果,再开启录制音频
      */
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-        } else {
-            Toast.makeText(getActivity(), "用户拒绝了权限", Toast.LENGTH_SHORT).show();
-        }
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
-
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+//        if (requestCode == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//
+//        } else {
+//            Toast.makeText(getActivity(), "用户拒绝了权限", Toast.LENGTH_SHORT).show();
+//        }
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//    }
     @Override
     public void onStop() {
         super.onStop();
         mPresenter.pause();
         setPlayBtnStatus(false);
+    }
+
+    @OnShowRationale(Manifest.permission.RECORD_AUDIO)
+    void showRationaleForRecord(final PermissionRequest request) {
+        new CommonDialog.Builder().setContext(getActivity()).setContentStr("亲爱的用户，显示声音频谱需要录音权限，请您知晓~")
+                .setOnDialogListener(new CommonDialog.OnDialogClickListener() {
+                    @Override
+                    public void doOk() {
+                        request.proceed();
+                    }
+                }).setIsShowOne(true).build().show();
+    }
+
+    @OnPermissionDenied(Manifest.permission.RECORD_AUDIO)
+    void showRecordDenied() {
+        Toast.makeText(getActivity(), "已拒绝录音权限，将不会显示音乐频谱。如需要显示请到系统权限管理设置。", Toast.LENGTH_LONG).show();
+    }
+
+    @OnNeverAskAgain(Manifest.permission.RECORD_AUDIO)
+    void onRecordNeverAskAgain() {
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        // NOTE: delegate the permission handling to generated method
+        HomeFragmentPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
+    }
+
+
+    @Override
+    public boolean shouldShowRequestPermissionRationale(@NonNull String permission) {
+        if(permission==Manifest.permission.RECORD_AUDIO)
+            return true;
+        return super.shouldShowRequestPermissionRationale(permission);
     }
 }

@@ -21,3 +21,17 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+ext {
+    minSdkVersion = 19
+    targetSdkVersion = 25
+    compileSdkVersion = 25
+    buildToolsVersion = '25.0.2'
+
+    //Dependencies
+    supportLibraryVersion = '23.2.1'
+
+
+    permissionsdispatcher = 'com.github.hotchemi:permissionsdispatcher:3.0.1'
+    permissionsdispatcher_processor = 'com.github.hotchemi:permissionsdispatcher-processor:3.0.1'
+}
