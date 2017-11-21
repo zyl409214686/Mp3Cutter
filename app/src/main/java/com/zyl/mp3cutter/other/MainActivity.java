@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void switchToCutterPage() {
-        getSupportFragmentManager().beginTransaction().replace(R.id.frame_content, HomeFragment.newInstance("", "")).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.frame_content, HomeFragment.newInstance()).commit();
         mToolBar.setTitle("音乐播放~~~");
     }
 

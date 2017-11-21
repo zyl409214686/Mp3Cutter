@@ -5,7 +5,7 @@
         android:id="@+id/rl_main"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:background="#ffffff">
+        android:background="#33888888">
 
         <!-- top bar view -->
 
@@ -70,8 +70,8 @@
 
                 <ImageView
                     android:id="@+id/iv_player_min_voice"
-                    android:layout_width="26dp"
-                    android:layout_height="26dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="10dip"
@@ -79,8 +79,8 @@
 
                 <ImageView
                     android:id="@+id/iv_player_max_voice"
-                    android:layout_width="26dp"
-                    android:layout_height="26dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="10dp"
@@ -94,10 +94,7 @@
                     android:layout_toLeftOf="@id/iv_player_max_voice"
                     android:layout_toRightOf="@id/iv_player_min_voice"
                     android:paddingLeft="5dp"
-                    android:paddingRight="5dp"
-                    android:progressDrawable="@drawable/layerlist_voice_seekbar_progress"
-                    android:thumb="@drawable/selector_voice_seekbar_thumb" />
-                <!-- android:background="@drawable/voice_seekbar_bg" -->
+                    android:paddingRight="5dp"/>
 
             </RelativeLayout>
         </RelativeLayout>

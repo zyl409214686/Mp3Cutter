@@ -37,10 +37,11 @@ import static com.zyl.mp3cutter.common.constant.CommonConstant.RING_FORMAT;
  * Created by zouyulong on 2017/10/22.
  * Person in charge :  zouyulong
  */
-public class HomePresenter extends BasePresenter<HomeContract.View> implements HomeContract.Presenter{
+public class HomePresenter extends BasePresenter<HomeContract.View> implements HomeContract.Presenter {
     public MediaPlayer mMediaPlayer;
     private String mSelMusicPath = "";
     private static final int REQUEST_CODE = 0;
+    private boolean mIsTouching;
 
     @Inject
     public HomePresenter(HomeContract.View view) {
@@ -53,7 +54,7 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
     private Consumer mUpdateProgressConsumer = new Consumer() {
         @Override
         public void accept(Object o) throws Exception {
-            if(mView==null)
+            if (mView == null)
                 return;
             mView.setPlayCurValue(getCurPosition());
             Number maxValue = mView.getSeekbarMaxValue();
@@ -66,7 +67,7 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
             // 消息处理
             if (getCurPosition() >= maxValue
                     .intValue()) {
-                if(mDisposable!=null) {
+                if (mDisposable != null) {
                     mDisposable.dispose();
                     mDisposable = null;
                 }
@@ -94,14 +95,14 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
             }
         }).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.newThread())
                 .subscribe(new Consumer() {
-            @Override
-            public void accept(Object o) throws Exception {
-                String cutterPath = (String)o;
-                if(mView!=null){
-                    mView.doCutterSucc(cutterPath);
-                }
-            }
-        });
+                    @Override
+                    public void accept(Object o) throws Exception {
+                        String cutterPath = (String) o;
+                        if (mView != null) {
+                            mView.doCutterSucc(cutterPath);
+                        }
+                    }
+                });
     }
 
     @Override
@@ -109,18 +110,10 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
         if (isPlaying()) {
             // 暂停
             pause();
-            if(mDisposable!=null) {
+            if (mDisposable != null) {
                 mDisposable.dispose();
                 mDisposable = null;
             }
-//            if(ContextCompat.checkSelfPermission(activity, android.Manifest.permission.RECORD_AUDIO)
-//                    != PackageManager.PERMISSION_GRANTED){
-//                ActivityCompat.requestPermissions(activity,new String[]{
-//                        android.Manifest.permission.RECORD_AUDIO},1);
-//            }
-//            else {
-//                mView.setVisualizerViewEnaled(false);
-//            }
             mView.setVisualizerViewEnaled(false);
             mView.setPlayBtnStatus(false);
         } else {
@@ -134,18 +127,81 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
             mView.setPlayBtnStatus(true);
             seekTo(mView.getSeekbarCurValue());
             play();
-//            if(ContextCompat.checkSelfPermission(activity, android.Manifest.permission.RECORD_AUDIO)
-//                    != PackageManager.PERMISSION_GRANTED){
-//                ActivityCompat.requestPermissions(activity, new String[]{
-//                        android.Manifest.permission.RECORD_AUDIO},1);
-//            }
-//            else {
-//                mView.setVisualizerViewEnaled(true);
-//            }
             mView.setVisualizerViewEnaled(true);
-            mDisposable = mUpdateProgressObservable.observeOn(AndroidSchedulers.mainThread()).subscribe(mUpdateProgressConsumer);
+            mDisposable = mUpdateProgressObservable.observeOn(AndroidSchedulers.mainThread()).
+                    subscribe(mUpdateProgressConsumer);
         }
 
+    }
+
+    /**
+     * 快进
+     */
+    @Override
+    public void onSpeedDown() {
+        new Thread() {
+            @Override
+            public void run() {
+                mIsTouching = true;
+                while (mIsTouching) {
+                    Number curNumber = mView
+                            .getSeekbarMaxValue();
+                    if (getCurPosition() + 500 < curNumber
+                            .doubleValue())
+                        seekTo(getCurPosition() + 500);
+                    else if (getCurPosition() + 500 == curNumber
+                            .doubleValue()) {
+                        seekTo(getDuration());
+                        mIsTouching = false;
+                    } else {
+                        mIsTouching = false;
+                    }
+                    try {
+                        Thread.sleep(10);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                super.run();
+            }
+        }.start();
+    }
+
+    @Override
+    public void onTouchSpeedFastUp() {
+        mIsTouching = false;
+    }
+
+    @Override
+    public void onBackword() {
+        new Thread() {
+            @Override
+            public void run() {
+                mIsTouching = true;
+                while (mIsTouching) {
+                    if(mView==null)
+                        return;
+                    Number minNumber = mView
+                            .getSeekbarMinValue();
+                    if (getCurPosition() - 500 > minNumber
+                            .doubleValue())
+                        seekTo(getCurPosition() - 500);
+                    else if (getCurPosition() - 500 == minNumber
+                            .doubleValue()) {
+                        seekTo(getDuration());
+                        mIsTouching = false;
+                    } else {
+                        mIsTouching = false;
+                    }
+                    try {
+                        Thread.sleep(10);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                super.run();
+            }
+        }.start();
     }
 
     @Override
@@ -242,24 +298,17 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
                     setDataSource(mSelMusicPath);
                     prepare();
                     mView.setDuration(getDuration());
-//                    if (ContextCompat.checkSelfPermission(mView.getContext(), android.Manifest.permission.RECORD_AUDIO)
-//                            != PackageManager.PERMISSION_GRANTED) {
-//                        ActivityCompat.requestPermissions((Activity) mView.getContext(), new String[]{
-//                                android.Manifest.permission.RECORD_AUDIO}, 1);
-//                    } else {
-//                        mView.linkMediaPlayerForVisualView(getMediaPlayer());
-//                    }
                     mView.checkRecordPermission(getMediaPlayer());
                     mView.addBarGraphRenderers();
                 }
             } catch (IllegalArgumentException e) {
-                // TODO Auto-generated catch block
+                // Auto-generated catch block
                 e.printStackTrace();
             } catch (SecurityException e) {
-                // TODO Auto-generated catch block
+                // Auto-generated catch block
                 e.printStackTrace();
             } catch (IllegalStateException e) {
-                // TODO Auto-generated catch block
+                // Auto-generated catch block
                 e.printStackTrace();
             }
         }
@@ -267,7 +316,7 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
 
     @Override
     public void onDestroy() {
-        if(mDisposable!=null) {
+        if (mDisposable != null) {
             mDisposable.dispose();
             mDisposable = null;
         }

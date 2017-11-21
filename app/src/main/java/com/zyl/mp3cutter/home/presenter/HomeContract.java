@@ -66,6 +66,12 @@ public class HomeContract {
 
         void prepare();
 
+        void onSpeedDown();
+
+        void onTouchSpeedFastUp();
+
+        void onBackword();
+
         MediaPlayer getMediaPlayer();
 
         int getDuration();

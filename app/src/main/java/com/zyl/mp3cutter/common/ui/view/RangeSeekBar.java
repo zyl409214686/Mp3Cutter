@@ -34,7 +34,8 @@ import java.math.BigDecimal;
 public class RangeSeekBar<T extends Number> extends ImageView {
         private final Paint paint = new Paint();
         private final Bitmap thumbImage = BitmapFactory.decodeResource(getResources(), R.mipmap.btn_seekbar_normal);
-        private final Bitmap cur_thumbImage = BitmapFactory.decodeResource(getResources(), R.mipmap.player_thumb_press);
+//        private final Bitmap cur_thumbImage = BitmapFactory.decodeResource(getResources(), R.mipmap.player_thumb_press);
+        private final Bitmap cur_thumbImage = BitmapFactory.decodeResource(getResources(), R.mipmap.player_thumb_normal);
         private final Bitmap seekbarBg = BitmapFactory.decodeResource(getResources(), R.mipmap.seekbar_bg);
         private final Bitmap seekbarSelBg = BitmapFactory.decodeResource(getResources(), R.mipmap.seekbar_sel_bg);
       

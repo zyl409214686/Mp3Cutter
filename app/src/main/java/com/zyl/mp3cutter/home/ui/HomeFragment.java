@@ -9,7 +9,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
@@ -56,18 +55,11 @@ import static com.zyl.mp3cutter.common.constant.CommonConstant.RING_FOLDER;
  * Person in charge :  zouyulong
  */
 @RuntimePermissions
-public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter> implements HomeContract.View {
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    private String mParam1;
-    private String mParam2;
+public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter> implements HomeContract.View, View.OnClickListener {
 
     public HomeFragment() {
         // Required empty public constructor
     }
-
     private ImageButton mPlayBtn, mCutterBtn, mSpeedBtn, mBackwardBtn;
     private TextView mPlayerStartTimeTV, mPlayerEndTimeTV;
     private VisualizerView mVisualView;
@@ -75,7 +67,6 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
     private TextView mVoiceBtn, mChooseBtn;
     // intent返回动作
     private static final int REQUEST_CODE = 0;
-    private boolean mIsTouching;
     private RelativeLayout rl_player_voice;
     // 音量面板显示和隐藏动画
     private Animation showVoicePanelAnimation;
@@ -84,11 +75,66 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
     private SeekBar mVoiceSeekBar;
     // 获取系统音频对象
     private AudioManager mAudioManager;
+    // 音乐滑块事件
+    private RangeSeekBar.ThumbListener mThumbListener = new RangeSeekBar.ThumbListener() {
+
+        @Override
+        public void onClickMinThumb(Number max, Number min, Number cur) {
+            if (min.intValue() >= cur.intValue()) {
+                mPresenter.pause();
+                setPlayBtnStatus(false);
+            }
+        }
+
+        @Override
+        public void onClickMaxThumb() {
+
+        }
+
+        @Override
+        public void onMinMove(Number max, Number min, Number cur) {
+            if (min.intValue() > cur.intValue()) {
+                mPresenter.seekTo(min.intValue());
+                mPlaySeekBar.setSelectedCurValue(min.intValue());
+            }
+        }
+
+        @Override
+        public void onMaxMove(Number max, Number min, Number cur) {
+            if (max.intValue() < cur.intValue()) {
+                mPresenter.seekTo(max.intValue());
+                mPlaySeekBar.setSelectedCurValue(max.intValue());
+            }
+        }
+
+        @Override
+        public void onUpMinThumb(Number max, Number min, Number cur) {
+            if (min.intValue() >= cur.intValue()) {
+                mPresenter.play();
+                setPlayBtnStatus(true);
+            }
+        }
+
+        @Override
+        public void onUpMaxThumb() {
+
+        }
+    };
+
+    RangeSeekBar.OnRangeSeekBarChangeListener mRangeChangeListener =
+            new RangeSeekBar.OnRangeSeekBarChangeListener<Integer>() {
+        @Override
+        public void rangeSeekBarValuesChanged(
+                RangeSeekBar<Integer> rangeSeekBar,
+                Number minValue, Number maxValue) {
+            mPlaySeekBar.invalidate();
+        }
+    };
 
     /**
      * 声音滑块滑动事件
      */
-    private SeekBar.OnSeekBarChangeListener seekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
+    private SeekBar.OnSeekBarChangeListener mVoiceChangeListener = new SeekBar.OnSeekBarChangeListener() {
 
         public void onStopTrackingTouch(SeekBar seekBar) {
         }
@@ -111,15 +157,11 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
      * @return A new instance of fragment MusicPlayFragment.
      */
-    public static HomeFragment newInstance(String param1, String param2) {
+    public static HomeFragment newInstance() {
         HomeFragment fragment = new HomeFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -128,8 +170,6 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
 
@@ -154,9 +194,7 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
         mVisualView = (VisualizerView) view.findViewById(R.id.visual_view);
     }
 
-
     private void init() {
-//        myMediaPlayer = new MediaPlayer();
         mPlaySeekBar.setSelectedMinValue(0);
         mPlaySeekBar.setSelectedMaxValue(100);
         mPlaySeekBar.setSelectedCurValue(0);
@@ -214,14 +252,12 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
                 .homeModule(new HomeModule(this)) //请将TempLateModule()第一个首字母改为小写
                 .build()
                 .inject(this);
-
     }
 
     @Override
     protected View initView(LayoutInflater inflater, ViewGroup container) {
         // Inflate the layout for this fragment
         FragmentHomeBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false);
-//        View view = inflater.inflate(R.layout.fragment_home, container, false);
         View view = binding.getRoot();
         initView(view);
         init();
@@ -235,7 +271,7 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
     }
 
     @Override
-    public void checkRecordPermission(MediaPlayer mediaPlayer){
+    public void checkRecordPermission(MediaPlayer mediaPlayer) {
         HomeFragmentPermissionsDispatcher.linkMediaPlayerForVisualViewWithPermissionCheck(this, mediaPlayer);
     }
 
@@ -297,6 +333,7 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
     @Override
     public void setPlayCurValue(int value) {
         mPlayerStartTimeTV.setText(TimeUtils.formatSecondTime(value));
+        mPlaySeekBar.setSelectedCurValue(value);
     }
 
     @Override
@@ -308,22 +345,6 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
     @Override
     public void doCutterSucc(String path) {
         showCutterSuccessDialog(path);
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
-
     }
 
     /**
@@ -365,88 +386,25 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
     }
 
     private void initListener() {
-        /**
-         * 选择音乐
-         */
-        mChooseBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (Environment.getExternalStorageState().equals(
-                        Environment.MEDIA_MOUNTED))
-                    startActivityForResult(new Intent(getActivity(),
-                            FileChooserActivity.class), REQUEST_CODE);
-                else
-                    Toast.makeText(getActivity(),
-                            R.string.sdcard_unmonted_hint, Toast.LENGTH_SHORT)
-                            .show();
-            }
-        });
+        mChooseBtn.setOnClickListener(this);
+        mPlayBtn.setOnClickListener(this);
+        mCutterBtn.setOnClickListener(this);
+        mVoiceBtn.setOnClickListener(this);
+        mPlaySeekBar.setThumbListener(mThumbListener);
+        mVoiceSeekBar.setOnSeekBarChangeListener(mVoiceChangeListener);
+//        mPlaySeekBar
+//                .setOnRangeSeekBarChangeListener(mRangeChangeListener);
 
-
-        /**
-         * 播放音乐
-         */
-
-        mPlayBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mPresenter.playToggle(getActivity());
-            }
-        });
-
-        /**
-         * 剪切音乐
-         */
-        mCutterBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mPresenter.isSelectedMp3(getActivity()))
-                    showCutterPromptDialog();
-            }
-        });
-
-        /**
-         * 快进功能
-         */
         mSpeedBtn.setOnTouchListener(new View.OnTouchListener() {
-
             @Override
             public boolean onTouch(View v, MotionEvent event) {
 
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        new Thread() {
-                            @Override
-                            public void run() {
-                                mIsTouching = true;
-                                while (mIsTouching) {
-                                    Number curNumber = mPlaySeekBar
-                                            .getSelectedMaxValue();
-                                    if (mPresenter.getCurPosition() + 500 < curNumber
-                                            .doubleValue())
-                                        mPresenter.seekTo(mPresenter
-                                                .getCurPosition() + 500);
-                                    else if (mPresenter.getCurPosition() + 500 == curNumber
-                                            .doubleValue()) {
-                                        mPresenter.seekTo(mPresenter
-                                                .getDuration());
-                                        mIsTouching = false;
-                                    } else {
-                                        mIsTouching = false;
-                                    }
-                                    try {
-                                        Thread.sleep(10);
-                                    } catch (InterruptedException e) {
-                                        // TODO Auto-generated catch block
-                                        e.printStackTrace();
-                                    }
-                                }
-                                super.run();
-                            }
-                        }.start();
+                        mPresenter.onSpeedDown();
                         break;
                     case MotionEvent.ACTION_UP:
-                        mIsTouching = false;
+                        mPresenter.onTouchSpeedFastUp();
                         break;
                 }
                 return false;
@@ -463,127 +421,15 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
 
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        new Thread() {
-                            @Override
-                            public void run() {
-                                mIsTouching = true;
-                                while (mIsTouching) {
-                                    Number minNumber = mPlaySeekBar
-                                            .getSelectedMinValue();
-                                    if (mPresenter.getCurPosition() - 500 > minNumber
-                                            .doubleValue())
-                                        mPresenter.seekTo(mPresenter
-                                                .getCurPosition() - 500);
-                                    else if (mPresenter.getCurPosition() - 500 == minNumber
-                                            .doubleValue()) {
-                                        mPresenter.seekTo(mPresenter
-                                                .getDuration());
-                                        mIsTouching = false;
-                                    } else {
-                                        mIsTouching = false;
-                                    }
-                                    try {
-                                        Thread.sleep(10);
-                                    } catch (InterruptedException e) {
-                                        // TODO Auto-generated catch block
-                                        e.printStackTrace();
-                                    }
-                                }
-                                super.run();
-                            }
-                        }.start();
+                        mPresenter.onBackword();
                         break;
                     case MotionEvent.ACTION_UP:
-                        mIsTouching = false;
+                        mPresenter.onTouchSpeedFastUp();
                         break;
                 }
                 return false;
             }
         });
-
-        /**
-         * 音量控制
-         */
-        mVoiceBtn.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                voicePanelAnimation();
-            }
-        });
-
-        /**
-         * 音量滑块滑动事件
-         */
-        mVoiceSeekBar.setOnSeekBarChangeListener(seekBarChangeListener);
-
-        /**
-         * 音乐滑块点击事件
-         */
-        mPlaySeekBar.setThumbListener(new RangeSeekBar.ThumbListener() {
-
-            @Override
-            public void onClickMinThumb(Number max, Number min, Number cur) {
-                if (min.intValue() >= cur.intValue()) {
-                    mPresenter.pause();
-                    setPlayBtnStatus(false);
-                }
-            }
-
-            @Override
-            public void onClickMaxThumb() {
-                // TODO Auto-generated method stub
-
-            }
-
-            @Override
-            public void onMinMove(Number max, Number min, Number cur) {
-                // TODO Auto-generated method stub
-                if (min.intValue() > cur.intValue()) {
-                    mPresenter.seekTo(min.intValue());
-                    mPlaySeekBar.setSelectedCurValue(min.intValue());
-                }
-            }
-
-            @Override
-            public void onMaxMove(Number max, Number min, Number cur) {
-                // TODO Auto-generated method stub
-                if (max.intValue() < cur.intValue()) {
-                    mPresenter.seekTo(max.intValue());
-                    mPlaySeekBar.setSelectedCurValue(max.intValue());
-                }
-            }
-
-            @Override
-            public void onUpMinThumb(Number max, Number min, Number cur) {
-                if (min.intValue() >= cur.intValue()) {
-                    mPresenter.play();
-                    setPlayBtnStatus(true);
-                }
-            }
-
-            @Override
-            public void onUpMaxThumb() {
-                // TODO Auto-generated method stub
-
-            }
-
-        });
-
-        /**
-         * 滑块滑动事件
-         */
-        mPlaySeekBar
-                .setOnRangeSeekBarChangeListener(new RangeSeekBar.OnRangeSeekBarChangeListener<Integer>() {
-
-                    @Override
-                    public void rangeSeekBarValuesChanged(
-                            RangeSeekBar<Integer> rangeSeekBar,
-                            Number minValue, Number maxValue) {
-                        mPlaySeekBar.invalidate();
-                    }
-
-                });
     }
 
 
@@ -594,19 +440,6 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
         mPresenter.onActivityResult(requestCode, resultCode, data);
     }
 
-    /**
-     * ⑨重写onRequestPermissionsResult方法
-     * 获取动态权限请求的结果,再开启录制音频
-     */
-//    @Override
-//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-//        if (requestCode == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//
-//        } else {
-//            Toast.makeText(getActivity(), "用户拒绝了权限", Toast.LENGTH_SHORT).show();
-//        }
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-//    }
     @Override
     public void onStop() {
         super.onStop();
@@ -644,8 +477,41 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
 
     @Override
     public boolean shouldShowRequestPermissionRationale(@NonNull String permission) {
-        if(permission==Manifest.permission.RECORD_AUDIO)
+        if (permission == Manifest.permission.RECORD_AUDIO)
             return true;
         return super.shouldShowRequestPermissionRationale(permission);
+    }
+
+    @Override
+    public void onClick(View v) {
+        int id = v.getId();
+        switch (id){
+            case R.id.btn_player_open:
+                openFile();
+                break;
+            case R.id.btn_play:
+                mPresenter.playToggle(getActivity());
+                break;
+            case R.id.btn_cutter_sure:
+                if (mPresenter.isSelectedMp3(getActivity()))
+                    showCutterPromptDialog();
+                break;
+            case R.id.btn_player_voice:
+                voicePanelAnimation();
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void openFile(){
+        if (Environment.getExternalStorageState().equals(
+                Environment.MEDIA_MOUNTED))
+            startActivityForResult(new Intent(getActivity(),
+                    FileChooserActivity.class), REQUEST_CODE);
+        else
+            Toast.makeText(getActivity(),
+                    R.string.sdcard_unmonted_hint, Toast.LENGTH_SHORT)
+                    .show();
     }
 }
