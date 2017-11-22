@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">音乐理发师</string>
+    <string name="app_name">Music剪刀手</string>
 
     <!-- MainActivity -->
     <string name="main_music">音乐</string>

@@ -5,9 +5,9 @@
         android:id="@+id/rl_main"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:background="#33888888">
+        android:background="#ffffff">
 
-        <!-- top bar view -->
+        <!-- top bar view 66cccc -->
 
         <RelativeLayout
             android:id="@+id/rl_player_topbar"
