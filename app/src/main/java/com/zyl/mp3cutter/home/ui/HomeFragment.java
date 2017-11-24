@@ -64,7 +64,6 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
     private TextView mPlayerStartTimeTV, mPlayerEndTimeTV;
     private VisualizerView mVisualView;
     private RangeSeekBar<Integer> mPlaySeekBar;
-    private TextView mVoiceBtn, mChooseBtn;
     // intent返回动作
     private static final int REQUEST_CODE = 0;
     private RelativeLayout rl_player_voice;
@@ -179,7 +178,6 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
     }
 
     private void initView(View view) {
-        mChooseBtn = (TextView) view.findViewById(R.id.btn_player_open);//.setOnClickListener(this);
         mPlayBtn = (ImageButton) view.findViewById(R.id.btn_play);
         mPlaySeekBar = (RangeSeekBar) view.findViewById(R.id.sb_player_cutterprogress);
         mCutterBtn = (ImageButton) view.findViewById(R.id.btn_cutter_sure);
@@ -188,7 +186,6 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
         mPlayerStartTimeTV = (TextView) view.findViewById(R.id.tv_player_playing_time);
         mPlayerEndTimeTV = (TextView) view.findViewById(R.id.tv_player_playering_end);
         rl_player_voice = (RelativeLayout) view.findViewById(R.id.rl_player_voice);
-        mVoiceBtn = (TextView) view.findViewById(R.id.btn_player_voice);
         mVoiceSeekBar = (SeekBar) view.findViewById(R.id.sb_player_voice);
         // 频谱视图
         mVisualView = (VisualizerView) view.findViewById(R.id.visual_view);
@@ -261,7 +258,7 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
         View view = binding.getRoot();
         initView(view);
         init();
-        initListener();
+        initListener(view);
         return view;
     }
 
@@ -306,6 +303,10 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
     public void setSeekbarValue(int selmin, int selcur) {
         mPlaySeekBar.setSelectedMinValue(selmin);
         mPlaySeekBar.setSelectedCurValue(selcur);
+    }
+
+    public void setSeekBarClickable(boolean isClickable){
+        mPlaySeekBar.setClickable(isClickable);
     }
 
     @NeedsPermission(Manifest.permission.RECORD_AUDIO)
@@ -375,7 +376,7 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
     /**
      * 音乐显示和隐藏
      */
-    private void voicePanelAnimation() {
+    public void voicePanelAnimation() {
         if (rl_player_voice.getVisibility() == View.GONE) {
             rl_player_voice.startAnimation(showVoicePanelAnimation);
             rl_player_voice.setVisibility(View.VISIBLE);
@@ -384,17 +385,21 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
             rl_player_voice.setVisibility(View.GONE);
         }
     }
+    
+    private void hidenVoicePanel(){
+        if(rl_player_voice.getVisibility() == View.VISIBLE) {
+            rl_player_voice.startAnimation(hiddenVoicePanelAnimation);
+            rl_player_voice.setVisibility(View.GONE);
+        }
+    }
 
-    private void initListener() {
-        mChooseBtn.setOnClickListener(this);
+    private void initListener(View view) {
+        view.findViewById(R.id.dismiss_voicebar_space).setOnClickListener(this);
         mPlayBtn.setOnClickListener(this);
         mCutterBtn.setOnClickListener(this);
-        mVoiceBtn.setOnClickListener(this);
         mPlaySeekBar.setThumbListener(mThumbListener);
+        mPlaySeekBar.setClickable(false);
         mVoiceSeekBar.setOnSeekBarChangeListener(mVoiceChangeListener);
-//        mPlaySeekBar
-//                .setOnRangeSeekBarChangeListener(mRangeChangeListener);
-
         mSpeedBtn.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -431,7 +436,6 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
             }
         });
     }
-
 
     /**
      * 选择文件返回
@@ -486,9 +490,6 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
     public void onClick(View v) {
         int id = v.getId();
         switch (id){
-            case R.id.btn_player_open:
-                openFile();
-                break;
             case R.id.btn_play:
                 mPresenter.playToggle(getActivity());
                 break;
@@ -496,15 +497,15 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
                 if (mPresenter.isSelectedMp3(getActivity()))
                     showCutterPromptDialog();
                 break;
-            case R.id.btn_player_voice:
-                voicePanelAnimation();
+            case R.id.dismiss_voicebar_space:
+                hidenVoicePanel();
                 break;
             default:
                 break;
         }
     }
 
-    private void openFile(){
+    public void openFile(){
         if (Environment.getExternalStorageState().equals(
                 Environment.MEDIA_MOUNTED))
             startActivityForResult(new Intent(getActivity(),

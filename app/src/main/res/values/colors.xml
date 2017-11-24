@@ -16,9 +16,9 @@
     <color name="yes_theme_green2">#00ffb3</color>
     <color name="yes_theme_red">#ff3057</color>
 
-    <color name="Indigo_colorPrimaryDark">#303f9f</color>
-    <color name="Indigo_colorPrimary">#3f51b5</color>
-    <color name="Indigo_nav_color">#4675FF</color>
+    <color name="Indigo_colorPrimaryDark">#000000</color>
+    <color name="Indigo_colorPrimary">#27272E</color>
+    <color name="Indigo_nav_color">#37373E</color>
 
 
 

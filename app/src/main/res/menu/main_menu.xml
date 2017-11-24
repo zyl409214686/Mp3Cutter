@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/home_item_voice"
+            android:icon="@drawable/selector_voice"
+            android:title="声音"
+            app:showAsAction="ifRoom"/>
+        <item
+            android:id="@+id/home_item_open"
+            android:icon="@drawable/selector_open"
+            android:title="打开"
+            app:showAsAction="ifRoom"/>
+    </group>
+</menu>

@@ -4,10 +4,12 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
 
 import com.jaeger.library.StatusBarUtil;
@@ -19,13 +21,13 @@ public class MainActivity extends AppCompatActivity {
     private Toolbar mToolBar;
     private DrawerLayout mDrawerLayout;
     private NavigationView mNavigationView;
-
+    Fragment mCurFragment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initView();
-        switchToCutterPage();
+        switchToHomePage();
 //        StatusBarUtil.setTransparent(HomeActivity.this);
         StatusBarUtil.setColorForDrawerLayout(MainActivity.this,
                 mDrawerLayout, Color.TRANSPARENT);
@@ -39,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void initToolBar() {
         mToolBar = (Toolbar) findViewById(R.id.tb_custom);
+        mToolBar.setTitle("主页");
         mToolBar.setTitleTextColor(Color.parseColor("#ffffff"));
         setSupportActionBar(mToolBar);
     }
@@ -62,8 +65,7 @@ public class MainActivity extends AppCompatActivity {
                         switchToAbout();
                         break;
                     case R.id.item_home:
-//                        switchToFolder();
-                        switchToCutterPage();
+                        switchToHomePage();
                         break;
                     case R.id.item_setting:
                         switchToSetting();
@@ -78,21 +80,54 @@ public class MainActivity extends AppCompatActivity {
 
     private void switchToSetting() {
         getSupportFragmentManager().beginTransaction().replace(R.id.frame_content, new SettingFragment()).commit();
-        mToolBar.setTitle("个人设置~");
+        mToolBar.setTitle("个人设置");
     }
 
-    private void switchToFolder() {
-        getSupportFragmentManager().beginTransaction().replace(R.id.frame_content, new FolderFragment()).commit();
-        mToolBar.setTitle("选择目录~~");
-    }
-
-    private void switchToCutterPage() {
+    private void switchToHomePage() {
         getSupportFragmentManager().beginTransaction().replace(R.id.frame_content, HomeFragment.newInstance()).commit();
-        mToolBar.setTitle("音乐播放~~~");
+        mToolBar.setTitle("主页");
     }
 
     private void switchToAbout() {
         getSupportFragmentManager().beginTransaction().replace(R.id.frame_content, new AboutFragment()).commit();
-        mToolBar.setTitle("关于~~~~");
+        mToolBar.setTitle("关于");
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        mCurFragment = getSupportFragmentManager().findFragmentById(R.id.frame_content);
+        if(mCurFragment instanceof HomeFragment){
+            menu.findItem(R.id.home_item_open).setVisible(true);
+            menu.findItem(R.id.home_item_voice).setVisible(true);
+        }
+        else{
+            menu.findItem(R.id.home_item_open).setVisible(false);
+            menu.findItem(R.id.home_item_voice).setVisible(false);
+        }
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.home_item_voice:
+                if(mCurFragment instanceof HomeFragment){
+                    ((HomeFragment)mCurFragment).voicePanelAnimation();
+                }
+                break;
+            case R.id.home_item_open:
+                if(mCurFragment instanceof HomeFragment){
+                    ((HomeFragment)mCurFragment).openFile();
+                }
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

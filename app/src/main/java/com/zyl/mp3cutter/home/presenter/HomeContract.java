@@ -34,10 +34,12 @@ public class HomeContract {
 
         void addBarGraphRenderers();
 
-        /**
-         * 设置当前播放值
-         * @param value
-         */
+        void setSeekBarClickable(boolean isClickable);
+
+            /**
+             * 设置当前播放值
+             * @param value
+             */
         void setPlayCurValue(int value);
 
         /**

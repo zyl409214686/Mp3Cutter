@@ -7,104 +7,100 @@
         android:layout_height="fill_parent"
         android:background="#ffffff">
 
-        <!-- top bar view 66cccc -->
-
+        <!-- voice bar -->
         <RelativeLayout
-            android:id="@+id/rl_player_topbar"
-            android:layout_width="fill_parent"
+            android:id="@+id/rl_player_voice"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true">
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="10dp"
+            android:visibility="gone">
 
-            <TextView
-                android:id="@+id/btn_player_open"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_marginBottom="5dp"
-                android:layout_marginRight="5dp"
-                android:layout_marginTop="5dp"
-                android:background="@drawable/shape_home_btn_back"
-                android:text="选择"
-                android:textColor="#ffffff"
-                android:textSize="14sp" />
-
-            <TextView
-                android:id="@+id/btn_player_voice"
+            <ImageView
+                android:id="@+id/iv_player_min_voice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
-                android:layout_marginBottom="5dp"
-                android:layout_marginLeft="5dp"
-                android:layout_marginTop="5dp"
-                android:background="@drawable/shape_home_btn_back"
-                android:text="声音"
-                android:textColor="#ffffff"
-                android:textSize="14sp" />
-        </RelativeLayout>
-        <!-- album view  android:background="@drawable/default_album" -->
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="10dip"
+                android:background="@mipmap/volume_min" />
 
-        <RelativeLayout
-            android:id="@+id/rl_player_display"
-            android:layout_width="fill_parent"
-            android:layout_height="352dp"
-            android:layout_below="@id/rl_player_topbar">
+            <ImageView
+                android:id="@+id/iv_player_max_voice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="10dp"
+                android:background="@mipmap/volume_max" />
 
-            <!--
-                 <ImageView android:layout_width="252dip"
-                android:layout_height="252dip"
-                android:layout_centerInParent="true"
-                android:src="@drawable/centerlogo"/>
-            -->
-
-            <com.zyl.mp3cutter.common.ui.view.visualizer.VisualizerView
-                android:id="@+id/visual_view"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent" />
-
-            <RelativeLayout
-                android:id="@+id/rl_player_voice"
+            <SeekBar
+                android:id="@+id/sb_player_voice"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:visibility="gone">
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@id/iv_player_max_voice"
+                android:layout_toRightOf="@id/iv_player_min_voice" />
 
-                <ImageView
-                    android:id="@+id/iv_player_min_voice"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginLeft="10dip"
-                    android:background="@mipmap/volume_min" />
-
-                <ImageView
-                    android:id="@+id/iv_player_max_voice"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginRight="10dp"
-                    android:background="@mipmap/volume_max" />
-
-                <SeekBar
-                    android:id="@+id/sb_player_voice"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_toLeftOf="@id/iv_player_max_voice"
-                    android:layout_toRightOf="@id/iv_player_min_voice"
-                    android:paddingLeft="5dp"
-                    android:paddingRight="5dp"/>
-
-            </RelativeLayout>
         </RelativeLayout>
-        <!-- playbar view -->
+        <!-- 点击声音bar消失占位view -->
+        <View
+            android:id="@+id/dismiss_voicebar_space"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/rl_player_voice"/>
+        <!-- playerbar view -->
+        <LinearLayout
+            android:id="@+id/ll_play_toolbar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:orientation="horizontal"
+            android:weightSum="4">
 
+            <ImageButton
+                android:id="@+id/btn_play"
+                android:layout_width="80dp"
+                android:layout_height="55dp"
+                android:layout_margin="3dp"
+                android:layout_weight="1"
+                android:background="@drawable/selector_play_btn" />
+
+            <ImageButton
+                android:id="@+id/btn_speed"
+                android:layout_width="80dp"
+                android:layout_height="55dp"
+                android:layout_margin="3dp"
+                android:layout_weight="1"
+                android:background="@drawable/selector_forward_btn" />
+
+            <ImageButton
+                android:id="@+id/btn_backward"
+                android:layout_width="80dp"
+                android:layout_height="55dp"
+                android:layout_margin="3dp"
+                android:layout_weight="1"
+                android:background="@drawable/selector_backward_btn" />
+
+            <ImageButton
+                android:id="@+id/btn_cutter_sure"
+                android:layout_width="80dp"
+                android:layout_height="55dp"
+                android:layout_margin="3dp"
+                android:layout_weight="1"
+                android:background="@drawable/selector_sure_btn" />
+        </LinearLayout>
+
+        <!-- playbar view -->
         <RelativeLayout
             android:id="@+id/rl_player_center"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/rl_player_display">
+            android:layout_above="@id/ll_play_toolbar"
+            android:layout_marginBottom="10dp">
 
             <ImageView
                 android:id="@+id/topborder"
@@ -166,86 +162,11 @@
                 android:layout_below="@id/rl_playerbar"
                 android:background="@mipmap/border_bg" />
         </RelativeLayout>
-        <!-- playerbar view -->
 
-        <LinearLayout
-            android:id="@+id/ll_play_toolbar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/rl_player_center"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:orientation="horizontal"
-            android:weightSum="4">
-
-            <ImageButton
-                android:id="@+id/btn_play"
-                android:layout_width="80dp"
-                android:layout_height="55dp"
-                android:layout_margin="3dp"
-                android:layout_weight="1"
-                android:background="@drawable/selector_play_btn" />
-
-            <ImageButton
-                android:id="@+id/btn_speed"
-                android:layout_width="80dp"
-                android:layout_height="55dp"
-                android:layout_margin="3dp"
-                android:layout_weight="1"
-                android:background="@drawable/selector_forward_btn" />
-
-            <ImageButton
-                android:id="@+id/btn_backward"
-                android:layout_width="80dp"
-                android:layout_height="55dp"
-                android:layout_margin="3dp"
-                android:layout_weight="1"
-                android:background="@drawable/selector_backward_btn" />
-
-            <ImageButton
-                android:id="@+id/btn_cutter_sure"
-                android:layout_width="80dp"
-                android:layout_height="55dp"
-                android:layout_margin="3dp"
-                android:layout_weight="1"
-                android:background="@drawable/selector_sure_btn" />
-        </LinearLayout>
-        <!--
-                <RelativeLayout
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:id="@+id/rl_player_bottom"
-                    android:layout_below="@id/rl_player_center"
-                    android:gravity="center_vertical"
-                    >
-                    <ImageButton
-                        android:layout_width="80dp"
-                        android:layout_height="55dp"
-                        android:layout_alignParentLeft="true"
-                        android:background="@drawable/sure_btn_bg"
-                        android:id="@+id/btn_cutter_sure"
-                        />
-                    <ImageButton
-                        android:layout_width="80dp"
-                        android:layout_height="55dp"
-                        android:layout_alignParentRight="true"
-                        android:background="@drawable/recommend_btn_bg"
-                        />
-                    <ImageView
-                        android:layout_width="80dp"
-                        android:layout_height="55dp"
-                        android:id="@+id/test"
-                        />
-                </RelativeLayout>
-        -->
-
-        <LinearLayout
-            android:id="@+id/AdLinearLayout"
+        <com.zyl.mp3cutter.common.ui.view.visualizer.VisualizerView
+            android:id="@+id/visual_view"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:gravity="center_horizontal"
-            android:orientation="horizontal" />
-
+            android:layout_height="fill_parent"
+            android:layout_above="@id/rl_player_center"/>
     </RelativeLayout>
 </layout>

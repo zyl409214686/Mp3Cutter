@@ -14,195 +14,179 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.zyl.mp3cutter.R;
+import com.zyl.mp3cutter.common.app.MyApplication;
+import com.zyl.mp3cutter.common.utils.FileUtils;
 import com.zyl.mp3cutter.databinding.ActivityFilechooserShowBinding;
 import com.zyl.mp3cutter.home.bean.MusicInfo;
+import com.zyl.mp3cutter.home.bean.MusicInfoDao;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 
 //import android.widget.TextView;
 
 public class FileChooserActivity extends Activity {
 
-	private ListView mListView;
-	// private View mBackView;
-	private View mBtExit;
-	// private TextView mTvPath ;
+    private ListView mListView;
+    // private View mBackView;
+    private View mBtExit;
+    // private TextView mTvPath ;
 
-	private String mSdcardRootPath;
-	private String mLastFilePath;
-	private ArrayList<MusicInfo> mFileLists = new ArrayList<MusicInfo>();
-	private FileChooserAdapter mAdatper;
-	public static final String EXTRA_FILE_CHOOSER = "file_chooser";
-	private ProgressDialog dialog;
-	private Handler mHandler = new Handler();
+    private String mSdcardRootPath;
+    private String mLastFilePath;
+    private ArrayList<MusicInfo> mFileLists = new ArrayList<MusicInfo>();
+    private FileChooserAdapter mAdatper;
+    public static final String EXTRA_FILE_CHOOSER = "file_chooser";
+    private ProgressDialog dialog;
+    private Handler mHandler = new Handler();
+    MusicInfoDao mDao;
 
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		ActivityFilechooserShowBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_filechooser_show);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        ActivityFilechooserShowBinding binding =
+                DataBindingUtil.setContentView(this, R.layout.activity_filechooser_show);
 
-		mSdcardRootPath = Environment.getExternalStorageDirectory()
-				.getAbsolutePath();
+        mSdcardRootPath = Environment.getExternalStorageDirectory()
+                .getAbsolutePath();
+        mBtExit = findViewById(R.id.btExit);
+        mBtExit.setOnClickListener(mClickListener);
 
-		// mBackView = findViewById(R.id.imgBackFolder);
-		// mBackView.setOnClickListener(mClickListener);
-		mBtExit = findViewById(R.id.btExit);
-		mBtExit.setOnClickListener(mClickListener);
+        mListView = (ListView) findViewById(R.id.gvFileChooser);
+        mListView.setEmptyView(findViewById(R.id.tvEmptyHint));
+        mListView.setOnItemClickListener(mItemClickListener);
+        mAdatper = new FileChooserAdapter(this);
+        mListView.setAdapter(mAdatper);
+        refreshData();
+    }
 
-		// mTvPath = (TextView)findViewById(R.id.tvPath);
+    private void refreshData() {
+        mDao = MyApplication.getInstances().
+                getDaoSession().getMusicInfoDao();
+        dialog = ProgressDialog.show(FileChooserActivity.this, "提示",
+                "音乐文件扫描中...");
+        new Thread() {
+            public void run() {
+                List<MusicInfo> datas = mDao.loadAll();
+                if (datas.size() > 0) {
+                    mFileLists.clear();
+                    mFileLists.addAll(datas);
+                } else {
+                    updateFileItems(mSdcardRootPath);
+                    mDao.deleteAll();
+                    mDao.insertInTx(mFileLists);
+                }
+                mHandler.post(new Runnable() {
 
-		mListView = (ListView) findViewById(R.id.gvFileChooser);
-		mListView.setEmptyView(findViewById(R.id.tvEmptyHint));
-		mListView.setOnItemClickListener(mItemClickListener);
-		mAdatper = new FileChooserAdapter(this);
-		mListView.setAdapter(mAdatper);
-		refreshData();
-	}
+                    @Override
+                    public void run() {
+                        dialog.dismiss();
+                        // When first enter , the object of mAdatper don't
+                        // initialized
+                        if (mAdatper != null) {
+                            mAdatper.setData(mFileLists);
+                            mAdatper.notifyDataSetChanged();
+                        }
+                    }
+                });
+            }
 
-	private void refreshData() {
-		dialog = ProgressDialog.show(FileChooserActivity.this, "提示",
-				"音乐文件扫描中...");
-		new Thread() {
-			public void run() {
-//				List<Music> datas = DataSupport.findAll(Music.class);
-//				if (datas.size() > 0) {
-//					mFileLists.clear();
-//					mFileLists.addAll(datas);
-//				} else {
-					updateFileItems(mSdcardRootPath);
-//					DataSupport.deleteAll(Music.class);
-//					DataSupport.saveAll(mFileLists);
-//				}
-				mHandler.post(new Runnable() {
+            ;
+        }.start();
 
-					@Override
-					public void run() {
-						dialog.dismiss();
-						// When first enter , the object of mAdatper don't
-						// initialized
-						if (mAdatper != null) {
-							mAdatper.setData(mFileLists);
-							mAdatper.notifyDataSetChanged();
-						}
-					}
-				});
-			};
-		}.start();
+    }
 
-	}
+    private void updateFileItems(String filePath) {
+        mLastFilePath = filePath;
+        // mTvPath.setText(mLastFilePath);
 
-	private void updateFileItems(String filePath) {
-		mLastFilePath = filePath;
-		// mTvPath.setText(mLastFilePath);
+        if (mFileLists == null)
+            mFileLists = new ArrayList<>();
+        // if(!mFileLists.isEmpty())
+        // mFileLists.clear() ;
 
-		if (mFileLists == null)
-			mFileLists = new ArrayList<MusicInfo>();
-		// if(!mFileLists.isEmpty())
-		// mFileLists.clear() ;
+        File[] files = folderScan(filePath);
+        if (files == null)
+            return;
+        File file;
+        for (int i = 0; i < files.length; i++) {
+            if (files[i].isHidden())
+                continue;
 
-		File[] files = folderScan(filePath);
-		if (files == null)
-			return;
+            String fileAbsolutePath = files[i].getAbsolutePath();
+            String fileName = files[i].getName();
+            boolean isDirectory = false;
+            if (files[i].isDirectory()) {
+                isDirectory = true;
+            }
+            FileChooserAdapter.FileInfo fileInfo = new FileChooserAdapter.FileInfo(fileAbsolutePath, fileName,
+                    isDirectory);
+            if (fileInfo.isDirectory())
+                updateFileItems(fileInfo.getFilePath());
+            else if (fileInfo.isMUSICFile()) {
+                String path = fileInfo.getFilePath();
+                file = new File(path);
+                String size = FileUtils.getFormatFileSizeForFile(file);
+                MusicInfo music = new MusicInfo(null, fileInfo.getFilePath(),
+                        fileInfo.getFileName(), size);
+                mFileLists.add(music);
+            }
+        }
+    }
 
-		for (int i = 0; i < files.length; i++) {
-			if (files[i].isHidden())
-				continue;
+    private File[] folderScan(String path) {
+        File file = new File(path);
+        File[] files = file.listFiles();
+        return files;
+    }
 
-			String fileAbsolutePath = files[i].getAbsolutePath();
-			String fileName = files[i].getName();
-			boolean isDirectory = false;
-			if (files[i].isDirectory()) {
-				isDirectory = true;
-			}
-			FileChooserAdapter.FileInfo fileInfo = new FileChooserAdapter.FileInfo(fileAbsolutePath, fileName,
-					isDirectory);
-			if (fileInfo.isDirectory())
-				updateFileItems(fileInfo.getFilePath());
-			else if (fileInfo.isMUSICFile()) {
-				MusicInfo music = new MusicInfo();
-				music.setFilename(fileInfo.getFileName());
-				music.setFilepath(fileInfo.getFilePath());
-				mFileLists.add(music);
-			}
-		}
-	}
+    private OnClickListener mClickListener = new OnClickListener() {
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.btExit:
+                    setResult(RESULT_CANCELED);
+                    finish();
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
 
-	private File[] folderScan(String path) {
-		File file = new File(path);
-		File[] files = file.listFiles();
-		return files;
-	}
+    private OnItemClickListener mItemClickListener = new OnItemClickListener() {
+        public void onItemClick(AdapterView<?> adapterView, View view,
+                                int position, long id) {
+            MusicInfo fileInfo = (MusicInfo) (((FileChooserAdapter) adapterView
+                    .getAdapter()).getItem(position));
+            Intent intent = new Intent();
+            intent.putExtra(EXTRA_FILE_CHOOSER, fileInfo.getFilepath());
+            setResult(RESULT_OK, intent);
+            finish();
+        }
+    };
 
-	private OnClickListener mClickListener = new OnClickListener() {
-		public void onClick(View v) {
-			switch (v.getId()) {
-			// case R.id.imgBackFolder:
-			// backProcess();
-			// break;
-			case R.id.btExit:
-				setResult(RESULT_CANCELED);
-				finish();
-				break;
-			default:
-				break;
-			}
-		}
-	};
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (event.getAction() == KeyEvent.ACTION_DOWN
+                && event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
+            backProcess();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
 
-	private OnItemClickListener mItemClickListener = new OnItemClickListener() {
-		public void onItemClick(AdapterView<?> adapterView, View view,
-				int position, long id) {
-			MusicInfo fileInfo = (MusicInfo) (((FileChooserAdapter) adapterView
-					.getAdapter()).getItem(position));
-			// if(fileInfo.isDirectory())
-			// updateFileItems(fileInfo.getFilePath()) ;
-			// else
-			// if(fileInfo.isMUSICFile()){
-			Intent intent = new Intent();
-			intent.putExtra(EXTRA_FILE_CHOOSER, fileInfo.getFilepath());
-			setResult(RESULT_OK, intent);
-			finish();
-			// }
-			// else {
-			// toast(getText(R.string.open_file_error_format));
-			// }
-		}
-	};
+    public void backProcess() {
+        setResult(RESULT_CANCELED);
+        finish();
+    }
 
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if (event.getAction() == KeyEvent.ACTION_DOWN
-				&& event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
-			backProcess();
-			return true;
-		}
-		return super.onKeyDown(keyCode, event);
-	}
-
-	public void backProcess() {
-		// if (!mLastFilePath.equals(mSdcardRootPath)) {
-		// File thisFile = new File(mLastFilePath);
-		// String parentFilePath = thisFile.getParent();
-		// updateFileItems(parentFilePath);
-		// }
-		// else {
-		setResult(RESULT_CANCELED);
-		finish();
-		// }
-	}
-
-	private void toast(CharSequence hint) {
-		Toast.makeText(this, hint, Toast.LENGTH_SHORT).show();
-	}
-
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		if(dialog!=null)
-			dialog.dismiss();
-	}
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (dialog != null)
+            dialog.dismiss();
+    }
 }

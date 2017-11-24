@@ -1,6 +1,6 @@
 package com.zyl.mp3cutter.mp3separate.bean;
 
-import com.zyl.mp3cutter.mp3separate.util.FileUtil;
+import com.zyl.mp3cutter.common.utils.FileUtils;
 import com.zyl.mp3cutter.mp3separate.util.StringUtil;
 
 import org.jaudiotagger.audio.mp3.MP3AudioHeader;
@@ -163,6 +163,6 @@ public class Mp3Fenge
     byte[] e2 = helper.getDataByTime(new File("testdata/e1.mp3"), 70000, 76000);
     List mp3datas = new ArrayList();
     mp3datas.add(e2);
-    FileUtil.generateFile(new File("testdata/e2.mp3"), mp3datas);
+    FileUtils.generateFile(new File("testdata/e2.mp3"), mp3datas);
   }
 }

@@ -293,6 +293,7 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
                 if (!TextUtils.isEmpty(mSelMusicPath)) {
                     mView.setSeekbarValue(0, 0);
                     mView.setPlayBtnStatus(false);
+                    mView.setSeekBarClickable(true);
                     pause();
                     reset();
                     setDataSource(mSelMusicPath);
