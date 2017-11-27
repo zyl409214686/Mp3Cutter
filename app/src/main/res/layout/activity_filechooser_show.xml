@@ -1,41 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#ffffff"
-        android:orientation="horizontal"
-        android:padding="5.0dip">
+        android:orientation="vertical">
 
-        <Button
-            android:id="@+id/btExit"
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:gravity="center"
-            android:text="退出"></Button>
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/Indigo_colorPrimary"
+            app:navigationIcon="@mipmap/toolbar_back"
+            app:title="选择音乐"
+            app:titleTextColor="#ffffff" />
 
-        <ListView
-            android:id="@+id/gvFileChooser"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@+id/btExit"
-            android:clickable="true"
-            android:columnWidth="90dp"
-            android:horizontalSpacing="10dp"
-            android:numColumns="auto_fit"
-            android:stretchMode="columnWidth"
-            android:verticalSpacing="10dp" />
+            android:background="#ffffff"
+            android:orientation="horizontal"
+            android:padding="5.0dip">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_alignParentBottom="true"
+                android:id="@+id/fl_main">
+                <com.wang.avi.AVLoadingIndicatorView
+                    android:id="@+id/avi_loading"
+                    style="@style/AVLoadingIndicatorView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="visible"
+                    android:layout_centerVertical="true"
+                    app:indicatorColor="@color/cutter_theme_black"
+                    app:indicatorName="PacmanIndicator"/>
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/btn_update"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:src="@mipmap/btn_update" />
+            </RelativeLayout>
 
-        <TextView
-            android:id="@+id/tvEmptyHint"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_centerInParent="true"
-            android:gravity="center"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:visibility="gone"></TextView>
-    </RelativeLayout>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rl_musice"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clickable="true"
+                android:columnWidth="90dp"
+                android:horizontalSpacing="10dp"
+                android:numColumns="auto_fit"
+                android:stretchMode="columnWidth"
+                android:verticalSpacing="10dp"
+                android:layout_above="@id/fl_main"/>
+
+        </RelativeLayout>
+    </LinearLayout>
 </layout>

@@ -31,6 +31,9 @@ public class MainActivity extends AppCompatActivity {
 //        StatusBarUtil.setTransparent(HomeActivity.this);
         StatusBarUtil.setColorForDrawerLayout(MainActivity.this,
                 mDrawerLayout, Color.TRANSPARENT);
+//        Slide slide = new Slide();
+//        slide.setDuration(1000);
+//        getWindow().setExitTransition(slide);
     }
 
     private void initView() {

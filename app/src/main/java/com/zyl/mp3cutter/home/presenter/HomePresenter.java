@@ -15,6 +15,7 @@ import com.zyl.mp3cutter.mp3separate.bean.Mp3Fenge;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -87,8 +88,16 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
                 if (FileUtils.bFolder(RING_FOLDER)) {
                     if (!TextUtils.isEmpty(fileName)) {
                         String cutterPath = RING_FOLDER + "/" + fileName + RING_FORMAT;
-                        if (helper.generateNewMp3ByTime(new File(cutterPath), minValue, maxValue)) {
-                            e.onNext(cutterPath);
+                        RandomAccessFile randomFile = null;
+                        try {
+                            randomFile = new RandomAccessFile(cutterPath, "rw");
+                            if (helper.generateNewMp3ByTime(randomFile, minValue, maxValue)) {
+                                e.onNext(cutterPath);
+                            }
+                        }
+                        finally {
+                            if(randomFile!=null)
+                                randomFile.close();
                         }
                     }
                 }

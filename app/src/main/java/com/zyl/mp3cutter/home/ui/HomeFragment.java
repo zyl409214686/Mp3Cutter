@@ -2,6 +2,7 @@ package com.zyl.mp3cutter.home.ui;
 
 
 import android.Manifest;
+import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
@@ -9,6 +10,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
@@ -60,6 +62,7 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
     public HomeFragment() {
         // Required empty public constructor
     }
+
     private ImageButton mPlayBtn, mCutterBtn, mSpeedBtn, mBackwardBtn;
     private TextView mPlayerStartTimeTV, mPlayerEndTimeTV;
     private VisualizerView mVisualView;
@@ -122,13 +125,13 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
 
     RangeSeekBar.OnRangeSeekBarChangeListener mRangeChangeListener =
             new RangeSeekBar.OnRangeSeekBarChangeListener<Integer>() {
-        @Override
-        public void rangeSeekBarValuesChanged(
-                RangeSeekBar<Integer> rangeSeekBar,
-                Number minValue, Number maxValue) {
-            mPlaySeekBar.invalidate();
-        }
-    };
+                @Override
+                public void rangeSeekBarValuesChanged(
+                        RangeSeekBar<Integer> rangeSeekBar,
+                        Number minValue, Number maxValue) {
+                    mPlaySeekBar.invalidate();
+                }
+            };
 
     /**
      * 声音滑块滑动事件
@@ -305,7 +308,7 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
         mPlaySeekBar.setSelectedCurValue(selcur);
     }
 
-    public void setSeekBarClickable(boolean isClickable){
+    public void setSeekBarClickable(boolean isClickable) {
         mPlaySeekBar.setClickable(isClickable);
     }
 
@@ -351,7 +354,7 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
     /**
      * 剪切提示弹出窗口
      */
-    private void showCutterPromptDialog() {
+    public void showCutterPromptDialog() {
         final Number minNumber = mPlaySeekBar.getSelectedMinValue();
         final Number maxNumber = mPlaySeekBar.getSelectedMaxValue();
         if (maxNumber.intValue() <= minNumber.intValue()) {
@@ -385,9 +388,9 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
             rl_player_voice.setVisibility(View.GONE);
         }
     }
-    
-    private void hidenVoicePanel(){
-        if(rl_player_voice.getVisibility() == View.VISIBLE) {
+
+    private void hidenVoicePanel() {
+        if (rl_player_voice.getVisibility() == View.VISIBLE) {
             rl_player_voice.startAnimation(hiddenVoicePanelAnimation);
             rl_player_voice.setVisibility(View.GONE);
         }
@@ -475,21 +478,21 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         // NOTE: delegate the permission handling to generated method
-        HomeFragmentPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
+//        HomeFragmentPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
     }
 
 
     @Override
     public boolean shouldShowRequestPermissionRationale(@NonNull String permission) {
-        if (permission == Manifest.permission.RECORD_AUDIO)
-            return true;
+//        if (permission == Manifest.permission.RECORD_AUDIO)
+//            return true;
         return super.shouldShowRequestPermissionRationale(permission);
     }
 
     @Override
     public void onClick(View v) {
         int id = v.getId();
-        switch (id){
+        switch (id) {
             case R.id.btn_play:
                 mPresenter.playToggle(getActivity());
                 break;
@@ -505,14 +508,18 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
         }
     }
 
-    public void openFile(){
+    public void openFile() {
+        if (getActivity() == null || getActivity().isFinishing()) {
+            return;
+        }
         if (Environment.getExternalStorageState().equals(
                 Environment.MEDIA_MOUNTED))
-            startActivityForResult(new Intent(getActivity(),
-                    FileChooserActivity.class), REQUEST_CODE);
-        else
-            Toast.makeText(getActivity(),
-                    R.string.sdcard_unmonted_hint, Toast.LENGTH_SHORT)
-                    .show();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                startActivityForResult(new Intent(getActivity(),
+                        FileChooserActivity.class), REQUEST_CODE, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
+            } else
+                Toast.makeText(getActivity(),
+                        R.string.sdcard_unmonted_hint, Toast.LENGTH_SHORT)
+                        .show();
     }
 }

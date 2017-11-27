@@ -1,23 +1,35 @@
 package com.zyl.mp3cutter.home.ui;
 
-import android.app.Activity;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.transition.TransitionInflater;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ListView;
 
+import com.jaeger.library.StatusBarUtil;
+import com.wang.avi.AVLoadingIndicatorView;
+import com.zhy.adapter.recyclerview.CommonAdapter;
+import com.zhy.adapter.recyclerview.base.ViewHolder;
 import com.zyl.mp3cutter.R;
 import com.zyl.mp3cutter.common.app.MyApplication;
+import com.zyl.mp3cutter.common.utils.DensityUtils;
 import com.zyl.mp3cutter.common.utils.FileUtils;
+import com.zyl.mp3cutter.common.utils.ScreenUtils;
 import com.zyl.mp3cutter.databinding.ActivityFilechooserShowBinding;
 import com.zyl.mp3cutter.home.bean.MusicInfo;
 import com.zyl.mp3cutter.home.bean.MusicInfoDao;
@@ -29,85 +41,137 @@ import java.util.List;
 
 //import android.widget.TextView;
 
-public class FileChooserActivity extends Activity {
+public class FileChooserActivity extends AppCompatActivity implements OnClickListener {
 
-    private ListView mListView;
-    // private View mBackView;
-    private View mBtExit;
-    // private TextView mTvPath ;
-
+    private RecyclerView mRecyclerView;
+    private CommonAdapter mAdapter;
     private String mSdcardRootPath;
     private String mLastFilePath;
-    private ArrayList<MusicInfo> mFileLists = new ArrayList<MusicInfo>();
-    private FileChooserAdapter mAdatper;
+    private ArrayList<MusicInfo> mFileList = new ArrayList<>();
+    private ArrayList<MusicInfo> mMusicList = new ArrayList<>();
     public static final String EXTRA_FILE_CHOOSER = "file_chooser";
     private ProgressDialog dialog;
     private Handler mHandler = new Handler();
-    MusicInfoDao mDao;
-
+    private AVLoadingIndicatorView mLoadingView;
+    private MusicInfoDao mDao;
+    private ObjectAnimator mMoveAnim;
+    private ActivityFilechooserShowBinding mBinding;
+    private int mUpdateBtnLeft;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        ActivityFilechooserShowBinding binding =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            android.transition.Transition transition = TransitionInflater.from(this).inflateTransition(R.transition.explode);
+            getWindow().setEnterTransition(transition);
+        }
+        StatusBarUtil.setColor(this, Color.TRANSPARENT);
+        mBinding =
                 DataBindingUtil.setContentView(this, R.layout.activity_filechooser_show);
-
+        mBinding.btnUpdate.setOnClickListener(this);
+        mBinding.btnUpdate.measure(0, 0);
+        mUpdateBtnLeft = ScreenUtils.getScreenSize(this)[0] -
+                mBinding.btnUpdate.getMeasuredWidth() - DensityUtils.dp2px(this ,10);
+        initToolbar();
         mSdcardRootPath = Environment.getExternalStorageDirectory()
                 .getAbsolutePath();
-        mBtExit = findViewById(R.id.btExit);
-        mBtExit.setOnClickListener(mClickListener);
-
-        mListView = (ListView) findViewById(R.id.gvFileChooser);
-        mListView.setEmptyView(findViewById(R.id.tvEmptyHint));
-        mListView.setOnItemClickListener(mItemClickListener);
-        mAdatper = new FileChooserAdapter(this);
-        mListView.setAdapter(mAdatper);
-        refreshData();
-    }
-
-    private void refreshData() {
+        mRecyclerView = mBinding.rlMusice;
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mAdapter = new CommonAdapter<MusicInfo>(this, R.layout.item_musicfile, mMusicList) {
+            @Override
+            protected void convert(ViewHolder holder, final MusicInfo musicInfo, int position) {
+                holder.setText(R.id.tv_name, musicInfo.getFilename());
+                holder.setText(R.id.tv_size, musicInfo.getFileSize());
+                holder.itemView.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        clickItem(musicInfo);
+                    }
+                });
+            }
+        };
+        mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(this,
+                DividerItemDecoration.VERTICAL));
         mDao = MyApplication.getInstances().
                 getDaoSession().getMusicInfoDao();
-        dialog = ProgressDialog.show(FileChooserActivity.this, "提示",
-                "音乐文件扫描中...");
+        mLoadingView = mBinding.aviLoading;
+        refreshData(false);
+    }
+
+    private void clickItem(MusicInfo info) {
+        Intent intent = new Intent();
+        intent.putExtra(EXTRA_FILE_CHOOSER, info.getFilepath());
+        setResult(RESULT_OK, intent);
+        finish();
+    }
+
+    private void initToolbar() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+//        getSupportActionBar().setHomeButtonEnabled(true); //设置返回键可用
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+    }
+
+    private void refreshData(final boolean isfocus) {
+        if (mLoadingView.isShown())
+            return;
+        mLoadingView.setVisibility(View.VISIBLE);
+        startLoadingAnim();
+//        dialog = ProgressDialog.show(FileChooserActivity.this, "提示",
+//                "音乐文件扫描中...");
         new Thread() {
             public void run() {
                 List<MusicInfo> datas = mDao.loadAll();
-                if (datas.size() > 0) {
-                    mFileLists.clear();
-                    mFileLists.addAll(datas);
+                if (datas.size() > 0 && !isfocus) {
+                    mFileList.clear();
+                    mFileList.addAll(datas);
                 } else {
+                    mFileList.clear();
                     updateFileItems(mSdcardRootPath);
                     mDao.deleteAll();
-                    mDao.insertInTx(mFileLists);
+                    mDao.insertInTx(mFileList);
                 }
                 mHandler.post(new Runnable() {
-
                     @Override
                     public void run() {
-                        dialog.dismiss();
-                        // When first enter , the object of mAdatper don't
-                        // initialized
-                        if (mAdatper != null) {
-                            mAdatper.setData(mFileLists);
-                            mAdatper.notifyDataSetChanged();
+                        mMusicList.clear();
+                        mMusicList.addAll(mFileList);
+                        mLoadingView.setVisibility(View.GONE);
+                        stopLoadingAnim();
+                        if (mAdapter != null) {
+                            mAdapter.notifyDataSetChanged();
                         }
                     }
                 });
             }
-
-            ;
         }.start();
+    }
 
+    private void startLoadingAnim() {
+        mMoveAnim  = ObjectAnimator.ofFloat(mLoadingView, "translationX", 0f, mUpdateBtnLeft);
+        mMoveAnim.setDuration(2000);
+        mMoveAnim.setRepeatCount(ValueAnimator.INFINITE);
+        mMoveAnim.start();
+    }
+
+    private void stopLoadingAnim(){
+        mMoveAnim.cancel();
     }
 
     private void updateFileItems(String filePath) {
         mLastFilePath = filePath;
         // mTvPath.setText(mLastFilePath);
 
-        if (mFileLists == null)
-            mFileLists = new ArrayList<>();
-        // if(!mFileLists.isEmpty())
-        // mFileLists.clear() ;
+        if (mFileList == null)
+            mFileList = new ArrayList<>();
+        // if(!mFileList.isEmpty())
+        // mFileList.clear() ;
 
         File[] files = folderScan(filePath);
         if (files == null)
@@ -123,7 +187,7 @@ public class FileChooserActivity extends Activity {
             if (files[i].isDirectory()) {
                 isDirectory = true;
             }
-            FileChooserAdapter.FileInfo fileInfo = new FileChooserAdapter.FileInfo(fileAbsolutePath, fileName,
+            FileInfo fileInfo = new FileInfo(fileAbsolutePath, fileName,
                     isDirectory);
             if (fileInfo.isDirectory())
                 updateFileItems(fileInfo.getFilePath());
@@ -133,7 +197,7 @@ public class FileChooserActivity extends Activity {
                 String size = FileUtils.getFormatFileSizeForFile(file);
                 MusicInfo music = new MusicInfo(null, fileInfo.getFilePath(),
                         fileInfo.getFileName(), size);
-                mFileLists.add(music);
+                mFileList.add(music);
             }
         }
     }
@@ -143,31 +207,6 @@ public class FileChooserActivity extends Activity {
         File[] files = file.listFiles();
         return files;
     }
-
-    private OnClickListener mClickListener = new OnClickListener() {
-        public void onClick(View v) {
-            switch (v.getId()) {
-                case R.id.btExit:
-                    setResult(RESULT_CANCELED);
-                    finish();
-                    break;
-                default:
-                    break;
-            }
-        }
-    };
-
-    private OnItemClickListener mItemClickListener = new OnItemClickListener() {
-        public void onItemClick(AdapterView<?> adapterView, View view,
-                                int position, long id) {
-            MusicInfo fileInfo = (MusicInfo) (((FileChooserAdapter) adapterView
-                    .getAdapter()).getItem(position));
-            Intent intent = new Intent();
-            intent.putExtra(EXTRA_FILE_CHOOSER, fileInfo.getFilepath());
-            setResult(RESULT_OK, intent);
-            finish();
-        }
-    };
 
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (event.getAction() == KeyEvent.ACTION_DOWN
@@ -188,5 +227,80 @@ public class FileChooserActivity extends Activity {
         super.onDestroy();
         if (dialog != null)
             dialog.dismiss();
+    }
+
+    @Override
+    public void onClick(View v) {
+        int id = v.getId();
+        switch (id) {
+            case R.id.btn_update:
+                refreshData(true);
+                break;
+        }
+    }
+
+    // =========================
+    // Model
+    // =========================
+    public static class FileInfo {
+        private FileType fileType;
+        private String fileName;
+        private String filePath;
+
+        public FileInfo(String filePath, String fileName, boolean isDirectory) {
+            this.filePath = filePath;
+            this.fileName = fileName;
+            fileType = isDirectory ? FileType.DIRECTORY : FileType.FILE;
+        }
+
+        public boolean isMUSICFile() {
+            if (fileName.lastIndexOf(".") < 0) // Don't have the suffix
+                return false;
+            String fileSuffix = fileName.substring(fileName.lastIndexOf("."));
+            if (!isDirectory() && MUSIC_SUFFIX.contains(fileSuffix))
+                return true;
+            else
+                return false;
+        }
+
+        public boolean isDirectory() {
+            if (fileType == FileType.DIRECTORY)
+                return true;
+            else
+                return false;
+        }
+
+        public String getFileName() {
+            return fileName;
+        }
+
+        public void setFileName(String fileName) {
+            this.fileName = fileName;
+        }
+
+        public String getFilePath() {
+            return filePath;
+        }
+
+        public void setFilePath(String filePath) {
+            this.filePath = filePath;
+        }
+
+        @Override
+        public String toString() {
+            return "FileInfo [fileType=" + fileType + ", fileName=" + fileName
+                    + ", filePath=" + filePath + "]";
+        }
+    }
+
+    private static ArrayList<String> MUSIC_SUFFIX = new ArrayList<String>();
+
+    static {
+        MUSIC_SUFFIX.add(".mp3");
+        // PPT_SUFFIX.add(".pptx");
+    }
+
+    enum FileType {
+        FILE, DIRECTORY;
     }
 }

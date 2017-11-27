@@ -10,11 +10,8 @@
     <color name="cutter_theme_white">#ffffff</color>
     <color name="cutter_theme_black">#101010</color>
     <color name="cutter_theme_gray">#acacac</color>
-    <color name="yes_theme_gray2">#dadada</color>
-    <color name="yes_theme_line_color">#f1f2f3</color><!-- old #dadada -->
-    <color name="yes_theme_green">#61ccac</color>
-    <color name="yes_theme_green2">#00ffb3</color>
-    <color name="yes_theme_red">#ff3057</color>
+    <color name="cutter_theme_gray2">#dadada</color>
+    <color name="cutter_theme_line_color">#f1f2f3</color><!-- old #dadada -->
 
     <color name="Indigo_colorPrimaryDark">#000000</color>
     <color name="Indigo_colorPrimary">#27272E</color>

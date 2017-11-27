@@ -16,6 +16,7 @@ import android.view.MotionEvent;
 import android.widget.ImageView;
 
 import com.zyl.mp3cutter.R;
+import com.zyl.mp3cutter.common.utils.DensityUtils;
 import com.zyl.mp3cutter.common.utils.TimeUtils;
 import com.zyl.mp3cutter.common.utils.ViewUtils;
 
@@ -314,9 +315,9 @@ public class RangeSeekBar<T extends Number> extends ImageView {
                 drawCurThumb(normalizedToScreen(normalizedCurValue), Thumb.CUR.equals(pressedThumb), canvas);
                 
                 paint.setColor(Color.rgb(255, 165, 0));
-                paint.setTextSize(ViewUtils.dp2px(getContext(), 16));
+                paint.setTextSize(DensityUtils.dp2px(getContext(), 16));
                 drawThumbText(normalizedToScreen(normalizedMinValue), getSelectedMinValue(), canvas);
-                drawThumbText(normalizedToScreen(normalizedMaxValue) - ViewUtils.dp2px(getContext(), 40), getSelectedMaxValue(), canvas);
+                drawThumbText(normalizedToScreen(normalizedMaxValue) - DensityUtils.dp2px(getContext(), 40), getSelectedMaxValue(), canvas);
         }
 
         /**
@@ -358,7 +359,7 @@ public class RangeSeekBar<T extends Number> extends ImageView {
         
         private void drawThumbText(float screenCoord, Number value, Canvas canvas) {
         	String progress = TimeUtils.formatSecondTime(value.intValue());
-            canvas.drawText(progress, screenCoord, ViewUtils.dp2px(getContext(), 15), paint);
+            canvas.drawText(progress, screenCoord, DensityUtils.dp2px(getContext(), 15), paint);
         }
         
         private void drawCurThumb(float screenCoord, boolean pressed, Canvas canvas) {

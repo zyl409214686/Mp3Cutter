@@ -20,13 +20,14 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme">
         </activity>
-
         <!-- 文件选择器Activity -->
-        <activity android:name=".home.ui.FileChooserActivity" android:screenOrientation="portrait">
+        <activity android:name=".home.ui.FileChooserActivity" android:screenOrientation="portrait"
+            android:theme="@style/AppTheme">
         </activity>
 
     </application>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"></uses-permission>
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />

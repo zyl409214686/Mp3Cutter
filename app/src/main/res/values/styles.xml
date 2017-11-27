@@ -7,6 +7,8 @@
         <item name="colorPrimary">@color/Indigo_colorPrimary</item>
         <!--返回键样式-->
         <item name="drawerArrowStyle">@style/AppTheme.DrawerArrowToggle</item>
+        <item name="android:windowContentTransitions">true</item>
+        <item name="android:listDivider">@color/cutter_theme_line_color</item>
     </style>
 
     <style name="AppTheme.DrawerArrowToggle" parent="Base.Widget.AppCompat.DrawerArrowToggle">
