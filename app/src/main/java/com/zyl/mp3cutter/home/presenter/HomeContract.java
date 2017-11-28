@@ -51,6 +51,11 @@ public class HomeContract {
          * 剪切成功
          */
         void doCutterSucc(String path);
+
+        /**
+         * 剪切失败
+         */
+        void doCutterFail();
     }
 
     interface Presenter extends IBasePresenter {

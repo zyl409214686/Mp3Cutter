@@ -3,6 +3,7 @@ package com.zyl.mp3cutter.home.ui;
 
 import android.Manifest;
 import android.app.ActivityOptions;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
@@ -14,6 +15,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -49,6 +51,7 @@ import permissions.dispatcher.OnShowRationale;
 import permissions.dispatcher.PermissionRequest;
 import permissions.dispatcher.RuntimePermissions;
 
+import static android.content.ContentValues.TAG;
 import static com.zyl.mp3cutter.common.constant.CommonConstant.RING_FOLDER;
 
 /**
@@ -77,6 +80,7 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
     private SeekBar mVoiceSeekBar;
     // 获取系统音频对象
     private AudioManager mAudioManager;
+    private ProgressDialog mProgressDialog;
     // 音乐滑块事件
     private RangeSeekBar.ThumbListener mThumbListener = new RangeSeekBar.ThumbListener() {
 
@@ -95,6 +99,7 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
 
         @Override
         public void onMinMove(Number max, Number min, Number cur) {
+            Log.d(TAG, "onMinMove:"+min);
             if (min.intValue() > cur.intValue()) {
                 mPresenter.seekTo(min.intValue());
                 mPlaySeekBar.setSelectedCurValue(min.intValue());
@@ -103,6 +108,7 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
 
         @Override
         public void onMaxMove(Number max, Number min, Number cur) {
+            Log.d(TAG, "onMaxMove:"+max);
             if (max.intValue() < cur.intValue()) {
                 mPresenter.seekTo(max.intValue());
                 mPlaySeekBar.setSelectedCurValue(max.intValue());
@@ -217,7 +223,7 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
      * 显示剪切成功窗口
      */
     private void showCutterSuccessDialog(final String path) {
-        new CommonDialog.Builder().setContext(getActivity()).setContentStr(getString(R.string.dialog_cutter_success))
+        new CommonDialog.Builder().setContext(getActivity()).setContentStr(getString(R.string.homefragment_cut_success))
                 .setOnDialogListener(new CommonDialog.OnDialogClickListener() {
                     @Override
                     public void doOk() {
@@ -349,6 +355,14 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
     @Override
     public void doCutterSucc(String path) {
         showCutterSuccessDialog(path);
+        if (mProgressDialog != null && getActivity() != null
+                && !getActivity().isFinishing())
+            mProgressDialog.dismiss();
+    }
+
+    @Override
+    public void doCutterFail() {
+        Toast.makeText(getActivity(), getResources().getString(R.string.homefragment_cut_fail), Toast.LENGTH_LONG).show();
     }
 
     /**
@@ -369,6 +383,8 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
                 .setOnDialogListener(new CommonDialog.OnDialogClickListener() {
                     @Override
                     public void doOk(String text) {
+                        mProgressDialog = ProgressDialog.show(getActivity(), "提示",
+                                getResources().getString(R.string.homefragment_cutting));
                         mPresenter.doCutter(text, minNumber.intValue(),
                                 maxNumber.intValue());
                     }
@@ -478,7 +494,7 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         // NOTE: delegate the permission handling to generated method
-//        HomeFragmentPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
+        HomeFragmentPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
     }
 
 
@@ -513,13 +529,18 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
             return;
         }
         if (Environment.getExternalStorageState().equals(
-                Environment.MEDIA_MOUNTED))
+                Environment.MEDIA_MOUNTED)) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 startActivityForResult(new Intent(getActivity(),
                         FileChooserActivity.class), REQUEST_CODE, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
-            } else
-                Toast.makeText(getActivity(),
-                        R.string.sdcard_unmonted_hint, Toast.LENGTH_SHORT)
-                        .show();
+            } else {
+                startActivityForResult(new Intent(getActivity(),
+                        FileChooserActivity.class), REQUEST_CODE);
+            }
+        } else {
+            Toast.makeText(getActivity(),
+                    R.string.sdcard_unmonted_hint, Toast.LENGTH_SHORT)
+                    .show();
+        }
     }
 }

@@ -9,6 +9,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -22,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
     private DrawerLayout mDrawerLayout;
     private NavigationView mNavigationView;
     Fragment mCurFragment;
+    private static final String TAG = "MainActivity";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
                         switchToSetting();
                         break;
                 }
+                invalidateOptionsMenu();
                 menuItem.setChecked(true);
                 mDrawerLayout.closeDrawers();
                 return true;
@@ -100,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main_menu, menu);
+
         return true;
     }
 
@@ -114,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
             menu.findItem(R.id.home_item_open).setVisible(false);
             menu.findItem(R.id.home_item_voice).setVisible(false);
         }
+        Log.d(TAG, "onPrepareOptionsMenu: visible"+ (mCurFragment instanceof HomeFragment));
         return super.onPrepareOptionsMenu(menu);
     }
 

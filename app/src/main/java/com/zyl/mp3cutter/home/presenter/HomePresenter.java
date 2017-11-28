@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
@@ -103,15 +104,41 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
                 }
             }
         }).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.newThread())
-                .subscribe(new Consumer() {
+                .subscribe(new Observer() {
                     @Override
-                    public void accept(Object o) throws Exception {
-                        String cutterPath = (String) o;
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(Object value) {
+                        String cutterPath = (String) value;
                         if (mView != null) {
                             mView.doCutterSucc(cutterPath);
                         }
                     }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        if (mView != null) {
+                            mView.doCutterFail();
+                        }
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
                 });
+//                .subscribe(new Consumer() {
+//                    @Override
+//                    public void accept(Object o) throws Exception {
+//                        String cutterPath = (String) o;
+//                        if (mView != null) {
+//                            mView.doCutterSucc(cutterPath);
+//                        }
+//                    }
+//                });
     }
 
     @Override
