@@ -129,16 +129,6 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
         }
     };
 
-    RangeSeekBar.OnRangeSeekBarChangeListener mRangeChangeListener =
-            new RangeSeekBar.OnRangeSeekBarChangeListener<Integer>() {
-                @Override
-                public void rangeSeekBarValuesChanged(
-                        RangeSeekBar<Integer> rangeSeekBar,
-                        Number minValue, Number maxValue) {
-                    mPlaySeekBar.invalidate();
-                }
-            };
-
     /**
      * 声音滑块滑动事件
      */
@@ -325,7 +315,7 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
     }
 
     /**
-     * 添加柱状频谱渲染
+     * 添加频谱渲染
      */
     @Override
     public void addBarGraphRenderers() {
@@ -383,7 +373,7 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
                 .setOnDialogListener(new CommonDialog.OnDialogClickListener() {
                     @Override
                     public void doOk(String text) {
-                        mProgressDialog = ProgressDialog.show(getActivity(), "提示",
+                        mProgressDialog = ProgressDialog.show(getActivity(), getResources().getString(R.string.homefragment_cutting_tip),
                                 getResources().getString(R.string.homefragment_cutting));
                         mPresenter.doCutter(text, minNumber.intValue(),
                                 maxNumber.intValue());
@@ -472,7 +462,8 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
 
     @OnShowRationale(Manifest.permission.RECORD_AUDIO)
     void showRationaleForRecord(final PermissionRequest request) {
-        new CommonDialog.Builder().setContext(getActivity()).setContentStr("亲爱的用户，显示声音频谱需要录音权限，请您知晓~")
+        new CommonDialog.Builder().setContext(getActivity()).setContentStr(
+                getResources().getString(R.string.homefragment_permission_prompt))
                 .setOnDialogListener(new CommonDialog.OnDialogClickListener() {
                     @Override
                     public void doOk() {
@@ -483,7 +474,8 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
 
     @OnPermissionDenied(Manifest.permission.RECORD_AUDIO)
     void showRecordDenied() {
-        Toast.makeText(getActivity(), "已拒绝录音权限，将不会显示音乐频谱。如需要显示请到系统权限管理设置。", Toast.LENGTH_LONG).show();
+        Toast.makeText(getActivity(), getResources().getString(R.string.homefragment_permission_denied),
+                Toast.LENGTH_LONG).show();
     }
 
     @OnNeverAskAgain(Manifest.permission.RECORD_AUDIO)

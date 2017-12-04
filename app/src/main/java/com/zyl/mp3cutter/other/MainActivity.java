@@ -30,12 +30,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         initView();
         switchToHomePage();
-//        StatusBarUtil.setTransparent(HomeActivity.this);
         StatusBarUtil.setColorForDrawerLayout(MainActivity.this,
                 mDrawerLayout, Color.TRANSPARENT);
-//        Slide slide = new Slide();
-//        slide.setDuration(1000);
-//        getWindow().setExitTransition(slide);
     }
 
     private void initView() {
@@ -86,17 +82,17 @@ public class MainActivity extends AppCompatActivity {
 
     private void switchToSetting() {
         getSupportFragmentManager().beginTransaction().replace(R.id.frame_content, new SettingFragment()).commit();
-        mToolBar.setTitle("个人设置");
+        mToolBar.setTitle(getResources().getString(R.string.main_tab_setting));
     }
 
     private void switchToHomePage() {
         getSupportFragmentManager().beginTransaction().replace(R.id.frame_content, HomeFragment.newInstance()).commit();
-        mToolBar.setTitle("主页");
+        mToolBar.setTitle(getResources().getString(R.string.main_tab_home));
     }
 
     private void switchToAbout() {
         getSupportFragmentManager().beginTransaction().replace(R.id.frame_content, new AboutFragment()).commit();
-        mToolBar.setTitle("关于");
+        mToolBar.setTitle(getResources().getString(R.string.main_tab_about));
     }
 
     @Override

@@ -59,7 +59,6 @@ public class FileChooserActivity extends AppCompatActivity implements OnClickLis
     private int mUpdateBtnLeft;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             android.transition.Transition transition = TransitionInflater.from(this).inflateTransition(R.transition.explode);
             getWindow().setEnterTransition(transition);

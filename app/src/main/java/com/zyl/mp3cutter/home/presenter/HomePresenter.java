@@ -64,7 +64,6 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
             int curPosition = getCurPosition();
             if (curPosition >= maxValue.intValue()) {
                 pause();
-                mView.setPlayBtnStatus(false);
             }
             // 消息处理
             if (getCurPosition() >= maxValue
@@ -150,7 +149,6 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
                 mDisposable.dispose();
                 mDisposable = null;
             }
-            mView.setVisualizerViewEnaled(false);
             mView.setPlayBtnStatus(false);
         } else {
             // 播放
@@ -163,7 +161,6 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
             mView.setPlayBtnStatus(true);
             seekTo(mView.getSeekbarCurValue());
             play();
-            mView.setVisualizerViewEnaled(true);
             mDisposable = mUpdateProgressObservable.observeOn(AndroidSchedulers.mainThread()).
                     subscribe(mUpdateProgressConsumer);
         }
@@ -243,6 +240,7 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
     @Override
     public void pause() {
         mMediaPlayer.pause();
+        mView.setVisualizerViewEnaled(false);
     }
 
     @Override
@@ -253,6 +251,7 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
     @Override
     public void play() {
         mMediaPlayer.start();
+        mView.setVisualizerViewEnaled(true);
     }
 
     @Override

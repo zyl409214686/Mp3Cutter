@@ -2,12 +2,14 @@ package com.zyl.mp3cutter.other;
 
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
+import com.jaeger.library.StatusBarUtil;
 import com.zyl.mp3cutter.R;
 import com.zyl.mp3cutter.databinding.ActivitySplashBinding;
 
@@ -22,6 +24,7 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        StatusBarUtil.setColor(this, Color.TRANSPARENT);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_splash);
         mTitleTv = (TextView) findViewById(R.id.tv_title);
         Typeface typeface = Typeface.createFromAsset(getAssets(),
@@ -37,15 +40,5 @@ public class SplashActivity extends AppCompatActivity {
                 overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             }
         }, 3000);
-//        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.splash_cutter);
-//        Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
-//            public void onGenerated(Palette palette) {
-//                // Use generated instance
-//                Palette.Swatch vibrant = palette.getVibrantSwatch();
-//                if (vibrant != null) {
-//                    mBinding.rlMain.setBackgroundColor(vibrant.getRgb());
-//                }
-//            }
-//        });
     }
 }

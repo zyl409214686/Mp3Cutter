@@ -146,7 +146,8 @@ public class VisualizerView extends View {
      * MediaPlayer it is good practice to call this method
      */
     public void release() {
-        mVisualizer.release();
+        if(mVisualizer!=null)
+            mVisualizer.release();
     }
 
     /**

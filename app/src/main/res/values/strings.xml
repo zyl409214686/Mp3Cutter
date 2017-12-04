@@ -2,13 +2,9 @@
     <string name="app_name">Music剪刀手</string>
 
     <!-- MainActivity -->
-    <string name="main_music">音乐</string>
-    <string name="open_music">打开</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-
-
+    <string name="main_tab_home">主页</string>
+    <string name="main_tab_setting">个人设置</string>
+    <string name="main_tab_about">关于</string>
 
     <!-- 弹出窗口 -->
     <string name="dialog_title">提示</string>
@@ -26,6 +22,9 @@
     <string name="homefragment_cut_success">音乐已经剪切成功，路径为/sdcard/MUSIC_CUTTER/，是否设置为手机铃声?</string>
     <string name="homefragment_cut_fail">剪刀手表示十分抱歉，您的音乐剪切失败了，请您重试。</string>
     <string name="homefragment_cutting">剪刀手正在为您剪切音乐，请您稍等...</string>
+    <string name="homefragment_cutting_tip">提示</string>
+    <string name="homefragment_permission_denied">已拒绝录音权限，将不会显示音乐频谱。如需要显示请到系统权限管理设置。</string>
+    <string name="homefragment_permission_prompt">亲爱的用户，显示声音频谱需要录音权限，请您知晓~</string>
 
     <!-- 文件选择器 -->
     <string name="title_activity_main">MainActivity</string>

@@ -1,13 +1,11 @@
 <resources xmlns:ns1="http://schemas.android.com/tools">
 
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <!--状态栏颜色-->
-        <item name="colorPrimaryDark">#ffffff</item>
         <!--Toolbar颜色-->
         <item name="colorPrimary">@color/Indigo_colorPrimary</item>
         <!--返回键样式-->
         <item name="drawerArrowStyle">@style/AppTheme.DrawerArrowToggle</item>
-        <item name="android:windowContentTransitions">true</item>
+        <!-- 分割线样式 -->
         <item name="android:listDivider">@color/cutter_theme_line_color</item>
     </style>
 
@@ -15,29 +13,9 @@
         <item name="color">@android:color/white</item>
     </style>
 
-
-    <style name="XfDialog">
-        <!-- 屏幕背景不变暗 -->
-        <!-- <item name="android:backgroundDimEnabled">false</item> -->
-        <!-- 更换背景图片实现全透明 -->
-        <item name="android:windowBackground">@color/translucence</item>
-        <item name="android:windowNoTitle">true</item>
-        <!-- 边框 -->
-        <item name="android:windowFrame">@null</item>
-        <!-- 是否悬浮在Activity之上 -->
-        <item name="android:windowIsFloating">true</item>
-        <!-- 半透明 -->
-        <!-- <item name="android:windowIsTranslucent">true</item> -->
-        <item name="android:windowContentOverlay">@null</item>
-        <!-- 更改对话框标题栏 -->
-        <item name="android:windowTitleStyle">@style/dialogWindowTitle</item>
-        <item name="android:windowAnimationStyle">@style/animationDialog</item>
-        <item name="android:popupBackground">@color/translucence</item>
-        <!--
-        android:windowSoftInputMode = "adjustResize" ，软键盘弹出时，要对主窗口布局重新进行布局，并调用onSizeChanged方法，切记一点当我们设置为“adjustResize”时，我们的界面不要设置为全屏模式，否则设置了这个属性也不会有什么效果。
-        而当我们设置android: windowSoftInputMode = "adjustPan"时，主窗口就不会调用onSizeChanged方法，界面的一部分就会被软键盘覆盖住，就不会被挤到软键盘之上了。
-        -->
-        <item name="android:windowSoftInputMode">adjustPan</item>
+    <!-- 启动页 -->
+    <style name="SplashTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
     </style>
 
     <style name="textAppearanceDialogWindowTitle">
