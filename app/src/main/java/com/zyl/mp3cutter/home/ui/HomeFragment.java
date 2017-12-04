@@ -31,6 +31,7 @@ import android.widget.Toast;
 import com.zyl.mp3cutter.R;
 import com.zyl.mp3cutter.common.app.di.AppComponent;
 import com.zyl.mp3cutter.common.base.BaseFragment;
+import com.zyl.mp3cutter.common.constant.CommonConstant;
 import com.zyl.mp3cutter.common.ui.view.CommonDialog;
 import com.zyl.mp3cutter.common.ui.view.RangeSeekBar;
 import com.zyl.mp3cutter.common.ui.view.visualizer.VisualizerView;
@@ -44,6 +45,11 @@ import com.zyl.mp3cutter.home.di.HomeModule;
 import com.zyl.mp3cutter.home.presenter.HomeContract;
 import com.zyl.mp3cutter.home.presenter.HomePresenter;
 
+import java.util.concurrent.TimeUnit;
+
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.OnNeverAskAgain;
 import permissions.dispatcher.OnPermissionDenied;
@@ -99,7 +105,7 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
 
         @Override
         public void onMinMove(Number max, Number min, Number cur) {
-            Log.d(TAG, "onMinMove:"+min);
+            Log.d(TAG, "onMinMove:" + min);
             if (min.intValue() > cur.intValue()) {
                 mPresenter.seekTo(min.intValue());
                 mPlaySeekBar.setSelectedCurValue(min.intValue());
@@ -108,7 +114,7 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
 
         @Override
         public void onMaxMove(Number max, Number min, Number cur) {
-            Log.d(TAG, "onMaxMove:"+max);
+            Log.d(TAG, "onMaxMove:" + max);
             if (max.intValue() < cur.intValue()) {
                 mPresenter.seekTo(max.intValue());
                 mPlaySeekBar.setSelectedCurValue(max.intValue());
@@ -165,13 +171,6 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-        }
-    }
-
-    @Override
     public void onAttach(Context context) {
         super.onAttach(context);
     }
@@ -213,7 +212,9 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
      * 显示剪切成功窗口
      */
     private void showCutterSuccessDialog(final String path) {
-        new CommonDialog.Builder().setContext(getActivity()).setContentStr(getString(R.string.homefragment_cut_success))
+        String format = String.format(getResources().getString(R.string.homefragment_cut_success),
+                CommonConstant.RING_FOLDER);
+        new CommonDialog.Builder().setContext(getActivity()).setContentStr(format)
                 .setOnDialogListener(new CommonDialog.OnDialogClickListener() {
                     @Override
                     public void doOk() {
@@ -245,7 +246,7 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
         DaggerHomeComponent
                 .builder()
                 .appComponent(appComponent)
-                .homeModule(new HomeModule(this)) //请将TempLateModule()第一个首字母改为小写
+                .homeModule(new HomeModule(this))
                 .build()
                 .inject(this);
     }
@@ -343,11 +344,20 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
     }
 
     @Override
-    public void doCutterSucc(String path) {
-        showCutterSuccessDialog(path);
-        if (mProgressDialog != null && getActivity() != null
-                && !getActivity().isFinishing())
-            mProgressDialog.dismiss();
+    public void doCutterSucc(final String path) {
+        Observable.timer(2000, TimeUnit.MILLISECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<Long>() {
+                    @Override
+                    public void accept(Long aLong) throws Exception {
+                        if (mProgressDialog != null && getActivity() != null
+                                && !getActivity().isFinishing()) {
+                            mProgressDialog.dismiss();
+                            showCutterSuccessDialog(path);
+                        }
+                    }
+                });
+
     }
 
     @Override

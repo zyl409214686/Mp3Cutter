@@ -18,6 +18,15 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    productFlavors {
+        //各个flavor设置
+        cutter {
+            applicationId "com.zyl.mp3cutter"
+            versionCode increasedVersionCode()
+            versionName "1.0.0"
+        }
+    }
+
     freeline {
         hack true
     }
@@ -34,6 +43,10 @@ android {
     greendao {
         schemaVersion 1
     }
+}
+
+def increasedVersionCode() {
+    return new Date().format("YYMMddHHmm").toInteger();
 }
 
 dependencies {

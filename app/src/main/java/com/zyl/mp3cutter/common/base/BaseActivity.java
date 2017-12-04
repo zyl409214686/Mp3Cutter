@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 
 import com.zyl.mp3cutter.common.app.MyApplication;
 import com.zyl.mp3cutter.common.app.di.AppComponent;
@@ -25,11 +24,10 @@ public abstract class BaseActivity<V extends IBaseView,T extends BasePresenter<V
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        mPresenter= getInstance(this,1);
-        setContentView(initView());
+        setContentView(initLayoutResId());
         myApplication = (MyApplication) getApplication();
         ComponentInject(myApplication.getAppComponent());//依赖注入
-        initData();
+        initData(savedInstanceState);
     }
 
     @Override
@@ -42,22 +40,8 @@ public abstract class BaseActivity<V extends IBaseView,T extends BasePresenter<V
      */
     protected abstract void ComponentInject(AppComponent appComponent);
 
-    protected abstract View initView();
+    protected abstract int initLayoutResId();
 
-    protected abstract void initData();
+    protected abstract void initData(Bundle savedInstanceState);
 
-//    public  <T> T getInstance(Object o, int i) {
-//        try {
-//            return ((Class<T>) ((ParameterizedType) (o.getClass()
-//                    .getGenericSuperclass())).getActualTypeArguments()[i])
-//                    .newInstance();
-//        } catch (InstantiationException e) {
-//            e.printStackTrace();
-//        } catch (IllegalAccessException e) {
-//            e.printStackTrace();
-//        } catch (ClassCastException e) {
-//            e.printStackTrace();
-//        }
-//        return null;
-//    }
 }

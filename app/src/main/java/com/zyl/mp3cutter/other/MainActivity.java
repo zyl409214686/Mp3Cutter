@@ -7,7 +7,6 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -15,19 +14,30 @@ import android.view.MenuItem;
 
 import com.jaeger.library.StatusBarUtil;
 import com.zyl.mp3cutter.R;
+import com.zyl.mp3cutter.common.app.di.AppComponent;
+import com.zyl.mp3cutter.common.base.BaseActivity;
 import com.zyl.mp3cutter.home.ui.HomeFragment;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
     private Toolbar mToolBar;
     private DrawerLayout mDrawerLayout;
     private NavigationView mNavigationView;
     Fragment mCurFragment;
     private static final String TAG = "MainActivity";
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+    protected void ComponentInject(AppComponent appComponent) {
+
+    }
+
+    @Override
+    protected int initLayoutResId() {
+        return R.layout.activity_main;
+    }
+
+    @Override
+    protected void initData(Bundle savedInstanceState) {
         initView();
         switchToHomePage();
         StatusBarUtil.setColorForDrawerLayout(MainActivity.this,
