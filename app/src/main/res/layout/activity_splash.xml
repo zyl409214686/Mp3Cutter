@@ -13,16 +13,12 @@
             android:scaleType="centerCrop"
             android:src="@mipmap/splash_cutter" />
 
-        <TextView
-            android:id="@+id/tv_title"
+        <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="35dp"
-            android:text="Music剪刀手"
-            android:textColor="#27272E"
-            android:textSize="26dp"
-            android:textStyle="bold" />
+            android:src="@mipmap/welcome_word"/>
     </RelativeLayout>
 </layout>

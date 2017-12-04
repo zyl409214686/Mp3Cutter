@@ -52,7 +52,7 @@ public class MainActivity extends BaseActivity {
 
     private void initToolBar() {
         mToolBar = (Toolbar) findViewById(R.id.tb_custom);
-        mToolBar.setTitle("主页");
+        mToolBar.setTitle(getResources().getString(R.string.main_tab_home));
         mToolBar.setTitleTextColor(Color.parseColor("#ffffff"));
         setSupportActionBar(mToolBar);
     }
@@ -109,7 +109,6 @@ public class MainActivity extends BaseActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main_menu, menu);
-
         return true;
     }
 
