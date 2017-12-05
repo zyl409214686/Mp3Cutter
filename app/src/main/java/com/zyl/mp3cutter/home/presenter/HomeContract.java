@@ -20,15 +20,11 @@ public class HomeContract {
 
         void checkRecordPermission(MediaPlayer mediaPlayer);
 
-        int getSeekbarCurValue();
-
         int getSeekbarMaxValue();
 
         int getSeekbarMinValue();
 
         void setPlayBtnStatus(boolean isPlayingStatus);
-
-        void setSeekbarValue(int selmin, int selcur);
 
         void linkMediaPlayerForVisualView(MediaPlayer player);
 
@@ -40,7 +36,7 @@ public class HomeContract {
              * 设置当前播放值
              * @param value
              */
-        void setPlayCurValue(int value);
+        void setSeekBarMinValue(int value);
 
         /**
          * 设置时长

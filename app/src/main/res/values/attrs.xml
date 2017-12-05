@@ -24,5 +24,8 @@
         <attr name="max" format="float" />
         <attr name="startingMin" format="float" />
         <attr name="startingMax" format="float" />
+        <attr name="thumbImage" format="reference" />
+        <attr name="seekbarBg" format="reference" />
+        <attr name="seekbarSelBg" format="reference" />
     </declare-styleable>
 </resources>

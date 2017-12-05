@@ -51,30 +51,32 @@
                 android:text="@string/about_auther"
                 android:textColor="#333333"
                 android:textSize="16dp" />
-
-            <TextView
-                android:id="@+id/blog_address"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/tv_desc"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="10dp"
-                android:autoLink="all"
-                android:text="@string/about_blog"
-                android:textColor="#333333"
-                android:textSize="16dp" />
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/blog_address"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:autoLink="all"
+                    android:text="@string/about_blog"
+                    android:textColor="#333333"
+                    android:textSize="16dp" />
 
-            <TextView
-                android:id="@+id/github_address"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/blog_address"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="10dp"
-                android:autoLink="all"
-                android:text="@string/about_github"
-                android:textColor="#333333"
-                android:textSize="16dp" />
+                <TextView
+                    android:id="@+id/github_address"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:autoLink="all"
+                    android:text="@string/about_github"
+                    android:textColor="#333333"
+                    android:textSize="16dp" />
+            </LinearLayout>
         </RelativeLayout>
     </LinearLayout>
 </layout>

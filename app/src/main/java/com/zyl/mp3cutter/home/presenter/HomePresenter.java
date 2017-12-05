@@ -58,7 +58,7 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
         public void accept(Object o) throws Exception {
             if (mView == null)
                 return;
-            mView.setPlayCurValue(getCurPosition());
+            mView.setSeekBarMinValue(getCurPosition());
             Number maxValue = mView.getSeekbarMaxValue();
             // 播放完暂停处理
             int curPosition = getCurPosition();
@@ -159,7 +159,7 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
                 return;
             }
             mView.setPlayBtnStatus(true);
-            seekTo(mView.getSeekbarCurValue());
+            seekTo(mView.getSeekbarMinValue());
             play();
             mDisposable = mUpdateProgressObservable.observeOn(AndroidSchedulers.mainThread()).
                     subscribe(mUpdateProgressConsumer);
@@ -326,7 +326,7 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
                     .getStringExtra(FileChooserActivity.EXTRA_FILE_CHOOSER);
             try {
                 if (!TextUtils.isEmpty(mSelMusicPath)) {
-                    mView.setSeekbarValue(0, 0);
+                    mView.setSeekBarMinValue(0);
                     mView.setPlayBtnStatus(false);
                     mView.setSeekBarClickable(true);
                     pause();

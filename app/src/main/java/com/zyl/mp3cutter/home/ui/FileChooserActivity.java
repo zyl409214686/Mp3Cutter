@@ -19,7 +19,6 @@ import android.transition.TransitionInflater;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.Window;
 
 import com.jaeger.library.StatusBarUtil;
 import com.wang.avi.AVLoadingIndicatorView;
@@ -39,8 +38,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-//import android.widget.TextView;
-
+/**
+ * Description: 音乐选择页
+ * Created by zouyulong on 2017/10/22.
+ * Person in charge :  zouyulong
+ */
 public class FileChooserActivity extends AppCompatActivity implements OnClickListener {
 
     private RecyclerView mRecyclerView;

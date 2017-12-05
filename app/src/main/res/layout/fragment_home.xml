@@ -35,7 +35,7 @@
                 android:background="@mipmap/volume_max" />
 
             <SeekBar
-                android:id="@+id/sb_player_voice"
+                android:id="@+id/voice_seekbar"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
@@ -116,7 +116,7 @@
                 android:layout_below="@id/topborder">
 
                 <TextView
-                    android:id="@+id/tv_player_playing_time"
+                    android:id="@+id/tv_starttime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
@@ -129,7 +129,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/tv_player_playering_end"
+                    android:id="@+id/tv_endtime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
@@ -142,13 +142,12 @@
                     android:textStyle="bold" />
 
                 <com.zyl.mp3cutter.common.ui.view.RangeSeekBar
-                    android:id="@+id/sb_player_cutterprogress"
-                    android:layout_width="fill_parent"
+                    android:id="@+id/range_seekbar"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:layout_toLeftOf="@id/tv_player_playering_end"
-                    android:layout_toRightOf="@id/tv_player_playing_time"
-                    android:progressDrawable="@mipmap/seekbar_bg"
+                    android:layout_toLeftOf="@id/tv_endtime"
+                    android:layout_toRightOf="@id/tv_starttime"
                     rangeseekbar:max="100.0"
                     rangeseekbar:min="0.0"
                     rangeseekbar:startingMax="30"
