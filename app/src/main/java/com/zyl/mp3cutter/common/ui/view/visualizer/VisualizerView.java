@@ -12,7 +12,6 @@ import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.PorterDuffXfermode;
@@ -46,7 +45,8 @@ public class VisualizerView extends View {
 
     private Paint mFlashPaint = new Paint();
     private Paint mFadePaint = new Paint();
-
+    AudioData mAudioData = new AudioData();
+    FFTData mFftData = new FFTData();
     public VisualizerView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs);
         init();
@@ -205,17 +205,17 @@ public class VisualizerView extends View {
 
         if (mBytes != null) {
             // Render all audio renderers
-            AudioData audioData = new AudioData(mBytes);
+            mAudioData.setBytes(mBytes);
             for (Renderer r : mRenderers) {
-                r.render(mCanvas, audioData, mRect);
+                r.render(mCanvas, mAudioData, mRect);
             }
         }
 
         if (mFFTBytes != null) {
             // Render all FFT renderers
-            FFTData fftData = new FFTData(mFFTBytes);
+            mFftData.setBytes(mFFTBytes);
             for (Renderer r : mRenderers) {
-                r.render(mCanvas, fftData, mRect);
+                r.render(mCanvas, mFftData, mRect);
             }
         }
 
@@ -228,6 +228,6 @@ public class VisualizerView extends View {
 //      mCanvas.drawPaint(mFlashPaint);
 //    }
 
-        canvas.drawBitmap(mCanvasBitmap, new Matrix(), null);
+        canvas.drawBitmap(mCanvasBitmap, 0, 0, null);
     }
 }

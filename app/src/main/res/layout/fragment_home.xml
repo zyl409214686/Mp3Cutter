@@ -123,7 +123,7 @@
                     android:layout_centerVertical="true"
                     android:paddingLeft="5dp"
                     android:paddingRight="5dp"
-                    android:text="00:00"
+                    android:text="@string/homefragment_zero_time"
                     android:textColor="#000000"
                     android:textSize="10dp"
                     android:textStyle="bold" />
@@ -136,7 +136,7 @@
                     android:layout_centerVertical="true"
                     android:paddingLeft="5dp"
                     android:paddingRight="5dp"
-                    android:text="00:00"
+                    android:text="@string/homefragment_zero_time"
                     android:textColor="#000000"
                     android:textSize="10dp"
                     android:textStyle="bold" />
@@ -151,7 +151,8 @@
                     rangeseekbar:max="100.0"
                     rangeseekbar:min="0.0"
                     rangeseekbar:startingMax="30"
-                    rangeseekbar:startingMin="10.0" />
+                    rangeseekbar:startingMin="10.0"
+                    />
             </RelativeLayout>
 
             <ImageView

@@ -14,5 +14,13 @@ public class AudioData
     this.bytes = bytes;
   }
 
+  public AudioData() {
+  }
+
   public byte[] bytes;
+
+  public AudioData setBytes(byte[] bytes) {
+    this.bytes = bytes;
+    return this;
+  }
 }

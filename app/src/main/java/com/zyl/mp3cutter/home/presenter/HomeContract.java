@@ -30,12 +30,17 @@ public class HomeContract {
 
         void addBarGraphRenderers();
 
-        void setSeekBarClickable(boolean isClickable);
+        /**
+         * seekbar 是否可以接收时间
+         * @param isEnable
+         */
+        void setSeekBarEnable(boolean isEnable);
 
-            /**
-             * 设置当前播放值
-             * @param value
-             */
+        /**
+         * 设置当前播放值
+         *
+         * @param value
+         */
         void setSeekBarMinValue(int value);
 
         /**
@@ -89,6 +94,7 @@ public class HomeContract {
 
         /**
          * 剪切音乐
+         *
          * @param fileName
          * @param minValue
          * @param maxValue
@@ -97,6 +103,7 @@ public class HomeContract {
 
         /**
          * 判断是否已选择mp3
+         *
          * @param context
          * @return
          */

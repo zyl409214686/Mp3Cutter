@@ -1,85 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
 
-    <LinearLayout
-        android:layout_width="fill_parent"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_centerInParent="true"
+    android:layout_margin="20dip"
+    android:background="@drawable/commondialog_bg"
+    android:orientation="vertical">
+    <TextView
+        android:id="@+id/tv_dialog_title"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:layout_margin="20dip"
-        android:background="@drawable/commondialog_bg"
-        android:orientation="vertical">
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"
+        android:textColor="#202020"
+        android:textSize="18dp"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/tv_dialog_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="18dp"
+        android:layout_marginTop="12dp"
+        android:textColor="#202020"
+        android:textSize="15dp" />
+
+    <EditText
+        android:id="@+id/et_dialog_input"
+        android:layout_width="fill_parent"
+        android:layout_height="32dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="12dp"
+        android:background="@mipmap/commondialog_et_bg"
+        android:inputType="textPassword"
+        android:maxLength="20"
+        android:maxLines="1"
+        android:paddingLeft="15dp"
+        android:textColor="#000000"
+        android:textColorHint="#ACB3BF"
+        android:textSize="13dp"
+        android:visibility="gone" />
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="12dp">
 
         <TextView
-            android:id="@+id/tv_dialog_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="20dp"
-            android:textColor="#202020"
-            android:textSize="18dp"
-            android:visibility="gone" />
+            android:id="@+id/tv_dialog_confirm"
+            android:layout_width="75dp"
+            android:layout_height="36dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="12dp"
+            android:gravity="center"
+            android:text="@string/dialog_btn_sure"
+            android:textColor="#009688"
+            android:textSize="14dp" />
 
         <TextView
-            android:id="@+id/tv_dialog_content"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="18dp"
-            android:layout_marginTop="12dp"
-            android:textColor="#202020"
-            android:textSize="15dp" />
+            android:id="@+id/tv_dialog_cancle"
+            android:layout_width="75dp"
+            android:layout_height="36dp"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="12dp"
+            android:layout_toLeftOf="@id/tv_dialog_confirm"
+            android:gravity="center"
+            android:text="@string/dialog_btn_cancel"
+            android:textColor="#009688"
+            android:textSize="14dp" />
 
-        <EditText
-            android:id="@+id/et_dialog_input"
-            android:layout_width="fill_parent"
-            android:layout_height="32dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginTop="12dp"
-            android:background="@mipmap/commondialog_et_bg"
-            android:inputType="textPassword"
-            android:maxLength="20"
-            android:paddingLeft="15dp"
-            android:singleLine="true"
-            android:textColor="#000000"
-            android:textColorHint="#ACB3BF"
-            android:textSize="13dp"
-            android:visibility="gone" />
+    </RelativeLayout>
+</LinearLayout>
 
-        <RelativeLayout
-            android:layout_width="fill_parent"
-            android:layout_height="48dp"
-            android:layout_marginTop="12dp">
-
-            <TextView
-                android:id="@+id/tv_dialog_confirm"
-                android:layout_width="75dp"
-                android:layout_height="36dp"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:layout_marginRight="12dp"
-                android:gravity="center"
-                android:textColor="#009688"
-                android:text="确定"
-                android:textSize="14dp" />
-
-            <TextView
-                android:id="@+id/tv_dialog_cancle"
-                android:layout_width="75dp"
-                android:layout_height="36dp"
-                android:layout_centerVertical="true"
-                android:layout_marginRight="12dp"
-                android:layout_toLeftOf="@id/tv_dialog_confirm"
-                android:text="取消"
-                android:gravity="center"
-                android:textColor="#009688"
-                android:textSize="14dp" />
-
-        </RelativeLayout>
-
-
-    </LinearLayout>
-
-</RelativeLayout>

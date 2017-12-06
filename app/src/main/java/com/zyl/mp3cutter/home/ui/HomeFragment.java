@@ -250,8 +250,8 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
         }
     }
 
-    public void setSeekBarClickable(boolean isClickable) {
-        mBinding.rangeSeekbar.setClickable(isClickable);
+    public void setSeekBarEnable(boolean isClickable) {
+        mBinding.rangeSeekbar.setEnabled(isClickable);
     }
 
     @NeedsPermission(Manifest.permission.RECORD_AUDIO)
@@ -362,7 +362,7 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
         mBinding.btnPlay.setOnClickListener(this);
         mBinding.btnCutterSure.setOnClickListener(this);
         mBinding.rangeSeekbar.setThumbListener(mThumbListener);
-        mBinding.rangeSeekbar.setClickable(false);
+        mBinding.rangeSeekbar.setEnabled(false);
         mBinding.voiceSeekbar.setOnSeekBarChangeListener(mVoiceChangeListener);
         mBinding.btnSpeed.setOnTouchListener(new View.OnTouchListener() {
             @Override

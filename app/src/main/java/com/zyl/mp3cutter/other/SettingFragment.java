@@ -56,7 +56,7 @@ public class SettingFragment extends BaseFragment implements View.OnClickListene
         switch (id){
             case R.id.rl_clear_cache:
                 new CommonDialog.Builder().setTitleStr(getResources().getString(R.string.dialog_title))
-                        .setContext(getActivity()).setContentStr(getResources().getString(R.string.setting_clear_cache))
+                        .setContext(getActivity()).setContentStr(getResources().getString(R.string.setting_prompt_clearcache))
                         .setOnDialogListener(new CommonDialog.OnDialogClickListener() {
                             @Override
                             public void doOk() {

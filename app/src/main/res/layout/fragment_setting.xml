@@ -1,4 +1,5 @@
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:rangeseekbar="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -19,7 +20,7 @@
                 android:layout_marginLeft="10dp"
                 android:layout_centerVertical="true"
                 android:textSize="16dp"
-                android:text="清空缓存"/>
+                android:text="@string/setting_clearcache"/>
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1px"
@@ -35,5 +36,17 @@
                 android:layout_centerVertical="true"
                 android:layout_marginRight="10dp"/>
         </RelativeLayout>
+        <com.zyl.mp3cutter.common.ui.view.RangeSeekBar
+            android:id="@+id/range_seekbar"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:background="#ffffff"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@id/tv_endtime"
+            android:layout_toRightOf="@id/tv_starttime"
+            rangeseekbar:max="100.0"
+            rangeseekbar:min="0.0"
+            rangeseekbar:startingMax="30"
+            rangeseekbar:startingMin="10.0" />
     </LinearLayout>
 </layout>

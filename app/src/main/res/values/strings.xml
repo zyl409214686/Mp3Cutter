@@ -5,12 +5,15 @@
     <string name="main_tab_home">主页</string>
     <string name="main_tab_setting">个人设置</string>
     <string name="main_tab_about">关于</string>
-
-    <!-- 弹出窗口 -->
+    <string name="main_menu_voice">声音</string>
+    <string name="main_menu_open">打开</string>
+    <!-- 通用弹出窗口 -->
     <string name="dialog_title">提示</string>
     <string name="dialog_exit_msg">是否要退出？</string>
     <string name="dialog_btn_sure">确定</string>
     <string name="dialog_btn_cancel">取消</string>
+
+    <!-- 剪切音乐提示弹窗 -->
     <string name="dialog_cutter_msg">确定剪切当前歌曲？</string>
     <string name="dialog_cutter_warning_length">截取音乐文件时间长度必须大于0!</string>
     <string name="dialog_cutter_warning_sel">请选择音乐！</string>
@@ -25,6 +28,7 @@
     <string name="homefragment_cutting_tip">提示</string>
     <string name="homefragment_permission_denied">已拒绝录音权限，将不会显示音乐频谱。如需要显示请到系统权限管理设置。</string>
     <string name="homefragment_permission_prompt">亲爱的用户，显示声音频谱需要录音权限，请您知晓~</string>
+    <string name="homefragment_zero_time">00:00</string>
 
     <!-- 文件选择器 -->
     <string name="title_activity_main">MainActivity</string>
@@ -41,5 +45,6 @@
     <string name="about_github">GitHub：https://github.com/zyl409214686</string>
 
     <!-- 设置页面 -->
-    <string name="setting_clear_cache">确定清空缓存？</string>
+    <string name="setting_prompt_clearcache">确定清空缓存？</string>
+    <string name="setting_clearcache">清空缓存</string>
 </resources>

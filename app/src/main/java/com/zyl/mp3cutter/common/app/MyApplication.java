@@ -3,6 +3,8 @@ package com.zyl.mp3cutter.common.app;
 import android.app.Application;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.orhanobut.logger.AndroidLogAdapter;
+import com.orhanobut.logger.Logger;
 import com.zyl.mp3cutter.common.app.di.AppComponent;
 import com.zyl.mp3cutter.common.app.di.AppModule;
 import com.zyl.mp3cutter.common.app.di.DaggerAppComponent;
@@ -35,6 +37,7 @@ public class MyApplication extends Application {
                 .appModule(new AppModule(this))
                 .build();
         setDatabase();
+        Logger.addLogAdapter(new AndroidLogAdapter());
     }
 
     public AppComponent getAppComponent() {

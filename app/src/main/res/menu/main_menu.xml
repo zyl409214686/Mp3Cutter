@@ -5,12 +5,12 @@
         <item
             android:id="@+id/home_item_voice"
             android:icon="@drawable/selector_voice"
-            android:title="声音"
+            android:title="@string/main_menu_voice"
             app:showAsAction="ifRoom"/>
         <item
             android:id="@+id/home_item_open"
             android:icon="@drawable/selector_open"
-            android:title="打开"
+            android:title="@string/main_menu_open"
             app:showAsAction="ifRoom"/>
     </group>
 </menu>

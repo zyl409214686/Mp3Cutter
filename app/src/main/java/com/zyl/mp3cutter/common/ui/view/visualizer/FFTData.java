@@ -14,5 +14,13 @@ public class FFTData
     this.bytes = bytes;
   }
 
+  public FFTData() {
+  }
+
+  public FFTData setBytes(byte[] bytes) {
+    this.bytes = bytes;
+    return this;
+  }
+
   public byte[] bytes;
 }

@@ -4,15 +4,15 @@
         <item
             android:id="@+id/item_home"
             android:icon="@mipmap/navigation_icon_home"
-            android:title="主页" />
+            android:title="@string/main_tab_home" />
         <item
             android:id="@+id/item_setting"
             android:icon="@mipmap/navigation_icon_setting"
-            android:title="个人设置" />
+            android:title="@string/main_tab_setting" />
         <item
             android:id="@+id/item_about"
             android:icon="@mipmap/navigation_icon_about"
-            android:title="关于" />
+            android:title="@string/main_tab_about" />
     </group>
 
     <!--<item android:title="@string/app_name">-->

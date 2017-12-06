@@ -18,6 +18,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.orhanobut.logger.Logger;
 import com.zyl.mp3cutter.R;
 import com.zyl.mp3cutter.common.utils.DensityUtils;
 import com.zyl.mp3cutter.common.utils.TimeUtils;
@@ -27,7 +28,7 @@ import java.math.BigDecimal;
 
 /**
  * Widget that lets users select a minimum and maximum value on a given numerical range.
- * The range value types can be one of Long, Double, Integer, Float, Short, Byte or BigDecimal.
+ * The range value types can be one of Long, Double, InteRangeSeekBarger, Float, Short, Byte or BigDecimal.
  *
  * @param <T> The Number type of the range values. One of Long, Double, Integer, Float, Short, Byte or BigDecimal.
  * @author Stephan Tittel (stephan.tittel@kom.tu-darmstadt.de)
@@ -52,41 +53,50 @@ public class RangeSeekBar<T extends Number> extends View {
     private double normalizedMaxValue = 1d;
     private Thumb pressedThumb = null;
     private ThumbListener thumbListener;
-
+    private RectF mSeekbarRect;
+    private RectF mSeekbarSelRect;
+    private boolean isEnable = true;
     public RangeSeekBar(Context context) {
         super(context);
     }
 
     public RangeSeekBar(Context context, AttributeSet attrs) {
         super(context, attrs);
-        if (attrs == null) {
-            this.absoluteMinValue = (T) new Float(0);
-            this.absoluteMaxValue = (T) new Float(100);
-            absoluteMinValuePrim = absoluteMinValue.doubleValue();
-            absoluteMaxValuePrim = absoluteMaxValue.doubleValue();
-            numberType = NumberType.fromNumber(absoluteMinValue);
-            setSelectedMinValue((T) new Float(0));
-            setSelectedMaxValue((T) new Float(100));
-        } else {
-            TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.RangeSeekBar, 0, 0);
-            this.absoluteMinValue = (T) new Float(a.getFloat(R.styleable.RangeSeekBar_min, (float) 0.0));
-            this.absoluteMaxValue = (T) new Float(a.getFloat(R.styleable.RangeSeekBar_max, (float) 100.0));
-            thumbImage = BitmapFactory.decodeResource(getResources(), a.getResourceId(R.styleable.RangeSeekBar_thumbImage, R.mipmap.btn_seekbar_normal));
-            seekbarBg = BitmapFactory.decodeResource(getResources(), a.getResourceId(R.styleable.RangeSeekBar_seekbarBg, R.mipmap.seekbar_bg));
-            seekbarSelBg = BitmapFactory.decodeResource(getResources(), a.getResourceId(R.styleable.RangeSeekBar_seekbarSelBg, R.mipmap.seekbar_sel_bg));
-            thumbWidth = thumbImage.getWidth();
-            thumbHalfWidth = 0.5f * thumbWidth;
-            thumbHalfHeight = 0.5f * thumbImage.getHeight();
-            lineHeight = 0.3f * thumbHalfHeight;
-            padding = thumbHalfWidth;
+        TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.RangeSeekBar, 0, 0);
+        this.absoluteMinValue = (T) new Float(a.getFloat(R.styleable.RangeSeekBar_min, (float) 0.0));
+        this.absoluteMaxValue = (T) new Float(a.getFloat(R.styleable.RangeSeekBar_max, (float) 100.0));
+        thumbImage = BitmapFactory.decodeResource(getResources(), a.getResourceId(R.styleable.RangeSeekBar_thumbImage, R.mipmap.btn_seekbar_normal));
+        seekbarBg = BitmapFactory.decodeResource(getResources(), a.getResourceId(R.styleable.RangeSeekBar_seekbarBg, R.mipmap.seekbar_bg));
+        seekbarSelBg = BitmapFactory.decodeResource(getResources(), a.getResourceId(R.styleable.RangeSeekBar_seekbarSelBg, R.mipmap.seekbar_sel_bg));
+        thumbWidth = thumbImage.getWidth();
+        thumbHalfWidth = 0.5f * thumbWidth;
+        thumbHalfHeight = 0.5f * thumbImage.getHeight();
+        lineHeight = 0.3f * thumbHalfHeight;
+        padding = thumbHalfWidth;
 
-            absoluteMinValuePrim = absoluteMinValue.doubleValue();
-            absoluteMaxValuePrim = absoluteMaxValue.doubleValue();
-            numberType = NumberType.fromNumber(absoluteMinValue);
-            setSelectedMinValue((T) new Float(a.getFloat(R.styleable.RangeSeekBar_startingMin, (float) 0.0)));
-            setSelectedMaxValue((T) new Float(a.getFloat(R.styleable.RangeSeekBar_startingMax, (float) 100.0)));
-            a.recycle();
-        }
+        absoluteMinValuePrim = absoluteMinValue.doubleValue();
+        absoluteMaxValuePrim = absoluteMaxValue.doubleValue();
+        numberType = NumberType.fromNumber(absoluteMinValue);
+        setSelectedMinValue((T) new Float(a.getFloat(R.styleable.RangeSeekBar_startingMin, (float) 0.0)));
+        setSelectedMaxValue((T) new Float(a.getFloat(R.styleable.RangeSeekBar_startingMax, (float) 100.0)));
+        a.recycle();
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        mSeekbarRect = new RectF(padding, 0.5f * (h - lineHeight), w - padding, 0.5f * (h + lineHeight));
+        mSeekbarSelRect = new RectF(mSeekbarRect);
+    }
+
+    /**
+     * 设置seekbar 是否接收事件
+     * @param enabled
+     */
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        this.isEnable = enabled;
     }
 
     public RangeSeekBar(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
@@ -172,40 +182,73 @@ public class RangeSeekBar<T extends Number> extends View {
      */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (!isClickable())
-            return true;
+//        if (!isClickable())
+//            return true;
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                Logger.d("ACTION_DOWN");
                 pressedThumb = evalPressedThumb(event.getX());
                 if (Thumb.MIN.equals(pressedThumb)) {
-                    thumbListener.onClickMinThumb(getSelectedMaxValue(), getSelectedMinValue());
+                    if(thumbListener!=null)
+                        thumbListener.onClickMinThumb(getSelectedMaxValue(), getSelectedMinValue());
                 }
                 if (Thumb.MAX.equals(pressedThumb)) {
-                    thumbListener.onClickMaxThumb();
+                    if(thumbListener!=null)
+                        thumbListener.onClickMaxThumb();
                 }
                 invalidate();
+                //Intercept parent TouchEvent
+                if(getParent() != null) {
+                    getParent().requestDisallowInterceptTouchEvent(true);
+                }
                 break;
             case MotionEvent.ACTION_MOVE:
+                Logger.d("ACTION_MOVE");
                 if (pressedThumb != null) {
                     if (Thumb.MIN.equals(pressedThumb)) {
                         setNormalizedMinValue(screenToNormalized(event.getX()));
-                        thumbListener.onMinMove(getSelectedMaxValue(), getSelectedMinValue());
+                        if(thumbListener!=null)
+                            thumbListener.onMinMove(getSelectedMaxValue(), getSelectedMinValue());
                     } else if (Thumb.MAX.equals(pressedThumb)) {
                         setNormalizedMaxValue(screenToNormalized(event.getX()));
-                        thumbListener.onMaxMove(getSelectedMaxValue(), getSelectedMinValue());
+                        if(thumbListener!=null)
+                            thumbListener.onMaxMove(getSelectedMaxValue(), getSelectedMinValue());
                     }
+                }
+                //Intercept parent TouchEvent
+                if(getParent() != null) {
+                    getParent().requestDisallowInterceptTouchEvent(true);
                 }
                 break;
             case MotionEvent.ACTION_UP:
+                Logger.d("ACTION_UP");
                 if (Thumb.MIN.equals(pressedThumb)) {
-                    thumbListener.onUpMinThumb(getSelectedMaxValue(), getSelectedMinValue());
+                    if(thumbListener!=null)
+                        thumbListener.onUpMinThumb(getSelectedMaxValue(), getSelectedMinValue());
                 }
                 if (Thumb.MAX.equals(pressedThumb)) {
-                    thumbListener.onUpMaxThumb();
+                    if(thumbListener!=null)
+                        thumbListener.onUpMaxThumb();
                 }
+                //Intercept parent TouchEvent
+                if(getParent() != null) {
+                    getParent().requestDisallowInterceptTouchEvent(true);
+                }
+                break;
             case MotionEvent.ACTION_CANCEL:
-                pressedThumb = null;
-                invalidate();
+                Logger.d("ACTION_CANCEL");
+                if (Thumb.MIN.equals(pressedThumb)) {
+                    if(thumbListener!=null)
+                        thumbListener.onUpMinThumb(getSelectedMaxValue(), getSelectedMinValue());
+                }
+                if (Thumb.MAX.equals(pressedThumb)) {
+                    if(thumbListener!=null)
+                        thumbListener.onUpMaxThumb();
+                }
+                //Intercept parent TouchEvent
+                if(getParent() != null) {
+                    getParent().requestDisallowInterceptTouchEvent(true);
+                }
                 break;
         }
         return true;
@@ -234,14 +277,13 @@ public class RangeSeekBar<T extends Number> extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         // draw seek bar background line
-        RectF rect = new RectF(padding, 0.5f * (getHeight() - lineHeight), getWidth() - padding, 0.5f * (getHeight() + lineHeight));
         paint.setStyle(Style.FILL);
-        canvas.drawBitmap(seekbarBg, null, rect, paint);
+        canvas.drawBitmap(seekbarBg, null, mSeekbarRect, paint);
         // draw seek bar active range line
-        rect.left = normalizedToScreen(normalizedMinValue);
-        rect.right = normalizedToScreen(normalizedMaxValue);
+        mSeekbarSelRect.left = normalizedToScreen(normalizedMinValue);
+        mSeekbarSelRect.right = normalizedToScreen(normalizedMaxValue);
         //canvas.drawBitmap(seekbarSelBg, padding, 0.5f * (getHeight() - lineHeight), paint);
-        canvas.drawBitmap(seekbarSelBg, null, rect, paint);
+        canvas.drawBitmap(seekbarSelBg, null, mSeekbarSelRect, paint);
         // draw minimum thumb
         drawThumb(normalizedToScreen(normalizedMinValue), Thumb.MIN.equals(pressedThumb), canvas);
         // draw maximum thumb
