@@ -182,8 +182,8 @@ public class RangeSeekBar<T extends Number> extends View {
      */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-//        if (!isClickable())
-//            return true;
+        if (!isEnable)
+            return true;
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 Logger.d("ACTION_DOWN");
