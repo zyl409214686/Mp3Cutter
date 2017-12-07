@@ -44,6 +44,9 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
     private String mSelMusicPath = "";
     private static final int REQUEST_CODE = 0;
     private boolean mIsTouching;
+    //滑块间10秒间隔
+    private final int BETWEEN_SPACE = 15 * 1000;
+    private final int SPEED = 500;
 
     @Inject
     public HomePresenter(HomeContract.View view) {
@@ -58,23 +61,25 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
         public void accept(Object o) throws Exception {
             if (mView == null)
                 return;
-            mView.setSeekBarMinValue(getCurPosition());
-            Number maxValue = mView.getSeekbarMaxValue();
-            // 播放完暂停处理
             int curPosition = getCurPosition();
-            if (curPosition >= maxValue.intValue()) {
-                pause();
-            }
-            // 消息处理
-            if (getCurPosition() >= maxValue
+            Number maxValue = mView.getSeekbarMaxValue();
+
+            if (!mView.setSeekBarSelMinValue(curPosition) || curPosition >= maxValue
                     .intValue()) {
-                if (mDisposable != null) {
-                    mDisposable.dispose();
-                    mDisposable = null;
-                }
+                pause();
             }
         }
     };
+
+    /**
+     * 取消更新seekbar rx事件
+     */
+    private void cancelUpdateProgress() {
+        if (mDisposable != null) {
+            mDisposable.dispose();
+            mDisposable = null;
+        }
+    }
 
     /**
      * 剪切音乐
@@ -94,9 +99,8 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
                             if (helper.generateNewMp3ByTime(randomFile, minValue, maxValue)) {
                                 e.onNext(cutterPath);
                             }
-                        }
-                        finally {
-                            if(randomFile!=null)
+                        } finally {
+                            if (randomFile != null)
                                 randomFile.close();
                         }
                     }
@@ -129,15 +133,6 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
 
                     }
                 });
-//                .subscribe(new Consumer() {
-//                    @Override
-//                    public void accept(Object o) throws Exception {
-//                        String cutterPath = (String) o;
-//                        if (mView != null) {
-//                            mView.doCutterSucc(cutterPath);
-//                        }
-//                    }
-//                });
     }
 
     @Override
@@ -179,10 +174,10 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
                 while (mIsTouching) {
                     Number curNumber = mView
                             .getSeekbarMaxValue();
-                    if (getCurPosition() + 500 < curNumber
+                    if (getCurPosition() + SPEED < curNumber
                             .doubleValue())
-                        seekTo(getCurPosition() + 500);
-                    else if (getCurPosition() + 500 == curNumber
+                        seekTo(getCurPosition() + SPEED);
+                    else if (getCurPosition() + SPEED == curNumber
                             .doubleValue()) {
                         seekTo(getDuration());
                         mIsTouching = false;
@@ -212,7 +207,7 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
             public void run() {
                 mIsTouching = true;
                 while (mIsTouching) {
-                    if(mView==null)
+                    if (mView == null)
                         return;
                     Number minNumber = mView
                             .getSeekbarMinValue();
@@ -240,7 +235,9 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
     @Override
     public void pause() {
         mMediaPlayer.pause();
+        mView.setPlayBtnStatus(false);
         mView.setVisualizerViewEnaled(false);
+        cancelUpdateProgress();
     }
 
     @Override
@@ -326,7 +323,7 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
                     .getStringExtra(FileChooserActivity.EXTRA_FILE_CHOOSER);
             try {
                 if (!TextUtils.isEmpty(mSelMusicPath)) {
-                    mView.setSeekBarMinValue(0);
+                    mView.resetSeekBarSelValue();
                     mView.setPlayBtnStatus(false);
                     mView.setSeekBarEnable(true);
                     pause();

@@ -115,43 +115,28 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/topborder">
 
-                <TextView
-                    android:id="@+id/tv_starttime"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_centerVertical="true"
-                    android:paddingLeft="5dp"
-                    android:paddingRight="5dp"
-                    android:text="@string/homefragment_zero_time"
-                    android:textColor="#000000"
-                    android:textSize="10dp"
-                    android:textStyle="bold" />
+                <!--<TextView-->
+                    <!--android:id="@+id/tv_endtime"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_alignParentRight="true"-->
+                    <!--android:layout_centerVertical="true"-->
+                    <!--android:paddingLeft="5dp"-->
+                    <!--android:paddingRight="5dp"-->
+                    <!--android:text="@string/homefragment_zero_time"-->
+                    <!--android:textColor="#000000"-->
+                    <!--android:textSize="10dp"-->
+                    <!--android:textStyle="bold" />-->
 
-                <TextView
-                    android:id="@+id/tv_endtime"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:paddingLeft="5dp"
-                    android:paddingRight="5dp"
-                    android:text="@string/homefragment_zero_time"
-                    android:textColor="#000000"
-                    android:textSize="10dp"
-                    android:textStyle="bold" />
-
-                <com.zyl.mp3cutter.common.ui.view.RangeSeekBar
+                <com.zyl.mp3cutter.common.ui.view.CustomRangeSeekBar
                     android:id="@+id/range_seekbar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:layout_toLeftOf="@id/tv_endtime"
-                    android:layout_toRightOf="@id/tv_starttime"
-                    rangeseekbar:max="100.0"
-                    rangeseekbar:min="0.0"
-                    rangeseekbar:startingMax="30"
-                    rangeseekbar:startingMin="10.0"
+                    rangeseekbar:progressBarBg="@mipmap/seekbar_bg"
+                    rangeseekbar:progressBarSelBg="@mipmap/seekbar_sel_bg"
+                    rangeseekbar:absolutemMax="100"
+                    rangeseekbar:absoluteMin="0"
                     />
             </RelativeLayout>
 

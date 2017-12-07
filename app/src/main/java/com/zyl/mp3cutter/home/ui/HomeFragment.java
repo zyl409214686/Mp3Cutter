@@ -29,11 +29,10 @@ import com.zyl.mp3cutter.common.app.di.AppComponent;
 import com.zyl.mp3cutter.common.base.BaseFragment;
 import com.zyl.mp3cutter.common.constant.CommonConstant;
 import com.zyl.mp3cutter.common.ui.view.CommonDialog;
-import com.zyl.mp3cutter.common.ui.view.RangeSeekBar;
+import com.zyl.mp3cutter.common.ui.view.CustomRangeSeekBar;
 import com.zyl.mp3cutter.common.ui.view.visualizer.renderer.CircleBarRenderer;
 import com.zyl.mp3cutter.common.utils.FileUtils;
 import com.zyl.mp3cutter.common.utils.SystemTools;
-import com.zyl.mp3cutter.common.utils.TimeUtils;
 import com.zyl.mp3cutter.databinding.FragmentHomeBinding;
 import com.zyl.mp3cutter.home.di.DaggerHomeComponent;
 import com.zyl.mp3cutter.home.di.HomeModule;
@@ -71,7 +70,7 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
     private AudioManager mAudioManager;
     private ProgressDialog mProgressDialog;
     // 音乐滑块事件
-    private RangeSeekBar.ThumbListener mThumbListener = new RangeSeekBar.ThumbListener() {
+    private CustomRangeSeekBar.ThumbListener mThumbListener = new CustomRangeSeekBar.ThumbListener() {
 
         @Override
         public void onClickMinThumb(Number max, Number min) {
@@ -85,26 +84,23 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
         @Override
         public void onMinMove(Number max, Number min) {
             mPresenter.seekTo(min.intValue());
-            mBinding.rangeSeekbar.setSelectedMinValue(min.intValue());
+//            mBinding.rangeSeekbar.setSelectedAbsoluteMinValue(min.intValue());
         }
 
         @Override
         public void onMaxMove(Number max, Number min) {
             if (max.intValue() <= min.intValue()) {
                 mPresenter.seekTo(max.intValue());
-                mBinding.rangeSeekbar.setSelectedMaxValue(max.intValue());
+//                mBinding.rangeSeekbar.setSelectedAbsoluteMaxValue(max.intValue());
             }
         }
 
         @Override
         public void onUpMinThumb(Number max, Number min) {
-            mPresenter.play();
-            setPlayBtnStatus(true);
         }
 
         @Override
         public void onUpMaxThumb() {
-
         }
     };
 
@@ -149,8 +145,6 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
     }
 
     private void init() {
-        mBinding.rangeSeekbar.setSelectedMinValue(0);
-        mBinding.rangeSeekbar.setSelectedMaxValue(100);
         // 获取系统音乐音量
         mAudioManager = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
         // 获取系统音乐当前音量
@@ -231,13 +225,13 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
 
     @Override
     public int getSeekbarMaxValue() {
-        Number number = mBinding.rangeSeekbar.getSelectedMaxValue();
+        Number number = mBinding.rangeSeekbar.getSelectedAbsoluteMaxValue();
         return number.intValue();
     }
 
     @Override
     public int getSeekbarMinValue() {
-        Number number = mBinding.rangeSeekbar.getSelectedMinValue();
+        Number number = mBinding.rangeSeekbar.getSelectedAbsoluteMinValue();
         return number.intValue();
     }
 
@@ -277,15 +271,23 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
     }
 
     @Override
-    public void setSeekBarMinValue(int value) {
-        mBinding.tvStarttime.setText(TimeUtils.formatSecondTime(value));
-        mBinding.rangeSeekbar.setSelectedMinValue(value);
+    public boolean setSeekBarSelMinValue(int value) {
+        return mBinding.rangeSeekbar.setSelectedAbsoluteMinValue(value);
+    }
+
+    /**
+     * 恢复默认seekbar初始值
+     */
+    @Override
+    public void resetSeekBarSelValue(){
+        mBinding.rangeSeekbar.setPercentMinValue(0);
+        mBinding.rangeSeekbar.setPercentMaxValue(100);
     }
 
     @Override
     public void setDuration(int value) {
         mBinding.rangeSeekbar.setAbsoluteMaxValue(value);
-        mBinding.tvEndtime.setText(TimeUtils.formatSecondTime(value));
+//        mBinding.tvEndtime.setText(TimeUtils.formatSecondTime(value));
     }
 
     @Override
@@ -314,8 +316,8 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
      * 剪切提示弹出窗口
      */
     public void showCutterPromptDialog() {
-        final Number minNumber = mBinding.rangeSeekbar.getSelectedMinValue();
-        final Number maxNumber = mBinding.rangeSeekbar.getSelectedMaxValue();
+        final Number minNumber = mBinding.rangeSeekbar.getSelectedAbsoluteMinValue();
+        final Number maxNumber = mBinding.rangeSeekbar.getSelectedAbsoluteMaxValue();
         if (maxNumber.intValue() <= minNumber.intValue()) {
             Toast.makeText(getActivity(),
                     getString(R.string.dialog_cutter_warning_length),

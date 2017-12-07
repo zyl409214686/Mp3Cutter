@@ -41,7 +41,7 @@ public class HomeContract {
          *
          * @param value
          */
-        void setSeekBarMinValue(int value);
+        boolean setSeekBarSelMinValue(int value);
 
         /**
          * 设置时长
@@ -57,7 +57,13 @@ public class HomeContract {
          * 剪切失败
          */
         void doCutterFail();
+
+        /**
+         * 设置seekbar选择滑块恢复默认
+         */
+        void resetSeekBarSelValue();
     }
+
 
     interface Presenter extends IBasePresenter {
         void playToggle(Activity activity);
