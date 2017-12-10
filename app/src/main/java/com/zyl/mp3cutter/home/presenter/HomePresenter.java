@@ -43,11 +43,7 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
     public MediaPlayer mMediaPlayer;
     private String mSelMusicPath = "";
     private static final int REQUEST_CODE = 0;
-    private boolean mIsTouching;
-    //滑块间10秒间隔
-    private final int BETWEEN_SPACE = 15 * 1000;
-    private final int SPEED = 500;
-
+    private boolean mIsMin = true;
     @Inject
     public HomePresenter(HomeContract.View view) {
         super(view);
@@ -62,9 +58,9 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
             if (mView == null)
                 return;
             int curPosition = getCurPosition();
-            Number maxValue = mView.getSeekbarMaxValue();
+            Number maxValue = mView.getSeekBarAbsoluteMaxValue();
 
-            if (!mView.setSeekBarSelMinValue(curPosition) || curPosition >= maxValue
+            if (!mView.setSeekBarProgressValue(curPosition, mIsMin) || curPosition >= maxValue
                     .intValue()) {
                 pause();
             }
@@ -154,84 +150,14 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
                 return;
             }
             mView.setPlayBtnStatus(true);
-            seekTo(mView.getSeekbarMinValue());
+            seekToForIsMin();
             play();
             mDisposable = mUpdateProgressObservable.observeOn(AndroidSchedulers.mainThread()).
                     subscribe(mUpdateProgressConsumer);
         }
 
     }
-
-    /**
-     * 快进
-     */
-    @Override
-    public void onSpeedDown() {
-        new Thread() {
-            @Override
-            public void run() {
-                mIsTouching = true;
-                while (mIsTouching) {
-                    Number curNumber = mView
-                            .getSeekbarMaxValue();
-                    if (getCurPosition() + SPEED < curNumber
-                            .doubleValue())
-                        seekTo(getCurPosition() + SPEED);
-                    else if (getCurPosition() + SPEED == curNumber
-                            .doubleValue()) {
-                        seekTo(getDuration());
-                        mIsTouching = false;
-                    } else {
-                        mIsTouching = false;
-                    }
-                    try {
-                        Thread.sleep(10);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-                super.run();
-            }
-        }.start();
-    }
-
-    @Override
-    public void onTouchSpeedFastUp() {
-        mIsTouching = false;
-    }
-
-    @Override
-    public void onBackword() {
-        new Thread() {
-            @Override
-            public void run() {
-                mIsTouching = true;
-                while (mIsTouching) {
-                    if (mView == null)
-                        return;
-                    Number minNumber = mView
-                            .getSeekbarMinValue();
-                    if (getCurPosition() - 500 > minNumber
-                            .doubleValue())
-                        seekTo(getCurPosition() - 500);
-                    else if (getCurPosition() - 500 == minNumber
-                            .doubleValue()) {
-                        seekTo(getDuration());
-                        mIsTouching = false;
-                    } else {
-                        mIsTouching = false;
-                    }
-                    try {
-                        Thread.sleep(10);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-                super.run();
-            }
-        }.start();
-    }
-
+    
     @Override
     public void pause() {
         mMediaPlayer.pause();
@@ -307,6 +233,42 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
             return false;
         }
         return true;
+    }
+
+    @Override
+    public void switchSeekBar() {
+        mIsMin = !mIsMin;
+        seekToForIsMin();
+    }
+    
+    @Override
+    public void seekToForIsMin(){
+        int curValue;
+        if(mIsMin) {
+            curValue = mView.getSeekbarSelectedMinValue();
+        }
+        else{
+            curValue = mView.getSeekbarSelectedMaxValue();
+        }
+        seekTo(curValue);
+    }
+
+    @Override
+    public void seekToForIsMin(boolean isMinBar){
+        int curValue;
+        if(mIsMin) {
+            if(isMinBar) {
+                curValue = mView.getSeekbarSelectedMinValue();
+                seekTo(curValue);
+            }
+        }
+        else{
+            if(!isMinBar) {
+                curValue = mView.getSeekbarSelectedMaxValue();
+                seekTo(curValue);
+            }
+        }
+
     }
 
     /**

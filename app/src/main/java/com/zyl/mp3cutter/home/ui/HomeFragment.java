@@ -16,7 +16,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -83,16 +82,18 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
 
         @Override
         public void onMinMove(Number max, Number min) {
-            mPresenter.seekTo(min.intValue());
+//            mPresenter.seekTo(min.intValue());
+            mPresenter.seekToForIsMin(true);
 //            mBinding.rangeSeekbar.setSelectedAbsoluteMinValue(min.intValue());
         }
 
         @Override
         public void onMaxMove(Number max, Number min) {
-            if (max.intValue() <= min.intValue()) {
-                mPresenter.seekTo(max.intValue());
+//            if (max.intValue() <= min.intValue()) {
+//                mPresenter.seekTo(max.intValue());
 //                mBinding.rangeSeekbar.setSelectedAbsoluteMaxValue(max.intValue());
-            }
+//            }
+            mPresenter.seekToForIsMin(false);
         }
 
         @Override
@@ -224,13 +225,18 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
     }
 
     @Override
-    public int getSeekbarMaxValue() {
+    public int getSeekbarSelectedMaxValue() {
         Number number = mBinding.rangeSeekbar.getSelectedAbsoluteMaxValue();
         return number.intValue();
     }
 
     @Override
-    public int getSeekbarMinValue() {
+    public float getSeekBarAbsoluteMaxValue() {
+        return mBinding.rangeSeekbar.getAbsoluteMaxValue();
+    }
+
+    @Override
+    public int getSeekbarSelectedMinValue() {
         Number number = mBinding.rangeSeekbar.getSelectedAbsoluteMinValue();
         return number.intValue();
     }
@@ -271,8 +277,13 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
     }
 
     @Override
-    public boolean setSeekBarSelMinValue(int value) {
-        return mBinding.rangeSeekbar.setSelectedAbsoluteMinValue(value);
+    public boolean setSeekBarProgressValue(int value, boolean isMin) {
+        if(isMin) {
+            return mBinding.rangeSeekbar.setSelectedAbsoluteMinValue(value);
+        }
+        else{
+            return mBinding.rangeSeekbar.setSelectedAbsoluteMaxValue(value);
+        }
     }
 
     /**
@@ -366,41 +377,7 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
         mBinding.rangeSeekbar.setThumbListener(mThumbListener);
         mBinding.rangeSeekbar.setEnabled(false);
         mBinding.voiceSeekbar.setOnSeekBarChangeListener(mVoiceChangeListener);
-        mBinding.btnSpeed.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        mPresenter.onSpeedDown();
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        mPresenter.onTouchSpeedFastUp();
-                        break;
-                }
-                return false;
-            }
-        });
-
-        /**
-         * 快退功能
-         */
-        mBinding.btnBackward.setOnTouchListener(new View.OnTouchListener() {
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        mPresenter.onBackword();
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        mPresenter.onTouchSpeedFastUp();
-                        break;
-                }
-                return false;
-            }
-        });
+        mBinding.btnSwitch.setOnClickListener(this);
     }
 
     /**
@@ -467,6 +444,9 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
                 break;
             case R.id.dismiss_voicebar_space:
                 hidenVoicePanel();
+                break;
+            case R.id.btn_switch:
+                mPresenter.switchSeekBar();
                 break;
             default:
                 break;

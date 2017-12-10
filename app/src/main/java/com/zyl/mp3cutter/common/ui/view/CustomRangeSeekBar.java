@@ -1,5 +1,4 @@
 package com.zyl.mp3cutter.common.ui.view;
-
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
@@ -16,8 +15,6 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.zyl.mp3cutter.R;
-import com.zyl.mp3cutter.common.utils.DensityUtils;
-import com.zyl.mp3cutter.common.utils.TimeUtils;
 
 
 /**
@@ -26,7 +23,7 @@ import com.zyl.mp3cutter.common.utils.TimeUtils;
  * @author zouyulong
  */
 public class CustomRangeSeekBar extends View {
-    private final Paint paint = new Paint();
+    private final Paint mPaint = new Paint();
     //滑块bitmap
     private Bitmap mThumbImage;
     //progress bar 背景
@@ -64,6 +61,15 @@ public class CustomRangeSeekBar extends View {
     private float mBetweenAbsoluteValue;
     //空间最小宽度
     private final int MIN_WIDTH = 200;
+    //进度文本显示格式-数字格式
+    public static final int HINT_FORMAT_NUMBER = 0;
+    //进度文本显示格式-时间格式
+    public static final int HINT_FORMAT_TIME = 1;
+    private int mProgressTextFormat;
+    //文本高度
+    private int mWordHeight;
+    //文本字体大小
+    private float mWordSize;
     public CustomRangeSeekBar(Context context) {
         super(context);
     }
@@ -77,12 +83,17 @@ public class CustomRangeSeekBar extends View {
         mProgressBarBg = BitmapFactory.decodeResource(getResources(), a.getResourceId(R.styleable.CustomRangeSeekBar_progressBarBg, R.mipmap.seekbar_bg));
         mProgressBarSelBg = BitmapFactory.decodeResource(getResources(), a.getResourceId(R.styleable.CustomRangeSeekBar_progressBarSelBg, R.mipmap.seekbar_sel_bg));
         mBetweenAbsoluteValue = a.getFloat(R.styleable.CustomRangeSeekBar_betweenAbsoluteValue, 0);
+        mProgressTextFormat = a.getInt(R.styleable.CustomRangeSeekBar_progressTextFormat, HINT_FORMAT_NUMBER);
+        mWordSize = a.getDimension(R.styleable.CustomRangeSeekBar_progressTextSize, 16);
+        mPaint.setTextSize(mWordSize);
         mThumbWidth = mThumbImage.getWidth();
         mThumbHalfWidth = 0.5f * mThumbWidth;
         mThumbHalfHeight = 0.5f * mThumbImage.getHeight();
         mProgressBarHeight = 0.3f * mThumbHalfHeight;
         //TOOD 提供定义attr
         mWidthPadding = mThumbHalfHeight;
+        Paint.FontMetrics metrics = mPaint.getFontMetrics();
+        mWordHeight = (int) (metrics.descent - metrics.ascent);
         setPercentMinValue(0.0);
         setPercentMaxValue(100.0);
         a.recycle();
@@ -91,7 +102,8 @@ public class CustomRangeSeekBar extends View {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        mProgressBarRect = new RectF(mWidthPadding, 0.5f * (h - mProgressBarHeight), w - mWidthPadding, 0.5f * (h + mProgressBarHeight));
+        mProgressBarRect = new RectF(mWidthPadding, mWordHeight + 0.5f * (h - mWordHeight - mProgressBarHeight),
+                w - mWidthPadding, mWordHeight + 0.5f*(h - mWordHeight + mProgressBarHeight));
         mProgressBarSelRect = new RectF(mProgressBarRect);
     }
 
@@ -135,9 +147,17 @@ public class CustomRangeSeekBar extends View {
                 value = new Float(maxValue - mBetweenAbsoluteValue);
                 status = false;
             }
+            if(maxValue - value <= 0) {
+                status = false;
+                value = maxValue;
+            }
             setPercentMinValue(absoluteValueToPercent(value));
         }
         return status;
+    }
+
+    public float getAbsoluteMaxValue(){
+        return mAbsoluteMaxValue;
     }
 
     /**
@@ -152,17 +172,23 @@ public class CustomRangeSeekBar extends View {
      *
      * @param value
      */
-    public void setSelectedAbsoluteMaxValue(float value) {
-        // in case mAbsoluteMinValue == mAbsoluteMaxValue, avoid division by zero when normalizing.
+    public boolean setSelectedAbsoluteMaxValue(float value) {
+        boolean status = true;
         if (0 == (mAbsoluteMaxValue - mAbsoluteMinValue)) {
             setPercentMaxValue(1d);
         } else {
             float minValue = percentToAbsoluteValue(mPercentMinValue);
             if (mBetweenAbsoluteValue>0&&value - minValue <= mBetweenAbsoluteValue) {
                 value = new Float(minValue + mBetweenAbsoluteValue);
+                status = false;
             }
-            setPercentMinValue(absoluteValueToPercent(value));
+            if(value - minValue <= 0) {
+                status = false;
+                value = minValue;
+            }
+            setPercentMaxValue(absoluteValueToPercent(value));
         }
+        return status;
     }
 
     @Override
@@ -254,7 +280,7 @@ public class CustomRangeSeekBar extends View {
         if (MeasureSpec.UNSPECIFIED != MeasureSpec.getMode(widthMeasureSpec)) {
             width = MeasureSpec.getSize(widthMeasureSpec);
         }
-        int height = mThumbImage.getHeight();
+        int height = mThumbImage.getHeight() + mWordHeight;
         if (MeasureSpec.UNSPECIFIED != MeasureSpec.getMode(heightMeasureSpec)) {
             height = Math.min(height, MeasureSpec.getSize(heightMeasureSpec));
         }
@@ -265,21 +291,21 @@ public class CustomRangeSeekBar extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         // draw seek bar background line
-        paint.setStyle(Style.FILL);
-        canvas.drawBitmap(mProgressBarBg, null, mProgressBarRect, paint);
+        mPaint.setStyle(Style.FILL);
+        canvas.drawBitmap(mProgressBarBg, null, mProgressBarRect, mPaint);
         // draw seek bar active range line
         mProgressBarSelRect.left = percentToScreen(mPercentMinValue);
         mProgressBarSelRect.right = percentToScreen(mPercentMaxValue);
-        //canvas.drawBitmap(mProgressBarSelBg, mWidthPadding, 0.5f * (getHeight() - mProgressBarHeight), paint);
-        canvas.drawBitmap(mProgressBarSelBg, null, mProgressBarSelRect, paint);
+        //canvas.drawBitmap(mProgressBarSelBg, mWidthPadding, 0.5f * (getHeight() - mProgressBarHeight), mPaint);
+        canvas.drawBitmap(mProgressBarSelBg, null, mProgressBarSelRect, mPaint);
         // draw minimum thumb
         drawThumb(percentToScreen(mPercentMinValue), Thumb.MIN.equals(mPressedThumb), canvas);
         // draw maximum thumb
         drawThumb(percentToScreen(mPercentMaxValue), Thumb.MAX.equals(mPressedThumb), canvas);
-        paint.setColor(Color.rgb(255, 165, 0));
-        paint.setTextSize(DensityUtils.dp2px(getContext(), 16));
+        mPaint.setColor(Color.rgb(255, 165, 0));
+//        mPaint.setTextSize(DensityUtils.dp2px(getContext(), 16));
         drawThumbMinText(percentToScreen(mPercentMinValue), getSelectedAbsoluteMinValue(), canvas);
-        drawThumbMaxText(percentToScreen(mPercentMaxValue) - DensityUtils.dp2px(getContext(), 40), getSelectedAbsoluteMaxValue(), canvas);
+        drawThumbMaxText(percentToScreen(mPercentMaxValue), getSelectedAbsoluteMaxValue(), canvas);
     }
 
     @Override
@@ -307,7 +333,7 @@ public class CustomRangeSeekBar extends View {
      * @param canvas      The canvas to draw upon.
      */
     private void drawThumb(float screenCoord, boolean pressed, Canvas canvas) {
-        canvas.drawBitmap(mThumbImage, screenCoord - mThumbHalfWidth, (float) ((0.5f * getHeight()) - mThumbHalfHeight), paint);//pressed ? thumbPressedImage :
+        canvas.drawBitmap(mThumbImage, screenCoord - mThumbHalfWidth, (mWordHeight + 0.5f * (getHeight()-mWordHeight) - mThumbHalfHeight), mPaint);//pressed ? thumbPressedImage :
     }
 
     /**
@@ -318,8 +344,9 @@ public class CustomRangeSeekBar extends View {
      * @param canvas
      */
     private void drawThumbMinText(float screenCoord, Number value, Canvas canvas) {
-        String progress = TimeUtils.formatSecondTime(value.intValue());
-        canvas.drawText(progress, screenCoord + DensityUtils.dp2px(getContext(), 5), DensityUtils.dp2px(getContext(), 15), paint);
+        String progress = getProgressStr(value.intValue());
+        float progressWidth = mPaint.measureText(progress);
+        canvas.drawText(progress, screenCoord - progressWidth/2, mWordSize, mPaint);
     }
 
     /**
@@ -330,11 +357,10 @@ public class CustomRangeSeekBar extends View {
      * @param canvas
      */
     private void drawThumbMaxText(float screenCoord, Number value, Canvas canvas) {
-        String progress = TimeUtils.formatSecondTime(value.intValue());
-        Paint.FontMetrics metrics = paint.getFontMetrics();
-        float txtheight = metrics.descent - metrics.ascent;
-        canvas.drawText(progress, screenCoord - DensityUtils.dp2px(getContext(), 5), DensityUtils.dp2px(getContext(), 15) + txtheight
-                , paint);
+        String progress = getProgressStr(value.intValue());
+        float progressWidth = mPaint.measureText(progress);
+        canvas.drawText(progress, screenCoord - progressWidth/2, mWordSize
+                , mPaint);
     }
 
     /**
@@ -455,4 +481,47 @@ public class CustomRangeSeekBar extends View {
 
         void onMaxMove(Number max, Number min);
     }
+
+    private String getProgressStr(int progress){
+        String progressStr;
+        if(mProgressTextFormat==HINT_FORMAT_TIME){
+            progressStr = formatSecondTime(progress);
+        }
+        else{
+            progressStr = String.valueOf(progress);
+        }
+        return progressStr;
+    }
+
+    /**
+     * 格式化毫秒->00:00
+     */
+    private static String formatSecondTime(int millisecond) {
+        if (millisecond == 0) {
+            return "00:00";
+        }
+        int second = millisecond / 1000;
+        int m = second / 60;
+        int s = second % 60;
+        if (m >= 60) {
+            int hour = m / 60;
+            int minute = m % 60;
+            return hour + ":" + (minute > 9 ? minute : "0" + minute) + ":" + (s > 9 ? s : "0" + s);
+        } else {
+            return (m > 9 ? m : "0" + m) + ":" + (s > 9 ? s : "0" + s);
+        }
+    }
+
+    /**
+     * 将dip或dp值转换为px值，保证尺寸大小不变
+     *
+     * @param dipValue （DisplayMetrics类中属性density）
+     * @return
+     */
+    public static int dp2px(Context context, float dipValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dipValue * scale + 0.5f);
+    }
+
+
 }

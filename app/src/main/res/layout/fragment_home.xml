@@ -58,6 +58,7 @@
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
             android:weightSum="4">
 
@@ -65,31 +66,22 @@
                 android:id="@+id/btn_play"
                 android:layout_width="80dp"
                 android:layout_height="55dp"
-                android:layout_margin="3dp"
                 android:layout_weight="1"
                 android:background="@drawable/selector_play_btn" />
 
             <ImageButton
-                android:id="@+id/btn_speed"
-                android:layout_width="80dp"
-                android:layout_height="55dp"
-                android:layout_margin="3dp"
+                android:id="@+id/btn_switch"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="10dp"
                 android:layout_weight="1"
-                android:background="@drawable/selector_forward_btn" />
-
-            <ImageButton
-                android:id="@+id/btn_backward"
-                android:layout_width="80dp"
-                android:layout_height="55dp"
-                android:layout_margin="3dp"
-                android:layout_weight="1"
-                android:background="@drawable/selector_backward_btn" />
+                android:background="@drawable/selector_switch_btn" />
 
             <ImageButton
                 android:id="@+id/btn_cutter_sure"
-                android:layout_width="80dp"
-                android:layout_height="55dp"
-                android:layout_margin="3dp"
+                android:layout_width="114dp"
+                android:layout_height="67dp"
                 android:layout_weight="1"
                 android:background="@drawable/selector_sure_btn" />
         </LinearLayout>
@@ -115,19 +107,6 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/topborder">
 
-                <!--<TextView-->
-                    <!--android:id="@+id/tv_endtime"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_alignParentRight="true"-->
-                    <!--android:layout_centerVertical="true"-->
-                    <!--android:paddingLeft="5dp"-->
-                    <!--android:paddingRight="5dp"-->
-                    <!--android:text="@string/homefragment_zero_time"-->
-                    <!--android:textColor="#000000"-->
-                    <!--android:textSize="10dp"-->
-                    <!--android:textStyle="bold" />-->
-
                 <com.zyl.mp3cutter.common.ui.view.CustomRangeSeekBar
                     android:id="@+id/range_seekbar"
                     android:layout_width="match_parent"
@@ -135,8 +114,10 @@
                     android:layout_centerVertical="true"
                     rangeseekbar:progressBarBg="@mipmap/seekbar_bg"
                     rangeseekbar:progressBarSelBg="@mipmap/seekbar_sel_bg"
-                    rangeseekbar:absolutemMax="100"
+                    rangeseekbar:absolutemMax="50"
                     rangeseekbar:absoluteMin="0"
+                    rangeseekbar:progressTextSize="16dp"
+                    rangeseekbar:progressTextFormat="timeFormat"
                     />
             </RelativeLayout>
 

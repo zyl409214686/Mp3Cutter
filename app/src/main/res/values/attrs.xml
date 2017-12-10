@@ -32,5 +32,12 @@
         <attr name="progressBarSelBg" format="reference" />
         <!-- 最大值和最小值之间的最小范围,绝对值（不会小于此范围） -->
         <attr name="betweenAbsoluteValue" format="float" />
+        <!-- 进度文本字体大小 -->
+        <attr name="progressTextSize" format="dimension" />
+        <!-- 进度文本显示格式 -->
+        <attr name="progressTextFormat" format="enum">
+            <enum name="numberFormat" value="0"/>
+            <enum name="timeFormat" value="1"/>
+        </attr>
     </declare-styleable>
 </resources>

@@ -39,7 +39,7 @@ import java.util.List;
 
 
 /**
- * Description: 音乐选择页
+ * Description: mp3文件选择页
  * Created by zouyulong on 2017/10/22.
  * Person in charge :  zouyulong
  */

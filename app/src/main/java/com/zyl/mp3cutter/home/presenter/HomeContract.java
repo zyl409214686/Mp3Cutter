@@ -20,9 +20,11 @@ public class HomeContract {
 
         void checkRecordPermission(MediaPlayer mediaPlayer);
 
-        int getSeekbarMaxValue();
+        int getSeekbarSelectedMaxValue();
 
-        int getSeekbarMinValue();
+        float getSeekBarAbsoluteMaxValue();
+
+        int getSeekbarSelectedMinValue();
 
         void setPlayBtnStatus(boolean isPlayingStatus);
 
@@ -41,7 +43,7 @@ public class HomeContract {
          *
          * @param value
          */
-        boolean setSeekBarSelMinValue(int value);
+        boolean setSeekBarProgressValue(int value, boolean isMin);
 
         /**
          * 设置时长
@@ -80,12 +82,6 @@ public class HomeContract {
 
         void prepare();
 
-        void onSpeedDown();
-
-        void onTouchSpeedFastUp();
-
-        void onBackword();
-
         MediaPlayer getMediaPlayer();
 
         int getDuration();
@@ -114,5 +110,11 @@ public class HomeContract {
          * @return
          */
         boolean isSelectedMp3(Context context);
+
+        void switchSeekBar();
+
+        void seekToForIsMin();
+
+        void seekToForIsMin(boolean isMinBar);
     }
 }
