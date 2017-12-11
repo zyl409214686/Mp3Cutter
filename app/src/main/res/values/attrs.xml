@@ -17,27 +17,4 @@
         <attr name="rv_zoom" format="boolean" />
         <attr name="rv_zoomScale" format="float" />
     </declare-styleable>
-
-
-    <declare-styleable name="CustomRangeSeekBar">
-        <!-- 范围选取最小值 -->
-        <attr name="absoluteMin" format="float" />
-        <!-- 范围选取最大值 -->
-        <attr name="absolutemMax" format="float" />
-        <!-- 滑块图片 -->
-        <attr name="thumbImage" format="reference" />
-        <!-- 进度bar背景 -->
-        <attr name="progressBarBg" format="reference" />
-        <!-- 进度bar 范围内已选背景（progress bar 中min - max 之间） -->
-        <attr name="progressBarSelBg" format="reference" />
-        <!-- 最大值和最小值之间的最小范围,绝对值（不会小于此范围） -->
-        <attr name="betweenAbsoluteValue" format="float" />
-        <!-- 进度文本字体大小 -->
-        <attr name="progressTextSize" format="dimension" />
-        <!-- 进度文本显示格式 -->
-        <attr name="progressTextFormat" format="enum">
-            <enum name="numberFormat" value="0"/>
-            <enum name="timeFormat" value="1"/>
-        </attr>
-    </declare-styleable>
 </resources>

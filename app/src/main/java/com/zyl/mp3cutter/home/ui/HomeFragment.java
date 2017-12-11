@@ -23,12 +23,12 @@ import android.view.animation.AnimationUtils;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
+import com.zyl.customrangeseekbar.CustomRangeSeekBar;
 import com.zyl.mp3cutter.R;
 import com.zyl.mp3cutter.common.app.di.AppComponent;
 import com.zyl.mp3cutter.common.base.BaseFragment;
 import com.zyl.mp3cutter.common.constant.CommonConstant;
 import com.zyl.mp3cutter.common.ui.view.CommonDialog;
-import com.zyl.mp3cutter.common.ui.view.CustomRangeSeekBar;
 import com.zyl.mp3cutter.common.ui.view.visualizer.renderer.CircleBarRenderer;
 import com.zyl.mp3cutter.common.utils.FileUtils;
 import com.zyl.mp3cutter.common.utils.SystemTools;
@@ -291,8 +291,8 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
      */
     @Override
     public void resetSeekBarSelValue(){
-        mBinding.rangeSeekbar.setPercentMinValue(0);
-        mBinding.rangeSeekbar.setPercentMaxValue(100);
+        mBinding.rangeSeekbar.restorePercentSelectedMinValue();
+        mBinding.rangeSeekbar.restorePercentSelectedMaxValue();
     }
 
     @Override

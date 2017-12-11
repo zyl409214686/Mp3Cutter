@@ -107,17 +107,18 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/topborder">
 
-                <com.zyl.mp3cutter.common.ui.view.CustomRangeSeekBar
+                <com.zyl.customrangeseekbar.CustomRangeSeekBar
                     android:id="@+id/range_seekbar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     rangeseekbar:progressBarBg="@mipmap/seekbar_bg"
                     rangeseekbar:progressBarSelBg="@mipmap/seekbar_sel_bg"
-                    rangeseekbar:absolutemMax="50"
-                    rangeseekbar:absoluteMin="0"
+                    rangeseekbar:thumbImage="@mipmap/btn_seekbar_normal"
                     rangeseekbar:progressTextSize="16dp"
                     rangeseekbar:progressTextFormat="timeFormat"
+                    rangeseekbar:startMinPercent="0"
+                    rangeseekbar:startMaxPercent="0.8"
                     />
             </RelativeLayout>
 
