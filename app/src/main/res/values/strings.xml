@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Music剪刀手</string>
+    <string name="app_name">Mp3剪刀手</string>
 
     <!-- MainActivity -->
     <string name="main_tab_home">主页</string>
@@ -40,9 +40,10 @@
 
     <!-- 关于页面 -->
     <string name="about_version">%1$s(Build %2$s)</string>
-    <string name="about_auther">作者：邹玉龙</string>
+    <string name="about_auther">作者：大龙龙龙</string>
     <string name="about_blog">博客地址：http://zouyulong.com</string>
     <string name="about_github">GitHub：https://github.com/zyl409214686</string>
+    <string name="about_email">邮箱：zyl409214686@163.com</string>
 
     <!-- 设置页面 -->
     <string name="setting_prompt_clearcache">确定清空缓存？</string>

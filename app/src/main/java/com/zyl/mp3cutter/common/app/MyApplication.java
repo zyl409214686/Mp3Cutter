@@ -32,11 +32,13 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         instances = this;
+        //greendao
         mAppComponent = DaggerAppComponent
                 .builder()
                 .appModule(new AppModule(this))
                 .build();
         setDatabase();
+        //logger
         Logger.addLogAdapter(new AndroidLogAdapter());
     }
 

@@ -34,5 +34,8 @@
             android:theme="@style/AppTheme">
         </activity>
 
+        <!-- umeng -->
+        <meta-data android:value="5a2f98458f4a9d4df40002bc" android:name="UMENG_APPKEY"/>
+        <meta-data android:value="github" android:name="UMENG_CHANNEL"/>
     </application>
 </manifest>

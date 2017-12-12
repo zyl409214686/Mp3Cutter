@@ -1,6 +1,6 @@
-# Music剪刀手，一个mp3剪切的小工具。
+# Mp3Cutter，个人原创的mp3剪切小工具。
 
-> 适用于剪切制作手机铃声以及闹铃等用途，功能简单易用、界面风格简洁，采用MaterialDesign设计规范。缺点：目前功能比较单一、只提供了对mp3格式的支持。
+> 适用于剪切制作手机铃声以及闹铃等用途，功能简单易用、界面风格简洁，采用MaterialDesign设计规范。
 
 
 
@@ -32,6 +32,14 @@
 * [AVLoadingIndicatorView](https://github.com/81813780/AVLoadingIndicatorView)
 * [baseAdapter](https://github.com/hongyangAndroid/baseAdapter)
 * [CustomRangeSeekBar](https://github.com/zyl409214686/CustomRangeSeekBar)
+
+## TODO
+- 增加主题颜色设置
+- 增加频谱的样式设置
+- 增加闹铃的设置
+- 增加对音乐文件的处理如分享等
+- 国际化支持
+
 ## 关于我
 
 一个来自于北京的android开发者

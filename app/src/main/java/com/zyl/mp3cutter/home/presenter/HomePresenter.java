@@ -3,6 +3,7 @@ package com.zyl.mp3cutter.home.presenter;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.text.TextUtils;
 import android.widget.Toast;
@@ -33,21 +34,29 @@ import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 import static com.zyl.mp3cutter.common.constant.CommonConstant.RING_FOLDER;
 import static com.zyl.mp3cutter.common.constant.CommonConstant.RING_FORMAT;
+import static com.zyl.mp3cutter.home.ui.HomeFragment.REQUEST_CODE;
 
 /**
- * Description: degger2 module类
+ * Description: Home presenter
  * Created by zouyulong on 2017/10/22.
  * Person in charge :  zouyulong
  */
 public class HomePresenter extends BasePresenter<HomeContract.View> implements HomeContract.Presenter {
     public MediaPlayer mMediaPlayer;
     private String mSelMusicPath = "";
-    private static final int REQUEST_CODE = 0;
-    private boolean mIsMin = true;
+    // 标识当前播放的滑块为min or max
+    private boolean mIsMinFlag = true;
+    // 获取系统音频对象
+    private AudioManager mAudioManager;
     @Inject
     public HomePresenter(HomeContract.View view) {
         super(view);
+        init();
+    }
+
+    private void init(){
         mMediaPlayer = new MediaPlayer();
+        mAudioManager = (AudioManager) mView.getContext().getSystemService(Context.AUDIO_SERVICE);
     }
 
     private Disposable mDisposable;
@@ -60,7 +69,7 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
             int curPosition = getCurPosition();
             Number maxValue = mView.getSeekBarAbsoluteMaxValue();
 
-            if (!mView.setSeekBarProgressValue(curPosition, mIsMin) || curPosition >= maxValue
+            if (!mView.setSeekBarProgressValue(curPosition, mIsMinFlag) || curPosition >= maxValue
                     .intValue()) {
                 pause();
             }
@@ -68,7 +77,7 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
     };
 
     /**
-     * 取消更新seekbar rx事件
+     * 取消更新seekbar rx轮询事件
      */
     private void cancelUpdateProgress() {
         if (mDisposable != null) {
@@ -140,7 +149,6 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
                 mDisposable.dispose();
                 mDisposable = null;
             }
-            mView.setPlayBtnStatus(false);
         } else {
             // 播放
             if (TextUtils.isEmpty(mSelMusicPath)) {
@@ -149,9 +157,9 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
                         Toast.LENGTH_SHORT).show();
                 return;
             }
-            mView.setPlayBtnStatus(true);
             seekToForIsMin();
             play();
+            //开启进度rx轮询事件
             mDisposable = mUpdateProgressObservable.observeOn(AndroidSchedulers.mainThread()).
                     subscribe(mUpdateProgressConsumer);
         }
@@ -161,29 +169,25 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
     @Override
     public void pause() {
         mMediaPlayer.pause();
-        mView.setPlayBtnStatus(false);
+        mView.setPlayBtnWithStatus(false);
         mView.setVisualizerViewEnaled(false);
         cancelUpdateProgress();
     }
 
-    @Override
-    public void seekTo(int progress) {
+    private void seekTo(int progress) {
         mMediaPlayer.seekTo(progress);
     }
 
-    @Override
-    public void play() {
+    private void play() {
         mMediaPlayer.start();
         mView.setVisualizerViewEnaled(true);
     }
 
-    @Override
-    public void reset() {
+    private void reset() {
         mMediaPlayer.reset();
     }
 
-    @Override
-    public void setDataSource(String path) {
+    private void setDataSource(String path) {
         try {
             mMediaPlayer.setDataSource(path);
         } catch (IOException e) {
@@ -191,8 +195,7 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
         }
     }
 
-    @Override
-    public void prepare() {
+    private void prepare() {
         try {
             mMediaPlayer.prepare();
         } catch (IOException e) {
@@ -200,23 +203,19 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
         }
     }
 
-    @Override
-    public MediaPlayer getMediaPlayer() {
+    private MediaPlayer getMediaPlayer() {
         return mMediaPlayer;
     }
 
-    @Override
-    public int getDuration() {
+    private int getDuration() {
         return mMediaPlayer.getDuration();
     }
 
-    @Override
-    public boolean isPlaying() {
+    private boolean isPlaying() {
         return mMediaPlayer.isPlaying();
     }
 
-    @Override
-    public int getCurPosition() {
+    private int getCurPosition() {
         return mMediaPlayer.getCurrentPosition();
     }
 
@@ -237,14 +236,13 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
 
     @Override
     public void switchSeekBar() {
-        mIsMin = !mIsMin;
+        mIsMinFlag = !mIsMinFlag;
         seekToForIsMin();
     }
     
-    @Override
-    public void seekToForIsMin(){
+    private void seekToForIsMin(){
         int curValue;
-        if(mIsMin) {
+        if(mIsMinFlag) {
             curValue = mView.getSeekbarSelectedMinValue();
         }
         else{
@@ -255,20 +253,35 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
 
     @Override
     public void seekToForIsMin(boolean isMinBar){
-        int curValue;
-        if(mIsMin) {
+        if(judgeIsPlayingThumb(isMinBar)){
+            int curValue;
             if(isMinBar) {
                 curValue = mView.getSeekbarSelectedMinValue();
-                seekTo(curValue);
+            }
+            else{
+                curValue = mView.getSeekbarSelectedMaxValue();
+            }
+            seekTo(curValue);
+        }
+    }
+
+    /**
+     * //判断滑动的滑块是否为当前正在播放的滑块
+     * @param isMinBar 滑动的滑块 true: min  false: max
+     */
+    private boolean judgeIsPlayingThumb(boolean isMinBar){
+        boolean isPlaying = false;
+        if(mIsMinFlag) {
+            if (isMinBar) {
+                isPlaying = true;
             }
         }
         else{
-            if(!isMinBar) {
-                curValue = mView.getSeekbarSelectedMaxValue();
-                seekTo(curValue);
+            if (!isMinBar) {
+                isPlaying = true;
             }
         }
-
+        return isPlaying;
     }
 
     /**
@@ -286,13 +299,13 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
             try {
                 if (!TextUtils.isEmpty(mSelMusicPath)) {
                     mView.resetSeekBarSelValue();
-                    mView.setPlayBtnStatus(false);
+                    mView.setPlayBtnWithStatus(false);
                     mView.setSeekBarEnable(true);
                     pause();
                     reset();
                     setDataSource(mSelMusicPath);
                     prepare();
-                    mView.setDuration(getDuration());
+                    mView.setSeekBarMaxValue(getDuration());
                     mView.checkRecordPermission(getMediaPlayer());
                     mView.addBarGraphRenderers();
                 }
@@ -315,5 +328,23 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
             mDisposable.dispose();
             mDisposable = null;
         }
+    }
+
+    @Override
+    public void setStreamVolume(int progress) {
+        mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC,
+                progress, 0);
+    }
+
+    @Override
+    public int getStreamMaxVolume() {
+        return mAudioManager
+                .getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+    }
+
+    @Override
+    public int getStreamVolume() {
+        return mAudioManager
+                .getStreamVolume(AudioManager.STREAM_MUSIC);
     }
 }

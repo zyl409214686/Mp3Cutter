@@ -27,7 +27,8 @@ public abstract class BaseFragment<V extends IBaseView,T extends BasePresenter<V
                              Bundle savedInstanceState) {
         myApplication = (MyApplication)getActivity().getApplication();
         ComponentInject(myApplication.getAppComponent());//依赖注入
-        return initView(inflater, container);
+        View view = initView(inflater, container);
+        return view;
     }
 
     @Override

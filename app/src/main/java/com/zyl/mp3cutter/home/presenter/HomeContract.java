@@ -16,24 +16,49 @@ import com.zyl.mp3cutter.common.base.IBaseView;
 
 public class HomeContract {
     public interface View extends IBaseView {
+        /**
+         *  启动或关闭频谱
+         * @param enabled
+         */
         void setVisualizerViewEnaled(boolean enabled);
 
+        /**
+         * 检测录音权限， 频谱
+         * @param mediaPlayer
+         */
         void checkRecordPermission(MediaPlayer mediaPlayer);
 
-        int getSeekbarSelectedMaxValue();
-
+        /**
+         * 获取seekbar最大值
+         * @return
+         */
         float getSeekBarAbsoluteMaxValue();
 
+        /**
+         * 获取seekbar min thumb滑块对应的值
+         * @return
+         */
         int getSeekbarSelectedMinValue();
 
-        void setPlayBtnStatus(boolean isPlayingStatus);
+        /**
+         * 获取seekbar max thumb滑块对应的值
+         * @return
+         */
+        int getSeekbarSelectedMaxValue();
 
-        void linkMediaPlayerForVisualView(MediaPlayer player);
+        /**
+         * 根据播放状态设置播放按钮背景
+         * @param isPlayingStatus
+         */
+        void setPlayBtnWithStatus(boolean isPlayingStatus);
 
+        /**
+         * 添加频谱渲染
+         */
         void addBarGraphRenderers();
 
         /**
-         * seekbar 是否可以接收时间
+         * seekbar 设置seekbar 滑块是否可用（可以滑动）
          * @param isEnable
          */
         void setSeekBarEnable(boolean isEnable);
@@ -46,9 +71,9 @@ public class HomeContract {
         boolean setSeekBarProgressValue(int value, boolean isMin);
 
         /**
-         * 设置时长
+         * 设置seekbar最大值
          */
-        void setDuration(int value);
+        void setSeekBarMaxValue(int value);
 
         /**
          * 剪切成功
@@ -68,31 +93,45 @@ public class HomeContract {
 
 
     interface Presenter extends IBasePresenter {
+        /**
+         * 播放暂停切换
+         * @param activity
+         */
         void playToggle(Activity activity);
 
+        /**
+         * 暂停
+         */
         void pause();
 
-        void seekTo(int progress);
+        /**
+         * 销毁
+         */
+        void onDestroy();
 
-        void play();
-
-        void reset();
-
-        void setDataSource(String path);
-
-        void prepare();
-
-        MediaPlayer getMediaPlayer();
-
-        int getDuration();
-
-        boolean isPlaying();
-
-        int getCurPosition();
-
+        /**
+         * activty回调
+         * @param requestCode
+         * @param resultCode
+         * @param data
+         */
         void onActivityResult(int requestCode, int resultCode, Intent data);
 
-        void onDestroy();
+        /**
+         * 设置系统声音值
+         * @param progress
+         */
+        void setStreamVolume(int progress);
+
+        /**
+         * 获取系统最大声音值
+         */
+        int getStreamMaxVolume();
+
+        /**
+         * 获取系统最当前声音值
+         */
+        int getStreamVolume();
 
         /**
          * 剪切音乐
@@ -111,10 +150,14 @@ public class HomeContract {
          */
         boolean isSelectedMp3(Context context);
 
+        /**
+         * 切换当前播放的滑块min or  max
+         */
         void switchSeekBar();
 
-        void seekToForIsMin();
-
+        /**
+         * mediaplayer 根据传入参数 flag 跳到指定滑块（min or max）对应的位置。
+         */
         void seekToForIsMin(boolean isMinBar);
     }
 }
