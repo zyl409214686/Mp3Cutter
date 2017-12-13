@@ -18,7 +18,6 @@ import com.zyl.mp3cutter.home.bean.DaoSession;
 /**
  * Description: 自定义application
  * Created by zouyulong on 2017/11/7.
- * Person in charge :  zouyulong
  */
 
 public class MyApplication extends Application {

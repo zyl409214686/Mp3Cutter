@@ -9,8 +9,10 @@ import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.zyl.mp3cutter.R;
+import com.zyl.mp3cutter.common.app.MyApplication;
 import com.zyl.mp3cutter.common.base.BasePresenter;
 import com.zyl.mp3cutter.common.utils.FileUtils;
+import com.zyl.mp3cutter.home.bean.MusicInfo;
 import com.zyl.mp3cutter.home.ui.FileChooserActivity;
 import com.zyl.mp3cutter.mp3cut.logic.Mp3CutLogic;
 
@@ -114,15 +116,16 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
                 }
             }
         }).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.newThread())
-                .subscribe(new Observer() {
+                .subscribe(new Observer<String>() {
                     @Override
                     public void onSubscribe(Disposable d) {
 
                     }
 
                     @Override
-                    public void onNext(Object value) {
+                    public void onNext(String value) {
                         String cutterPath = (String) value;
+                        addMp3ToDb(cutterPath);
                         if (mView != null) {
                             mView.doCutterSucc(cutterPath);
                         }
@@ -140,6 +143,19 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
 
                     }
                 });
+    }
+
+    /**
+     * 添加mp3到数据库
+     * @param cutterPath
+     */
+    private void addMp3ToDb(String cutterPath){
+        File file = new File(cutterPath);
+        String size = FileUtils.getFormatFileSizeForFile(file);
+        MusicInfo music = new MusicInfo(null, cutterPath,
+                file.getName(), size);
+        MyApplication.getInstances().
+                getDaoSession().getMusicInfoDao().insert(music);
     }
 
     @Override

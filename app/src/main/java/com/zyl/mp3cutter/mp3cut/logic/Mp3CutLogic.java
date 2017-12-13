@@ -14,7 +14,11 @@ import java.io.RandomAccessFile;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
+/**
+ * Description: mp3剪切逻辑
+ * Created by zouyulong on 2017/12/1.
+ * Person in charge :  zouyulong
+ */
 public class Mp3CutLogic {
     //缓存大小
     private static final int BUFFER_SIZE = 1024 * 1024;
@@ -72,21 +76,25 @@ public class Mp3CutLogic {
             if (header.isVariableBitRate()) {
                 throw new Exception("This is nonsupport variableBitRate!!!");
             } else {
+                //返回音乐数据的第一个字节
                 long mp3StartIndex = header.getMp3StartByte();
+                //获取音轨时长
                 int trackLengthMs = header.getTrackLength() * 1000;
                 long bitRate = header.getBitRateAsNumber();
-                long beginIndex = bitRate * 1024L / 8L / 1000L * beginTime + mp3StartIndex;
-                long endIndex = beginIndex + bitRate * 1024L / 8L / 1000L * (endTime - beginTime);
+                //1KByte/s=8Kbps, bitRate *1024L / 8L / 1000L 转换为 bps 每毫秒
+//              //计算出开始字节位置
+                long beginIndex = convertKbpsToBpm(bitRate) * beginTime + mp3StartIndex;
+                //计算出结束字节位置
+                long endIndex = beginIndex + convertKbpsToBpm(bitRate) * (endTime - beginTime);
                 if (endTime > trackLengthMs) {
                     endIndex = this.mp3File.length() - 1L;
                 }
                 //write mp3 header info
                 rMp3File = new RandomAccessFile(mp3File, "rw");
-                writeFileByInputFileAndSize(newMp3, rMp3File, mp3StartIndex);
-                rMp3File.seek(beginIndex);
+                writeFileByInputFileAndSize(newMp3, rMp3File, mp3StartIndex, 0);
                 //write mp3 frame info
                 int size = (int) (endIndex - beginIndex);
-                writeFileByInputFileAndSize(newMp3, rMp3File, size);
+                writeFileByInputFileAndSize(newMp3, rMp3File, size, beginIndex);
             }
         } finally {
             if (rMp3File != null) {
@@ -100,27 +108,36 @@ public class Mp3CutLogic {
     }
 
     /**
+     * kbps 每秒千字节 转换到 bpm  每毫秒字节数
+     * @param bitRate
+     * @return
+     */
+    private long convertKbpsToBpm(long bitRate){
+        return bitRate * 1024L / 8L / 1000L;
+    }
+
+    /**
      * 根据文件和大小写入指定文件
      *
      * @param writeFile 写入的新文件
      * @param readFile  读取数据的文件
      * @param totalSize 需要读取并写入数据的总长度
+     * @param offset    读取文件的偏移量
      * @throws IOException
      */
     private static void writeFileByInputFileAndSize(RandomAccessFile writeFile, RandomAccessFile readFile,
-                                                    long totalSize) throws IOException {
+                                                    long totalSize, long offset) throws IOException {
         //缓存大小，每次写入指定数据防止内存泄漏
         int buffersize = BUFFER_SIZE;
         long count = totalSize / buffersize;
         if (count <= 1) {
             //文件总长度小于小于缓存大小情况
-            writeFileByFileAndSize(writeFile, readFile, new byte[(int) totalSize], 0);
+            writeFileByFileAndSize(writeFile, readFile, new byte[(int) totalSize], offset);
         } else {
             // 写入count后剩下的size
             long remainSize = totalSize % buffersize;
             byte data[] = new byte[buffersize];
             //读入文件时seek的偏移量
-            int offset = 0;
             for (int i = 0; i < count; i++) {
                 writeFileByFileAndSize(writeFile, readFile, data, offset);
                 offset+=BUFFER_SIZE;
@@ -139,7 +156,7 @@ public class Mp3CutLogic {
      * @param offset      读入文件时seek的偏移值
      */
     private static void writeFileByFileAndSize(RandomAccessFile outPutFile, RandomAccessFile inPutFile,
-                                               byte data[], int offset){
+                                               byte data[], long offset){
         try {
             inPutFile.seek(offset);
             inPutFile.read(data);
@@ -155,8 +172,6 @@ public class Mp3CutLogic {
      */
     public static void writeDataToTail(RandomAccessFile randomFile, byte[] data) {
         try {
-//            // 打开一个随机访问文件流，按读写方式
-//            RandomAccessFile randomFile = new RandomAccessFile(file.getAbsoluteFile(), "rw");
             // 文件长度，字节数
             long fileLength = randomFile.length();
             // 将写文件指针移到文件尾。
