@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.orhanobut.logger.AndroidLogAdapter;
 import com.orhanobut.logger.Logger;
+import com.umeng.analytics.MobclickAgent;
 import com.zyl.mp3cutter.common.app.di.AppComponent;
 import com.zyl.mp3cutter.common.app.di.AppModule;
 import com.zyl.mp3cutter.common.app.di.DaggerAppComponent;
@@ -40,6 +41,8 @@ public class MyApplication extends Application {
         setDatabase();
         //logger
         Logger.addLogAdapter(new AndroidLogAdapter());
+        //umeng analytics
+        MobclickAgent.setScenarioType(this, MobclickAgent.EScenarioType.E_UM_NORMAL);
     }
 
     public AppComponent getAppComponent() {

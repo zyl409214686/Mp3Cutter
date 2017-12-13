@@ -16,7 +16,7 @@
 ### Step1. 选择mp3文件
 <a href="gif/step1_select_mp3.gif"><img src="gif/step1_select_mp3.gif" width="33%"/></a>
 ### Step2. 通过滑块选择剪切范围然后点击剪切按钮
-<a href="gif/step1_select_mp3.gif"><img src="gif/step2_mp3cutter.gif" width="33%"/></a>
+<a href="gif/step2_mp3cutter.gif"><img src="gif/step2_mp3cutter.gif" width="33%"/></a>
 ### 操作技巧：使用**切换**按钮切换当前播放的滑块
 ![](screenshot/screenshot_doswitch.png)
 
