@@ -40,25 +40,6 @@ public class FileUtils {
     }
 
     /**
-     * 文件尾部写入数据
-     * @param data
-     */
-    public static void writeDataToTail(RandomAccessFile randomFile, byte[] data) {
-        try {
-//            // 打开一个随机访问文件流，按读写方式
-//            RandomAccessFile randomFile = new RandomAccessFile(file.getAbsoluteFile(), "rw");
-            // 文件长度，字节数
-            long fileLength = randomFile.length();
-            // 将写文件指针移到文件尾。
-            randomFile.seek(fileLength);
-            randomFile.write(data);
-//            randomFile.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
      * 已有文件后增加字节
      *
      * @param file

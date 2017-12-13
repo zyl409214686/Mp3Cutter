@@ -308,6 +308,10 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
 
     @Override
     public void doCutterFail() {
+        if (mProgressDialog != null && getActivity() != null
+                && !getActivity().isFinishing()) {
+            mProgressDialog.dismiss();
+        }
         Toast.makeText(getActivity(), getResources().getString(R.string.homefragment_cut_fail), Toast.LENGTH_LONG).show();
     }
 

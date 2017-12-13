@@ -12,7 +12,7 @@ import com.zyl.mp3cutter.R;
 import com.zyl.mp3cutter.common.base.BasePresenter;
 import com.zyl.mp3cutter.common.utils.FileUtils;
 import com.zyl.mp3cutter.home.ui.FileChooserActivity;
-import com.zyl.mp3cutter.mp3separate.bean.Mp3Fenge;
+import com.zyl.mp3cutter.mp3cut.logic.Mp3CutLogic;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,13 +48,14 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
     private boolean mIsMinFlag = true;
     // 获取系统音频对象
     private AudioManager mAudioManager;
+
     @Inject
     public HomePresenter(HomeContract.View view) {
         super(view);
         init();
     }
 
-    private void init(){
+    private void init() {
         mMediaPlayer = new MediaPlayer();
         mAudioManager = (AudioManager) mView.getContext().getSystemService(Context.AUDIO_SERVICE);
     }
@@ -94,16 +95,17 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
         Observable.create(new ObservableOnSubscribe() {
             @Override
             public void subscribe(ObservableEmitter e) throws Exception {
-                Mp3Fenge helper = new Mp3Fenge(new File(mSelMusicPath));
+                Mp3CutLogic helper = new Mp3CutLogic(new File(mSelMusicPath));
                 if (FileUtils.bFolder(RING_FOLDER)) {
                     if (!TextUtils.isEmpty(fileName)) {
                         String cutterPath = RING_FOLDER + "/" + fileName + RING_FORMAT;
                         RandomAccessFile randomFile = null;
                         try {
                             randomFile = new RandomAccessFile(cutterPath, "rw");
-                            if (helper.generateNewMp3ByTime(randomFile, minValue, maxValue)) {
-                                e.onNext(cutterPath);
-                            }
+                            helper.generateNewMp3ByTime(randomFile, minValue, maxValue);
+                            e.onNext(cutterPath);
+                        } catch (Exception e1) {
+                            e.onError(e1);
                         } finally {
                             if (randomFile != null)
                                 randomFile.close();
@@ -165,7 +167,7 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
         }
 
     }
-    
+
     @Override
     public void pause() {
         mMediaPlayer.pause();
@@ -239,26 +241,24 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
         mIsMinFlag = !mIsMinFlag;
         seekToForIsMin();
     }
-    
-    private void seekToForIsMin(){
+
+    private void seekToForIsMin() {
         int curValue;
-        if(mIsMinFlag) {
+        if (mIsMinFlag) {
             curValue = mView.getSeekbarSelectedMinValue();
-        }
-        else{
+        } else {
             curValue = mView.getSeekbarSelectedMaxValue();
         }
         seekTo(curValue);
     }
 
     @Override
-    public void seekToForIsMin(boolean isMinBar){
-        if(judgeIsPlayingThumb(isMinBar)){
+    public void seekToForIsMin(boolean isMinBar) {
+        if (judgeIsPlayingThumb(isMinBar)) {
             int curValue;
-            if(isMinBar) {
+            if (isMinBar) {
                 curValue = mView.getSeekbarSelectedMinValue();
-            }
-            else{
+            } else {
                 curValue = mView.getSeekbarSelectedMaxValue();
             }
             seekTo(curValue);
@@ -267,16 +267,16 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
 
     /**
      * //判断滑动的滑块是否为当前正在播放的滑块
+     *
      * @param isMinBar 滑动的滑块 true: min  false: max
      */
-    private boolean judgeIsPlayingThumb(boolean isMinBar){
+    private boolean judgeIsPlayingThumb(boolean isMinBar) {
         boolean isPlaying = false;
-        if(mIsMinFlag) {
+        if (mIsMinFlag) {
             if (isMinBar) {
                 isPlaying = true;
             }
-        }
-        else{
+        } else {
             if (!isMinBar) {
                 isPlaying = true;
             }
