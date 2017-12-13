@@ -20,6 +20,17 @@
 ### 操作技巧：使用**切换**按钮切换当前播放的滑块
 ![](screenshot/screenshot_doswitch.png)
 
+## mp3剪切实现思路：
+1. 首先通过自定义范围seekbar获取到两个时间点**startTime**, **endTime**
+2. 通过**jaudiotagger**库获取mp3音乐部分**首帧字节位置(firstFramePosition)**，并获取到mp3文件的**比特率**（kbps）也就是每秒千字节
+3. 根据**startTime**和步骤2中获取到的mp3**比特率**转换为**每毫秒的字节数据（startBpm）**，
+  ** startBpm = kbps * 1024L / 8L / 1000L**
+4. 根据首帧字节位置和步骤3中算出来的startTime 的startBpm算出需要截取的mp3首位置对应的字节位置（startTimeIndex）：
+  **startTimePostion = firstFramePosition +startBpm**
+  同理算出第二个字节位置**endTimePosition**
+5. 有了首个字节位置**startTimePostion**和第二个字节位置**endTimePosition**然后就是文件操作啦~~~
+  此部分逻辑可以看`com.zyl.mp3cutter.mp3cut.logic.Mp3CutLogic类`
+
 ## 感谢
 * [jaudiotagger](http://www.jthink.net/jaudiotagger/)
 * [RXJava](https://github.com/ReactiveX/RxJava)
@@ -39,6 +50,7 @@
 - 增加闹铃的设置
 - 增加对音乐文件的处理如分享等
 - 国际化支持
+- 增加滑块当前状态绘制
 
 ## 关于我
 

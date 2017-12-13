@@ -81,8 +81,8 @@ public class Mp3CutLogic {
                 //获取音轨时长
                 int trackLengthMs = header.getTrackLength() * 1000;
                 long bitRate = header.getBitRateAsNumber();
-                //1KByte/s=8Kbps, bitRate *1024L / 8L / 1000L 转换为 bps 每毫秒
-//              //计算出开始字节位置
+                 //1KByte/s=8Kbps, bitRate *1024L / 8L / 1000L 转换为 bps 每毫秒
+                //计算出开始字节位置
                 long beginIndex = convertKbpsToBpm(bitRate) * beginTime + mp3StartIndex;
                 //计算出结束字节位置
                 long endIndex = beginIndex + convertKbpsToBpm(bitRate) * (endTime - beginTime);
