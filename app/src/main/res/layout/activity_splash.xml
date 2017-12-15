@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <RelativeLayout
         android:id="@+id/rl_main"
         android:layout_width="match_parent"
@@ -13,12 +14,24 @@
             android:scaleType="centerCrop"
             android:src="@mipmap/splash_cutter" />
 
-        <ImageView
+        <!--<ImageView-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_alignParentBottom="true"-->
+            <!--android:layout_centerHorizontal="true"-->
+            <!--android:layout_marginBottom="35dp"-->
+            <!--android:src="@mipmap/welcome_word"/>-->
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/lottie_imageview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:lottie_fileName="data.json"
+            app:lottie_imageAssetsFolder="images/"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:layout_marginBottom="35dp"
-            android:src="@mipmap/welcome_word"/>
+            android:layout_marginBottom="35dp"/>
+            <!--app:lottie_loop="true"-->
+            <!--app:lottie_autoPlay="true"-->
+
     </RelativeLayout>
 </layout>
