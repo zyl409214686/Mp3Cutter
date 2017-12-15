@@ -198,6 +198,7 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
 
     private void play() {
         mMediaPlayer.start();
+        mView.setPlayBtnWithStatus(true);
         mView.setVisualizerViewEnaled(true);
     }
 
