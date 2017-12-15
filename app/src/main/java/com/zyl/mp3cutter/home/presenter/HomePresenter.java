@@ -105,6 +105,7 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
                         try {
                             randomFile = new RandomAccessFile(cutterPath, "rw");
                             helper.generateNewMp3ByTime(randomFile, minValue, maxValue);
+                            addMp3ToDb(cutterPath);
                             e.onNext(cutterPath);
                         } catch (Exception e1) {
                             e.onError(e1);
@@ -124,8 +125,7 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
 
                     @Override
                     public void onNext(String value) {
-                        String cutterPath = (String) value;
-                        addMp3ToDb(cutterPath);
+                        String cutterPath = value;
                         if (mView != null) {
                             mView.doCutterSucc(cutterPath);
                         }

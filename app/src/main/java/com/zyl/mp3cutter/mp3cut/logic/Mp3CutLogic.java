@@ -119,65 +119,51 @@ public class Mp3CutLogic {
     /**
      * 根据文件和大小写入指定文件
      *
-     * @param writeFile 写入的新文件
-     * @param readFile  读取数据的文件
+     * @param targetFile 写入的新文件
+     * @param sourceFile  读取数据的文件
      * @param totalSize 需要读取并写入数据的总长度
      * @param offset    读取文件的偏移量
      * @throws IOException
      */
-    private static void writeFileByInputFileAndSize(RandomAccessFile writeFile, RandomAccessFile readFile,
+    private static void writeFileByInputFileAndSize(RandomAccessFile targetFile, RandomAccessFile sourceFile,
                                                     long totalSize, long offset) throws IOException {
         //缓存大小，每次写入指定数据防止内存泄漏
         int buffersize = BUFFER_SIZE;
         long count = totalSize / buffersize;
         if (count <= 1) {
             //文件总长度小于小于缓存大小情况
-            writeFileByFileAndSize(writeFile, readFile, new byte[(int) totalSize], offset);
+            writeFileByFileAndSize(targetFile, sourceFile, new byte[(int) totalSize], offset);
         } else {
             // 写入count后剩下的size
             long remainSize = totalSize % buffersize;
             byte data[] = new byte[buffersize];
             //读入文件时seek的偏移量
             for (int i = 0; i < count; i++) {
-                writeFileByFileAndSize(writeFile, readFile, data, offset);
+                writeFileByFileAndSize(targetFile, sourceFile, data, offset);
                 offset+=BUFFER_SIZE;
             }
             if (remainSize > 0) {
-                writeFileByFileAndSize(writeFile, readFile, new byte[(int) remainSize], offset);
+                writeFileByFileAndSize(targetFile, sourceFile, new byte[(int) remainSize], offset);
             }
         }
     }
 
     /**
      * 根据文件和大小写入指定文件
-     * @param outPutFile  输出的文件
-     * @param inPutFile   读取的文件
+     * @param targetFile  输出的文件
+     * @param sourceFile   读取的文件
      * @param data        输入输出的缓存数据
      * @param offset      读入文件时seek的偏移值
      */
-    private static void writeFileByFileAndSize(RandomAccessFile outPutFile, RandomAccessFile inPutFile,
+    private static void writeFileByFileAndSize(RandomAccessFile targetFile, RandomAccessFile sourceFile,
                                                byte data[], long offset){
         try {
-            inPutFile.seek(offset);
-            inPutFile.read(data);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        writeDataToTail(outPutFile, data);
-    }
-
-    /**
-     * 文件尾部写入数据
-     * @param data
-     */
-    public static void writeDataToTail(RandomAccessFile randomFile, byte[] data) {
-        try {
-            // 文件长度，字节数
-            long fileLength = randomFile.length();
+            sourceFile.seek(offset);
+            sourceFile.read(data);
+            long fileLength = targetFile.length();
             // 将写文件指针移到文件尾。
-            randomFile.seek(fileLength);
-            randomFile.write(data);
-//            randomFile.close();
+            targetFile.seek(fileLength);
+            targetFile.write(data);
         } catch (IOException e) {
             e.printStackTrace();
         }

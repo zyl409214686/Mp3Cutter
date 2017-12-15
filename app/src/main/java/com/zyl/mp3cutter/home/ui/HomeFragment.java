@@ -59,7 +59,7 @@ import static com.zyl.mp3cutter.common.constant.CommonConstant.RING_FOLDER;
 @RuntimePermissions
 public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter> implements HomeContract.View, View.OnClickListener {
     FragmentHomeBinding mBinding;
-    // intent返回动作
+    // intent返回动作p
     public static final int REQUEST_CODE = 1010;
     // 音量面板显示和隐藏动画
     private Animation showVoicePanelAnimation;
