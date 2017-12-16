@@ -29,7 +29,7 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void setListener() {
-        ValueAnimator animator = new ValueAnimator().ofFloat(0f, 1f).setDuration(4000);
+        ValueAnimator animator = new ValueAnimator().ofFloat(0f, 1f).setDuration(3000);
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {

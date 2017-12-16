@@ -40,7 +40,7 @@
 
     <!-- 关于页面 -->
     <string name="about_version">%1$s(Build %2$s)</string>
-    <string name="about_auther">作者：大龙龙龙</string>
+    <string name="about_auther">作者：大龙龙龙\n（A android coding ape from BeiJing）</string>
     <string name="about_blog">博客地址：http://zouyulong.com</string>
     <string name="about_github">GitHub：https://github.com/zyl409214686</string>
     <string name="about_email">邮箱：zyl409214686@163.com</string>

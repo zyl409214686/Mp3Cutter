@@ -24,7 +24,10 @@ public class MainActivity extends BaseActivity {
     private Toolbar mToolBar;
     private DrawerLayout mDrawerLayout;
     private NavigationView mNavigationView;
-    Fragment mCurFragment;
+    private Fragment mCurFragment;
+    private Fragment mSettingFragment;
+    private Fragment mHomeFragment;
+    private Fragment mAboutFragment;
     private static final String TAG = "MainActivity";
 
     @Override
@@ -40,6 +43,9 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void initData(Bundle savedInstanceState) {
         initView();
+        mSettingFragment = new SettingFragment();
+        mHomeFragment = new HomeFragment();
+        mAboutFragment = new AboutFragment();
         switchToHomePage();
         StatusBarUtil.setColorForDrawerLayout(MainActivity.this,
                 mDrawerLayout, Color.TRANSPARENT);
@@ -92,17 +98,20 @@ public class MainActivity extends BaseActivity {
     }
 
     private void switchToSetting() {
-        getSupportFragmentManager().beginTransaction().replace(R.id.frame_content, new SettingFragment()).commit();
+        mCurFragment = mSettingFragment;
+        getSupportFragmentManager().beginTransaction().replace(R.id.frame_content, mSettingFragment).commit();
         mToolBar.setTitle(getResources().getString(R.string.main_tab_setting));
     }
 
     private void switchToHomePage() {
-        getSupportFragmentManager().beginTransaction().replace(R.id.frame_content, HomeFragment.newInstance()).commit();
+        mCurFragment = mHomeFragment;
+        getSupportFragmentManager().beginTransaction().replace(R.id.frame_content, mHomeFragment).commit();
         mToolBar.setTitle(getResources().getString(R.string.main_tab_home));
     }
 
     private void switchToAbout() {
-        getSupportFragmentManager().beginTransaction().replace(R.id.frame_content, new AboutFragment()).commit();
+        mCurFragment = mAboutFragment;
+        getSupportFragmentManager().beginTransaction().replace(R.id.frame_content, mAboutFragment).commit();
         mToolBar.setTitle(getResources().getString(R.string.main_tab_about));
     }
 
@@ -110,12 +119,12 @@ public class MainActivity extends BaseActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main_menu, menu);
-        return true;
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        mCurFragment = getSupportFragmentManager().findFragmentById(R.id.frame_content);
+//        mCurFragment = getSupportFragmentManager().findFragmentById(R.id.frame_content);
         if(mCurFragment instanceof HomeFragment){
             menu.findItem(R.id.home_item_open).setVisible(true);
             menu.findItem(R.id.home_item_voice).setVisible(true);
