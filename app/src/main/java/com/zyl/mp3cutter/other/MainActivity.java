@@ -8,12 +8,12 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.jaeger.library.StatusBarUtil;
+import com.orhanobut.logger.Logger;
 import com.zyl.mp3cutter.R;
 import com.zyl.mp3cutter.common.app.di.AppComponent;
 import com.zyl.mp3cutter.common.base.BaseActivity;
@@ -133,7 +133,7 @@ public class MainActivity extends BaseActivity {
             menu.findItem(R.id.home_item_open).setVisible(false);
             menu.findItem(R.id.home_item_voice).setVisible(false);
         }
-        Log.d(TAG, "onPrepareOptionsMenu: visible"+ (mCurFragment instanceof HomeFragment));
+        Logger.d("onPrepareOptionsMenu: visible"+ (mCurFragment instanceof HomeFragment));
         return super.onPrepareOptionsMenu(menu);
     }
 

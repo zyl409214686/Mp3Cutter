@@ -9,6 +9,7 @@ import com.umeng.analytics.MobclickAgent;
 import com.zyl.mp3cutter.common.app.di.AppComponent;
 import com.zyl.mp3cutter.common.app.di.AppModule;
 import com.zyl.mp3cutter.common.app.di.DaggerAppComponent;
+import com.zyl.mp3cutter.common.utils.LogUtils;
 import com.zyl.mp3cutter.home.bean.DaoMaster;
 import com.zyl.mp3cutter.home.bean.DaoSession;
 
@@ -39,7 +40,9 @@ public class MyApplication extends Application {
                 .build();
         setDatabase();
         //logger
-        Logger.addLogAdapter(new AndroidLogAdapter());
+        if(LogUtils.isApkDebugable(this)) {
+            Logger.addLogAdapter(new AndroidLogAdapter());
+        }
         //umeng analytics
         MobclickAgent.setScenarioType(this, MobclickAgent.EScenarioType.E_UM_NORMAL);
     }
