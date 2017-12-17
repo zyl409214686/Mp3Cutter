@@ -31,6 +31,11 @@
 5. 有了首个字节位置**startTimePostion**和第二个字节位置**endTimePosition**然后就是文件操作啦~~~
   此部分逻辑可以看`com.zyl.mp3cutter.mp3cut.logic.Mp3CutLogic类`
 
+
+
+## Blog
+https://juejin.im/post/5a324f3f5188253da72e7956
+
 ## 感谢
 * [jaudiotagger](http://www.jthink.net/jaudiotagger/)
 * [RXJava](https://github.com/ReactiveX/RxJava)

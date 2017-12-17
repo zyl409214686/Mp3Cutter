@@ -100,18 +100,18 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
                 Mp3CutLogic helper = new Mp3CutLogic(new File(mSelMusicPath));
                 if (FileUtils.bFolder(RING_FOLDER)) {
                     if (!TextUtils.isEmpty(fileName)) {
-                        String cutterPath = RING_FOLDER + "/" + fileName + RING_FORMAT;
-                        RandomAccessFile randomFile = null;
+                        String targetMp3FilePath = RING_FOLDER + "/" + fileName + RING_FORMAT;
+                        RandomAccessFile targetMp3File = null;
                         try {
-                            randomFile = new RandomAccessFile(cutterPath, "rw");
-                            helper.generateNewMp3ByTime(randomFile, minValue, maxValue);
-                            addMp3ToDb(cutterPath);
-                            e.onNext(cutterPath);
+                            targetMp3File = new RandomAccessFile(targetMp3FilePath, "rw");
+                            helper.generateNewMp3ByTime(targetMp3File, minValue, maxValue);
+                            addMp3ToDb(targetMp3FilePath);
+                            e.onNext(targetMp3FilePath);
                         } catch (Exception e1) {
                             e.onError(e1);
                         } finally {
-                            if (randomFile != null)
-                                randomFile.close();
+                            if (targetMp3File != null)
+                                targetMp3File.close();
                         }
                     }
                 }
