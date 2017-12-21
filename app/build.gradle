@@ -1,5 +1,5 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.antfortune.freeline' //freeline
+//apply plugin: 'com.antfortune.freeline' //freeline
 apply plugin: 'org.greenrobot.greendao' //greendao
 android {
     compileSdkVersion rootProject.compileSdkVersion
@@ -29,11 +29,6 @@ android {
             versionName "1.0.0"
         }
     }
-
-    freeline {
-        hack true
-    }
-
     sourceSets {
         main {
             //jni库的调用会到资源文件夹下libs里面找so文件
@@ -68,7 +63,7 @@ dependencies {
     //透明状态栏
     compile 'com.jaeger.statusbarutil:library:1.4.0'
     //freeline
-    compile 'com.antfortune.freeline:runtime:0.7.2'
+//    compile 'com.antfortune.freeline:runtime:0.7.2'
     //rxjava rxandroid
     compile 'io.reactivex.rxjava2:rxjava:2.0.1'
     compile 'io.reactivex.rxjava2:rxandroid:2.0.1'

@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
+import com.umeng.analytics.MobclickAgent;
 import com.zyl.mp3cutter.common.app.MyApplication;
 import com.zyl.mp3cutter.common.app.di.AppComponent;
 
@@ -44,4 +45,15 @@ public abstract class BaseActivity<V extends IBaseView,T extends BasePresenter<V
 
     protected abstract void initData(Bundle savedInstanceState);
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        MobclickAgent.onResume(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        MobclickAgent.onPause(this);
+    }
 }
