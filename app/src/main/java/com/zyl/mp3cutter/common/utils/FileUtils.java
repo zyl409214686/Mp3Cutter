@@ -91,6 +91,16 @@ public class FileUtils {
         return btmp;
     }
 
+    /**
+     * 检测是否有文件， 如果有则删除。
+     * @param file
+     */
+    public static void checkAndDelFile(File file){
+        if(file.exists()){
+            file.delete();//删除文件
+        }
+    }
+
     //删除指定文件夹下所有文件
 //param path 文件夹完整绝对路径
     public static boolean delAllFile(String path) {

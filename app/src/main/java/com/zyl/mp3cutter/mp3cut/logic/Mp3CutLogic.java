@@ -1,5 +1,6 @@
 package com.zyl.mp3cutter.mp3cut.logic;
 
+import com.zyl.mp3cutter.common.utils.FileUtils;
 import com.zyl.mp3cutter.mp3cut.bean.Mp3Info;
 import com.zyl.mp3cutter.mp3cut.util.StringUtil;
 
@@ -66,12 +67,12 @@ public class Mp3CutLogic {
     /**
      * 根据时间生成新的mp3文件
      *
-     * @param targetMp3File 要生成的目标mp3文件
+     * @param targetFileStr 要生成的目标mp3文件
      * @param beginTime
      * @param endTime
      * @return
      */
-    public void generateNewMp3ByTime(RandomAccessFile targetMp3File, int beginTime, int endTime) throws Exception {
+    public void generateNewMp3ByTime(String targetFileStr, long beginTime, long endTime) throws Exception {
         MP3File mp3 = new MP3File(this.mSourceMp3File);
         MP3AudioHeader header = (MP3AudioHeader) mp3.getAudioHeader();
         if (header.isVariableBitRate()) {
@@ -92,33 +93,39 @@ public class Mp3CutLogic {
             if (endTime > trackLengthMs) {
                 endByte = this.mSourceMp3File.length() - 1L;
             }
-            generateTargetMp3File(targetMp3File, beginByte, endByte, firstFrameByte);
+            generateTargetMp3File(targetFileStr, beginByte, endByte, firstFrameByte);
         }
     }
 
     /**
      * 生成目标mp3文件
      *
-     * @param targetFile
+     * @param targetFileStr
      * @param beginByte
      * @param endByte
      * @param firstFrameByte
      * @throws Exception
      */
-    private void generateTargetMp3File(RandomAccessFile targetFile,
+    private void generateTargetMp3File(String targetFileStr,
                                        long beginByte, long endByte, long firstFrameByte) throws Exception {
+        File file = new File(targetFileStr);
+        //如果存在则删除
+        FileUtils.checkAndDelFile(file);
+        RandomAccessFile targetMp3File = new RandomAccessFile(targetFileStr, "rw");
         RandomAccessFile sourceFile = new RandomAccessFile(mSourceMp3File, "rw");
         try {
             //write mp3 header info
-            writeSourceToTargetFileWithBuffer(targetFile, sourceFile, firstFrameByte, 0);
+            writeSourceToTargetFileWithBuffer(targetMp3File, sourceFile, firstFrameByte, 0);
             //write mp3 frame info
             int size = (int) (endByte - beginByte);
-            writeSourceToTargetFileWithBuffer(targetFile, sourceFile, size, beginByte);
+            writeSourceToTargetFileWithBuffer(targetMp3File, sourceFile, size, beginByte);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             if (sourceFile != null)
                 sourceFile.close();
+            if (targetMp3File != null)
+                targetMp3File.close();
         }
     }
 

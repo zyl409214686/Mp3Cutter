@@ -321,7 +321,7 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
     public void showCutterPromptDialog() {
         final Number minNumber = mBinding.rangeSeekbar.getSelectedAbsoluteMinValue();
         final Number maxNumber = mBinding.rangeSeekbar.getSelectedAbsoluteMaxValue();
-        if (maxNumber.intValue() <= minNumber.intValue()) {
+        if (maxNumber.intValue() <= minNumber.longValue()) {
             Toast.makeText(getActivity(),
                     getString(R.string.dialog_cutter_warning_length),
                     Toast.LENGTH_LONG).show();
@@ -334,8 +334,8 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
                     public void doOk(String text) {
                         mProgressDialog = ProgressDialog.show(getActivity(), getResources().getString(R.string.homefragment_cutting_tip),
                                 getResources().getString(R.string.homefragment_cutting));
-                        mPresenter.doCutter(text, minNumber.intValue(),
-                                maxNumber.intValue());
+                        mPresenter.doCutter(text, minNumber.longValue(),
+                                maxNumber.longValue());
                     }
                 })
                 .build().show();

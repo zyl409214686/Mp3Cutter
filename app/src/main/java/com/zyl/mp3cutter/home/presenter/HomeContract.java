@@ -140,7 +140,7 @@ public class HomeContract {
          * @param minValue
          * @param maxValue
          */
-        void doCutter(final String fileName, final int minValue, final int maxValue);
+        void doCutter(final String fileName, final long minValue, final long maxValue);
 
         /**
          * 判断是否已选择mp3

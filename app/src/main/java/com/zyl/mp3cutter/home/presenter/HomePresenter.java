@@ -18,7 +18,6 @@ import com.zyl.mp3cutter.mp3cut.logic.Mp3CutLogic;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -93,7 +92,7 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
      * 剪切音乐
      */
     @Override
-    public void doCutter(final String fileName, final int minValue, final int maxValue) {
+    public void doCutter(final String fileName, final long minValue, final long maxValue) {
         Observable.create(new ObservableOnSubscribe() {
             @Override
             public void subscribe(ObservableEmitter e) throws Exception {
@@ -101,17 +100,13 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
                 if (FileUtils.bFolder(RING_FOLDER)) {
                     if (!TextUtils.isEmpty(fileName)) {
                         String targetMp3FilePath = RING_FOLDER + "/" + fileName + RING_FORMAT;
-                        RandomAccessFile targetMp3File = null;
+
                         try {
-                            targetMp3File = new RandomAccessFile(targetMp3FilePath, "rw");
-                            helper.generateNewMp3ByTime(targetMp3File, minValue, maxValue);
+                            helper.generateNewMp3ByTime(targetMp3FilePath, minValue, maxValue);
                             addMp3ToDb(targetMp3FilePath);
                             e.onNext(targetMp3FilePath);
                         } catch (Exception e1) {
                             e.onError(e1);
-                        } finally {
-                            if (targetMp3File != null)
-                                targetMp3File.close();
                         }
                     }
                 }
@@ -147,9 +142,10 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
 
     /**
      * 添加mp3到数据库
+     *
      * @param cutterPath
      */
-    private void addMp3ToDb(String cutterPath){
+    private void addMp3ToDb(String cutterPath) {
         File file = new File(cutterPath);
         String size = FileUtils.getFormatFileSizeForFile(file);
         MusicInfo music = new MusicInfo(null, cutterPath,
