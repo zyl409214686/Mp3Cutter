@@ -65,7 +65,7 @@ public class Mp3CutLogic {
     }
 
     /**
-     * 根据时间生成新的mp3文件
+     * 根据时间生成新的mp3文件（分别支持VBR 和 CBR）
      *
      * @param targetFileStr 要生成的目标mp3文件
      * @param beginTime
@@ -76,25 +76,66 @@ public class Mp3CutLogic {
         MP3File mp3 = new MP3File(this.mSourceMp3File);
         MP3AudioHeader header = (MP3AudioHeader) mp3.getAudioHeader();
         if (header.isVariableBitRate()) {
-            throw new Exception("This is nonsupport variableBitRate!!!");
+            generateMp3ByTimeAndVBR(header, targetFileStr, beginTime, endTime);
         } else {
-            //获取音轨时长
-            int trackLengthMs = header.getTrackLength() * 1000;
-            long bitRateKbps = header.getBitRateAsNumber();
-            //1KByte/s=8Kbps, bitRate *1024L / 8L / 1000L 转换为 bps 每毫秒
-            //计算出开始字节位置
-            long beginBitRateBpm = convertKbpsToBpm(bitRateKbps) * beginTime;
-            //返回音乐数据的第一个字节
-            long firstFrameByte = header.getMp3StartByte();
-            //获取开始时间所在文件的字节位置
-            long beginByte = firstFrameByte + beginBitRateBpm;
-            //计算出结束字节位置
-            long endByte = beginByte + convertKbpsToBpm(bitRateKbps) * (endTime - beginTime);
-            if (endTime > trackLengthMs) {
-                endByte = this.mSourceMp3File.length() - 1L;
-            }
-            generateTargetMp3File(targetFileStr, beginByte, endByte, firstFrameByte);
+            generateMp3ByTimeAndCBR(header, targetFileStr, beginTime, endTime);
         }
+    }
+
+    /**
+     * 根据时间和源文件生成MP3文件 （源文件mp3 比特率为vbr可变比特率）
+     *
+     * @param header
+     * @param targetFileStr
+     * @param beginTime
+     * @param endTime
+     * @throws IOException
+     */
+    private void generateMp3ByTimeAndVBR(MP3AudioHeader header, String targetFileStr, long beginTime, long endTime) throws IOException {
+        long frameCount = header.getNumberOfFrames();
+        int sampleRate = header.getSampleRateAsNumber();
+        int sampleCount = 1152;//header.getNoOfSample();
+        int paddingLength = header.isPadding() ? 1 : 0;
+        //帧大小 = ( 每帧采样次数 × 比特率(bit/s) ÷ 8 ÷采样率) + Padding
+        //getBitRateAsNumber 返回的为kbps 所以要*1000
+        float frameSize = sampleCount * header.getBitRateAsNumber() / 8f / sampleRate * 1000 + paddingLength;
+        //获取音轨时长
+        int trackLengthMs = header.getTrackLength() * 1000;
+        float p = (float) beginTime / (float) trackLengthMs;
+        float pe = (float) endTime / (float) trackLengthMs;
+        long startFrameSize = (long) (p * frameCount * frameSize);
+        long endFrameSize = (long) (pe * frameCount * frameSize);
+        //返回音乐数据的第一个字节
+        long firstFrameByte = header.getMp3StartByte();
+        generateTargetMp3File(targetFileStr, startFrameSize, endFrameSize, firstFrameByte);
+    }
+
+    /**
+     * 根据时间和源文件生成MP3文件 （源文件mp3 比特率为cbr恒定比特率）
+     *
+     * @param header
+     * @param targetFileStr
+     * @param beginTime
+     * @param endTime
+     * @throws IOException
+     */
+    private void generateMp3ByTimeAndCBR(MP3AudioHeader header, String targetFileStr, long beginTime, long endTime) throws IOException {
+        //获取音轨时长
+        int trackLengthMs = header.getTrackLength() * 1000;
+        long bitRateKbps = header.getBitRateAsNumber();
+        //1KByte/s=8Kbps, bitRate *1024L / 8L / 1000L 转换为 bps 每毫秒
+        //计算出开始字节位置
+        long beginBitRateBpm = convertKbpsToBpm(bitRateKbps) * beginTime;
+        //返回音乐数据的第一个字节
+        long firstFrameByte = header.getMp3StartByte();
+        //获取开始时间所在文件的字节位置
+        long beginByte = firstFrameByte + beginBitRateBpm;
+        //计算出结束字节位置
+        long endByte = beginByte + convertKbpsToBpm(bitRateKbps) * (endTime - beginTime);
+        if (endTime > trackLengthMs) {
+            endByte = this.mSourceMp3File.length() - 1L;
+        }
+        generateTargetMp3File(targetFileStr, beginByte, endByte, firstFrameByte);
     }
 
     /**
@@ -107,13 +148,15 @@ public class Mp3CutLogic {
      * @throws Exception
      */
     private void generateTargetMp3File(String targetFileStr,
-                                       long beginByte, long endByte, long firstFrameByte) throws Exception {
+                                       long beginByte, long endByte, long firstFrameByte) throws IOException {
         File file = new File(targetFileStr);
         //如果存在则删除
         FileUtils.checkAndDelFile(file);
-        RandomAccessFile targetMp3File = new RandomAccessFile(targetFileStr, "rw");
-        RandomAccessFile sourceFile = new RandomAccessFile(mSourceMp3File, "rw");
+        RandomAccessFile targetMp3File = null;
+        RandomAccessFile sourceFile = null;
         try {
+            targetMp3File = new RandomAccessFile(targetFileStr, "rw");
+            sourceFile = new RandomAccessFile(mSourceMp3File, "rw");
             //write mp3 header info
             writeSourceToTargetFileWithBuffer(targetMp3File, sourceFile, firstFrameByte, 0);
             //write mp3 frame info
