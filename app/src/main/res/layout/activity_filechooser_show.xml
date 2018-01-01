@@ -35,7 +35,7 @@
                     style="@style/AVLoadingIndicatorView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:visibility="visible"
+                    android:visibility="gone"
                     android:layout_centerVertical="true"
                     app:indicatorColor="@color/cutter_theme_black"
                     app:indicatorName="PacmanIndicator"/>

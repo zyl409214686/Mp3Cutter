@@ -57,6 +57,7 @@ public class CommonDialog extends Dialog {
         mIsShowInput = builder.isShowInput;
         mHintContent = builder.hintContent;
         mIsPasswordInput = builder.isPasswordInput;
+        setCancelable(builder.canCancel);
     }
 
     private void initView() {
@@ -188,6 +189,7 @@ public class CommonDialog extends Dialog {
         private boolean isShowInput;
         private String hintContent;
         private boolean isPasswordInput;
+        private boolean canCancel = true;
         private OnDialogClickListener mOnDialogClickListener;
 
         public Builder() {
@@ -255,6 +257,15 @@ public class CommonDialog extends Dialog {
 
         public CommonDialog build() {
             return new CommonDialog(this);
+        }
+
+        public boolean isCanCancel() {
+            return canCancel;
+        }
+
+        public Builder setCanCancel(boolean canCancel) {
+            this.canCancel = canCancel;
+            return this;
         }
     }
 }

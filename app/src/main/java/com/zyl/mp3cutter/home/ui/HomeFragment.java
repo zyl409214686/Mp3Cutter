@@ -6,14 +6,18 @@ import android.app.ActivityOptions;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.media.MediaPlayer;
+import android.media.RingtoneManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -144,15 +148,18 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
                 .setOnDialogListener(new CommonDialog.OnDialogClickListener() {
                     @Override
                     public void doOk() {
-                        if (FileUtils.bFolder(RING_FOLDER)) {
-                            SystemTools.setMyRingtone(path,
-                                    getActivity());
-                        }
+                        HomeFragmentPermissionsDispatcher.setRingWithPermissionCheck(HomeFragment.this, path);
                     }
                 })
                 .build().show();
     }
 
+    @NeedsPermission(Manifest.permission.WRITE_SETTINGS)
+    public void setRing(final String path) {
+        if (FileUtils.bFolder(RING_FOLDER)) {
+            SystemTools.setRing(getActivity(), RingtoneManager.TYPE_RINGTONE, path);
+        }
+    }
 
     @Override
     public void onDetach() {
@@ -267,10 +274,9 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
 
     @Override
     public boolean setSeekBarProgressValue(int value, boolean isMin) {
-        if(isMin) {
+        if (isMin) {
             return mBinding.rangeSeekbar.setSelectedAbsoluteMinValue(value);
-        }
-        else{
+        } else {
             return mBinding.rangeSeekbar.setSelectedAbsoluteMaxValue(value);
         }
     }
@@ -279,7 +285,7 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
      * 恢复默认seekbar初始值
      */
     @Override
-    public void resetSeekBarSelValue(){
+    public void resetSeekBarSelValue() {
         mBinding.rangeSeekbar.restorePercentSelectedMinValue();
         mBinding.rangeSeekbar.restorePercentSelectedMaxValue();
     }
@@ -327,6 +333,7 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
                     Toast.LENGTH_LONG).show();
             return;
         }
+        mPresenter.pause();
         new CommonDialog.Builder().setContext(getActivity()).setContentStr(getString(R.string.dialog_cutter_msg))
                 .setIsShowInput(true)
                 .setOnDialogListener(new CommonDialog.OnDialogClickListener() {

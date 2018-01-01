@@ -159,23 +159,8 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
         if (isPlaying()) {
             // 暂停
             pause();
-            if (mDisposable != null) {
-                mDisposable.dispose();
-                mDisposable = null;
-            }
         } else {
-            // 播放
-            if (TextUtils.isEmpty(mSelMusicPath)) {
-                Toast.makeText(activity,
-                        activity.getString(R.string.dialog_cutter_warning_sel),
-                        Toast.LENGTH_SHORT).show();
-                return;
-            }
-            seekToForIsMin();
-            play();
-            //开启进度rx轮询事件
-            mDisposable = mUpdateProgressObservable.observeOn(AndroidSchedulers.mainThread()).
-                    subscribe(mUpdateProgressConsumer);
+            play(activity);
         }
 
     }
@@ -192,10 +177,22 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
         mMediaPlayer.seekTo(progress);
     }
 
-    private void play() {
+    @Override
+    public void play(Activity activity) {
+        // 播放
+        if (TextUtils.isEmpty(mSelMusicPath)) {
+            Toast.makeText(activity,
+                    activity.getString(R.string.dialog_cutter_warning_sel),
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
         mMediaPlayer.start();
         mView.setPlayBtnWithStatus(true);
         mView.setVisualizerViewEnaled(true);
+        seekToForIsMin();
+        //开启进度rx轮询事件
+        mDisposable = mUpdateProgressObservable.observeOn(AndroidSchedulers.mainThread()).
+                subscribe(mUpdateProgressConsumer);
     }
 
     private void reset() {

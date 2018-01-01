@@ -1,5 +1,6 @@
 package com.zyl.mp3cutter.home.ui;
 
+import android.Manifest;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Intent;
@@ -8,6 +9,7 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -17,6 +19,7 @@ import android.transition.TransitionInflater;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Toast;
 
 import com.jaeger.library.StatusBarUtil;
 import com.wang.avi.AVLoadingIndicatorView;
@@ -42,6 +45,9 @@ import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
+import permissions.dispatcher.NeedsPermission;
+import permissions.dispatcher.OnNeverAskAgain;
+import permissions.dispatcher.RuntimePermissions;
 
 
 /**
@@ -49,6 +55,7 @@ import io.reactivex.schedulers.Schedulers;
  * Created by zouyulong on 2017/10/22.
  * Person in charge :  zouyulong
  */
+@RuntimePermissions
 public class FileChooserActivity extends AppCompatActivity implements OnClickListener {
 
     private RecyclerView mRecyclerView;
@@ -69,7 +76,7 @@ public class FileChooserActivity extends AppCompatActivity implements OnClickLis
         }
         StatusBarUtil.setColor(this, Color.TRANSPARENT);
         mBinding =
-                DataBindingUtil.setContentView(this, R.layout.activity_filechooser_show);
+                (ActivityFilechooserShowBinding)DataBindingUtil.setContentView(this, R.layout.activity_filechooser_show);
         mBinding.btnUpdate.setOnClickListener(this);
         mBinding.btnUpdate.measure(0, 0);
         mUpdateBtnLeft = ScreenUtils.getScreenSize(this)[0] -
@@ -98,7 +105,7 @@ public class FileChooserActivity extends AppCompatActivity implements OnClickLis
         mDao = MyApplication.getInstances().
                 getDaoSession().getMusicInfoDao();
         mLoadingView = mBinding.aviLoading;
-        refreshData(false);
+        FileChooserActivityPermissionsDispatcher.refreshDataWithPermissionCheck(this, false);
     }
 
     private void clickItem(MusicInfo info) {
@@ -119,7 +126,9 @@ public class FileChooserActivity extends AppCompatActivity implements OnClickLis
         });
     }
 
-    private void refreshData(final boolean isforce) {
+    @NeedsPermission({Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE})
+    void refreshData(final boolean isforce) {
         if (mLoadingView.isShown())
             return;
         startLoadingAnim();
@@ -228,8 +237,21 @@ public class FileChooserActivity extends AppCompatActivity implements OnClickLis
         int id = v.getId();
         switch (id) {
             case R.id.btn_update:
-                refreshData(true);
+                FileChooserActivityPermissionsDispatcher.refreshDataWithPermissionCheck(this, true);
                 break;
         }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        FileChooserActivityPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
+    }
+
+    @OnNeverAskAgain({Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE})
+    void onRecordNeverAskAgain() {
+        Toast.makeText(FileChooserActivity.this, getResources().getString(R.string.filechoose_permission_denied),
+                Toast.LENGTH_SHORT).show();
     }
 }

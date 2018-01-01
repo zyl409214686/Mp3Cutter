@@ -105,6 +105,12 @@ public class HomeContract {
         void pause();
 
         /**
+         * 播放
+         * @param activity
+         */
+        void play(Activity activity);
+
+        /**
          * 销毁
          */
         void onDestroy();

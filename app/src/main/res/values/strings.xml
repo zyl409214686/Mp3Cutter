@@ -29,6 +29,8 @@
     <string name="homefragment_permission_denied">已拒绝录音权限，将不会显示音乐频谱。如需要显示请到系统权限管理设置。</string>
     <string name="homefragment_permission_prompt">亲爱的用户，显示声音频谱需要录音权限，请您知晓~</string>
     <string name="homefragment_zero_time">00:00</string>
+    <string name="homefragment_systemsetting_denied">您拒绝了设置系统设置的权限，请在设置中打开</string>
+
 
     <!-- 文件选择器 -->
     <string name="title_activity_main">MainActivity</string>
@@ -37,6 +39,7 @@
     <string name="open_file_none">您没有选择任何文件</string>
     <string name="empty_hint">文件夹为空</string>
     <string name="sdcard_unmonted_hint">请先挂载SD卡</string>
+    <string name="filechoose_permission_denied">您拒绝了访问SD卡的权限，请在设置中打开</string>
 
     <!-- 关于页面 -->
     <string name="about_version">%1$s(Build %2$s)</string>
