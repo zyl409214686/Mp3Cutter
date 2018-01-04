@@ -1,6 +1,8 @@
 package com.zyl.mp3cutter.common.base;
 
 import android.content.Context;
+import android.databinding.DataBindingUtil;
+import android.databinding.ViewDataBinding;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -16,18 +18,23 @@ import javax.inject.Inject;
  * MVPPlugin
  */
 
-public abstract class BaseFragment<V extends IBaseView,T extends BasePresenter<V>> extends Fragment implements IBaseView {
+public abstract class BaseFragment<V extends IBaseView,T extends BasePresenter<V>,
+            B extends ViewDataBinding> extends Fragment implements IBaseView {
     protected MyApplication myApplication;
 
     @Inject
     public T mPresenter;
+
+    protected  B mDataBinding;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         myApplication = (MyApplication)getActivity().getApplication();
         ComponentInject(myApplication.getAppComponent());//依赖注入
-        View view = initView(inflater, container);
+        mDataBinding = DataBindingUtil.inflate(inflater, initLayoutResId(), container, false);
+        View view = mDataBinding.getRoot();
+        init(view);
         return view;
     }
 
@@ -41,7 +48,10 @@ public abstract class BaseFragment<V extends IBaseView,T extends BasePresenter<V
      */
     protected abstract void ComponentInject(AppComponent appComponent);
 
-    protected abstract View initView(LayoutInflater inflater, ViewGroup container);
+    protected abstract void init(View view);
+
+    protected abstract int initLayoutResId();
+
 
 //    public  <T> T getInstance(Object o, int i) {
 //            try {

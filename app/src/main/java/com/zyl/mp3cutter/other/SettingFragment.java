@@ -1,15 +1,14 @@
 package com.zyl.mp3cutter.other;
 
 import android.content.Context;
-import android.databinding.DataBindingUtil;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.zyl.mp3cutter.R;
 import com.zyl.mp3cutter.common.app.MyApplication;
 import com.zyl.mp3cutter.common.app.di.AppComponent;
 import com.zyl.mp3cutter.common.base.BaseFragment;
+import com.zyl.mp3cutter.common.base.BasePresenter;
+import com.zyl.mp3cutter.common.base.IBaseView;
 import com.zyl.mp3cutter.common.ui.view.CommonDialog;
 import com.zyl.mp3cutter.common.utils.FileUtils;
 import com.zyl.mp3cutter.databinding.FragmentSettingBinding;
@@ -28,7 +27,7 @@ import static com.zyl.mp3cutter.common.constant.CommonConstant.RING_FOLDER;
  * Created by zouyulong on 2017/11/22.
  * Person in charge :  zouyulong
  */
-public class SettingFragment extends BaseFragment implements View.OnClickListener {
+public class SettingFragment extends BaseFragment <IBaseView, BasePresenter<IBaseView>, FragmentSettingBinding> implements View.OnClickListener {
 
     public SettingFragment() {
     }
@@ -39,11 +38,21 @@ public class SettingFragment extends BaseFragment implements View.OnClickListene
     }
 
     @Override
-    protected View initView(LayoutInflater inflater, ViewGroup container) {
-        FragmentSettingBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_setting, container, false);
-        binding.rlClearCache.setOnClickListener(this);
-        return binding.getRoot();
+    protected void init(View view) {
+        mDataBinding.rlClearCache.setOnClickListener(this);
     }
+
+    @Override
+    protected int initLayoutResId() {
+        return R.layout.fragment_setting;
+    }
+
+//    @Override
+//    protected View initView(LayoutInflater inflater, ViewGroup container) {
+//        FragmentSettingBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_setting, container, false);
+//        binding.rlClearCache.setOnClickListener(this);
+//        return binding.getRoot();
+//    }
 
     @Override
     public void onAttach(Context context) {

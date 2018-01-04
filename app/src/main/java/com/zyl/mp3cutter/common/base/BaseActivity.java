@@ -1,6 +1,8 @@
 package com.zyl.mp3cutter.common.base;
 
 import android.content.Context;
+import android.databinding.DataBindingUtil;
+import android.databinding.ViewDataBinding;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -16,16 +18,18 @@ import javax.inject.Inject;
  * MVPPlugin
  */
 
-public abstract class BaseActivity<V extends IBaseView,T extends BasePresenter<V>>
+public abstract class BaseActivity<V extends IBaseView,T extends BasePresenter<V>, B extends ViewDataBinding>
         extends AppCompatActivity implements IBaseView {
     protected MyApplication myApplication;
 
     @Inject
     public T mPresenter;
+
+    protected  B mDataBinding;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(initLayoutResId());
+        mDataBinding = DataBindingUtil.setContentView(this, initLayoutResId());
         myApplication = (MyApplication) getApplication();
         ComponentInject(myApplication.getAppComponent());//依赖注入
         initData(savedInstanceState);

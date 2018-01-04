@@ -5,9 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,13 +15,13 @@ import com.orhanobut.logger.Logger;
 import com.zyl.mp3cutter.R;
 import com.zyl.mp3cutter.common.app.di.AppComponent;
 import com.zyl.mp3cutter.common.base.BaseActivity;
+import com.zyl.mp3cutter.common.base.BasePresenter;
+import com.zyl.mp3cutter.common.base.IBaseView;
+import com.zyl.mp3cutter.databinding.ActivityMainBinding;
 import com.zyl.mp3cutter.home.ui.HomeFragment;
 
 
-public class MainActivity extends BaseActivity {
-    private Toolbar mToolBar;
-    private DrawerLayout mDrawerLayout;
-    private NavigationView mNavigationView;
+public class MainActivity extends BaseActivity<IBaseView, BasePresenter<IBaseView>, ActivityMainBinding> {
     private Fragment mCurFragment;
     private Fragment mSettingFragment;
     private Fragment mHomeFragment;
@@ -48,7 +46,7 @@ public class MainActivity extends BaseActivity {
         mAboutFragment = new AboutFragment();
         switchToHomePage();
         StatusBarUtil.setColorForDrawerLayout(MainActivity.this,
-                mDrawerLayout, Color.TRANSPARENT);
+                mDataBinding.drawerlayout, Color.TRANSPARENT);
     }
 
     private void initView() {
@@ -58,24 +56,21 @@ public class MainActivity extends BaseActivity {
     }
 
     private void initToolBar() {
-        mToolBar = (Toolbar) findViewById(R.id.tb_custom);
-        mToolBar.setTitle(getResources().getString(R.string.main_tab_home));
-        mToolBar.setTitleTextColor(Color.parseColor("#ffffff"));
-        setSupportActionBar(mToolBar);
+        mDataBinding.toolbar.setTitle(getResources().getString(R.string.main_tab_home));
+        mDataBinding.toolbar.setTitleTextColor(Color.parseColor("#ffffff"));
+        setSupportActionBar(mDataBinding.toolbar);
     }
 
     private void initDrawer() {
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.dl_left);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, mDrawerLayout,
-                mToolBar, R.string.app_name, R.string.app_name);
-        mDrawerLayout.addDrawerListener(toggle);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, mDataBinding.drawerlayout,
+                mDataBinding.toolbar, R.string.app_name, R.string.app_name);
+        mDataBinding.drawerlayout.addDrawerListener(toggle);
         toggle.syncState();
     }
 
     private void initNavigationView() {
-        mNavigationView = (NavigationView) findViewById(R.id.nav_view);
-        mNavigationView.setItemIconTintList(null);
-        mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+        mDataBinding.navigationView.setItemIconTintList(null);
+        mDataBinding.navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
@@ -91,7 +86,7 @@ public class MainActivity extends BaseActivity {
                 }
                 invalidateOptionsMenu();
                 menuItem.setChecked(true);
-                mDrawerLayout.closeDrawers();
+                mDataBinding.drawerlayout.closeDrawers();
                 return true;
             }
         });
@@ -100,19 +95,19 @@ public class MainActivity extends BaseActivity {
     private void switchToSetting() {
         mCurFragment = mSettingFragment;
         getSupportFragmentManager().beginTransaction().replace(R.id.frame_content, mSettingFragment).commit();
-        mToolBar.setTitle(getResources().getString(R.string.main_tab_setting));
+        mDataBinding.toolbar.setTitle(getResources().getString(R.string.main_tab_setting));
     }
 
     private void switchToHomePage() {
         mCurFragment = mHomeFragment;
         getSupportFragmentManager().beginTransaction().replace(R.id.frame_content, mHomeFragment).commit();
-        mToolBar.setTitle(getResources().getString(R.string.main_tab_home));
+        mDataBinding.toolbar.setTitle(getResources().getString(R.string.main_tab_home));
     }
 
     private void switchToAbout() {
         mCurFragment = mAboutFragment;
         getSupportFragmentManager().beginTransaction().replace(R.id.frame_content, mAboutFragment).commit();
-        mToolBar.setTitle(getResources().getString(R.string.main_tab_about));
+        mDataBinding.toolbar.setTitle(getResources().getString(R.string.main_tab_about));
     }
 
     @Override

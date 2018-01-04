@@ -167,10 +167,12 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
 
     @Override
     public void pause() {
-        mMediaPlayer.pause();
-        mView.setPlayBtnWithStatus(false);
-        mView.setVisualizerViewEnaled(false);
-        cancelUpdateProgress();
+        if (isPlaying()) {
+            mMediaPlayer.pause();
+            mView.setPlayBtnWithStatus(false);
+            mView.setVisualizerViewEnaled(false);
+            cancelUpdateProgress();
+        }
     }
 
     private void seekTo(int progress) {

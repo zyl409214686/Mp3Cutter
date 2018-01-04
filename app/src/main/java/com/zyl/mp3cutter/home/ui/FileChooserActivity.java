@@ -4,16 +4,13 @@ import android.Manifest;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Intent;
-import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.transition.TransitionInflater;
 import android.view.KeyEvent;
@@ -22,11 +19,14 @@ import android.view.View.OnClickListener;
 import android.widget.Toast;
 
 import com.jaeger.library.StatusBarUtil;
-import com.wang.avi.AVLoadingIndicatorView;
 import com.zhy.adapter.recyclerview.CommonAdapter;
 import com.zhy.adapter.recyclerview.base.ViewHolder;
 import com.zyl.mp3cutter.R;
 import com.zyl.mp3cutter.common.app.MyApplication;
+import com.zyl.mp3cutter.common.app.di.AppComponent;
+import com.zyl.mp3cutter.common.base.BaseActivity;
+import com.zyl.mp3cutter.common.base.BasePresenter;
+import com.zyl.mp3cutter.common.base.IBaseView;
 import com.zyl.mp3cutter.common.utils.DensityUtils;
 import com.zyl.mp3cutter.common.utils.FileUtils;
 import com.zyl.mp3cutter.common.utils.ScreenUtils;
@@ -56,17 +56,14 @@ import permissions.dispatcher.RuntimePermissions;
  * Person in charge :  zouyulong
  */
 @RuntimePermissions
-public class FileChooserActivity extends AppCompatActivity implements OnClickListener {
+public class FileChooserActivity extends BaseActivity<IBaseView, BasePresenter<IBaseView>, ActivityFilechooserShowBinding> implements OnClickListener {
 
-    private RecyclerView mRecyclerView;
     private CommonAdapter mAdapter;
     private String mSdcardRootPath;
     private ArrayList<MusicInfo> mMusicList = new ArrayList<>();
     public static final String EXTRA_FILE_CHOOSER = "file_chooser";
-    private AVLoadingIndicatorView mLoadingView;
     private MusicInfoDao mDao;
     private ObjectAnimator mMoveAnim;
-    private ActivityFilechooserShowBinding mBinding;
     private int mUpdateBtnLeft;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,17 +72,14 @@ public class FileChooserActivity extends AppCompatActivity implements OnClickLis
             getWindow().setEnterTransition(transition);
         }
         StatusBarUtil.setColor(this, Color.TRANSPARENT);
-        mBinding =
-                (ActivityFilechooserShowBinding)DataBindingUtil.setContentView(this, R.layout.activity_filechooser_show);
-        mBinding.btnUpdate.setOnClickListener(this);
-        mBinding.btnUpdate.measure(0, 0);
+        mDataBinding.btnUpdate.setOnClickListener(this);
+        mDataBinding.btnUpdate.measure(0, 0);
         mUpdateBtnLeft = ScreenUtils.getScreenSize(this)[0] -
-                mBinding.btnUpdate.getMeasuredWidth() - DensityUtils.dp2px(this ,10);
+                mDataBinding.btnUpdate.getMeasuredWidth() - DensityUtils.dp2px(this ,10);
         initToolbar();
         mSdcardRootPath = Environment.getExternalStorageDirectory()
                 .getAbsolutePath();
-        mRecyclerView = mBinding.rlMusice;
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mDataBinding.rlMusice.setLayoutManager(new LinearLayoutManager(this));
         mAdapter = new CommonAdapter<MusicInfo>(this, R.layout.item_musicfile, mMusicList) {
             @Override
             protected void convert(ViewHolder holder, final MusicInfo musicInfo, int position) {
@@ -99,13 +93,27 @@ public class FileChooserActivity extends AppCompatActivity implements OnClickLis
                 });
             }
         };
-        mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(this,
+        mDataBinding.rlMusice.setAdapter(mAdapter);
+        mDataBinding.rlMusice.addItemDecoration(new DividerItemDecoration(this,
                 DividerItemDecoration.VERTICAL));
         mDao = MyApplication.getInstances().
                 getDaoSession().getMusicInfoDao();
-        mLoadingView = mBinding.aviLoading;
         FileChooserActivityPermissionsDispatcher.refreshDataWithPermissionCheck(this, false);
+    }
+
+    @Override
+    protected void ComponentInject(AppComponent appComponent) {
+
+    }
+
+    @Override
+    protected int initLayoutResId() {
+        return R.layout.activity_filechooser_show;
+    }
+
+    @Override
+    protected void initData(Bundle savedInstanceState) {
+
     }
 
     private void clickItem(MusicInfo info) {
@@ -129,7 +137,7 @@ public class FileChooserActivity extends AppCompatActivity implements OnClickLis
     @NeedsPermission({Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE})
     void refreshData(final boolean isforce) {
-        if (mLoadingView.isShown())
+        if (mDataBinding.aviLoading.isShown())
             return;
         startLoadingAnim();
         loadFile(isforce);
@@ -166,8 +174,8 @@ public class FileChooserActivity extends AppCompatActivity implements OnClickLis
     }
 
     private void startLoadingAnim() {
-        mLoadingView.setVisibility(View.VISIBLE);
-        mMoveAnim  = ObjectAnimator.ofFloat(mLoadingView, "translationX", 0f, mUpdateBtnLeft);
+        mDataBinding.aviLoading.setVisibility(View.VISIBLE);
+        mMoveAnim  = ObjectAnimator.ofFloat(mDataBinding.aviLoading, "translationX", 0f, mUpdateBtnLeft);
         mMoveAnim.setDuration(2000);
         mMoveAnim.setRepeatCount(ValueAnimator.INFINITE);
         mMoveAnim.start();
@@ -175,7 +183,7 @@ public class FileChooserActivity extends AppCompatActivity implements OnClickLis
 
     private void stopLoadingAnim(){
         mMoveAnim.cancel();
-        mLoadingView.setVisibility(View.GONE);
+        mDataBinding.aviLoading.setVisibility(View.GONE);
     }
 
     private void updateFileItems(List<MusicInfo> list, String filePath) {

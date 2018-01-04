@@ -6,8 +6,6 @@ import android.app.ActivityOptions;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.media.MediaPlayer;
@@ -15,12 +13,8 @@ import android.media.RingtoneManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.SeekBar;
@@ -61,8 +55,7 @@ import static com.zyl.mp3cutter.common.constant.CommonConstant.RING_FOLDER;
  * Person in charge :  zouyulong
  */
 @RuntimePermissions
-public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter> implements HomeContract.View, View.OnClickListener {
-    FragmentHomeBinding mBinding;
+public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter, FragmentHomeBinding> implements HomeContract.View, View.OnClickListener {
     // intent返回动作p
     public static final int REQUEST_CODE = 1010;
     // 音量面板显示和隐藏动画
@@ -116,7 +109,7 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
             if (seekBar.getId() == R.id.voice_seekbar) {
                 // 设置音量
                 mPresenter.setStreamVolume(progress);
-                mBinding.visualView.invalidate();
+                mDataBinding.visualView.invalidate();
             }
         }
     };
@@ -183,13 +176,14 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
     }
 
     @Override
-    protected View initView(LayoutInflater inflater, ViewGroup container) {
-        // Inflate the layout for this fragment
-        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false);
-        View view = mBinding.getRoot();
+    protected void init(View view) {
         init();
         initListener();
-        return view;
+    }
+
+    @Override
+    protected int initLayoutResId() {
+        return R.layout.fragment_home;
     }
 
     private void init() {
@@ -197,23 +191,23 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
                 getActivity(), R.anim.push_up_in);
         hiddenVoicePanelAnimation = AnimationUtils.loadAnimation(
                 getActivity(), R.anim.push_up_out);
-        mBinding.voiceSeekbar.setMax(mPresenter.getStreamMaxVolume());
-        mBinding.voiceSeekbar.setProgress(mPresenter.getStreamVolume());
+        mDataBinding.voiceSeekbar.setMax(mPresenter.getStreamMaxVolume());
+        mDataBinding.voiceSeekbar.setProgress(mPresenter.getStreamVolume());
     }
 
     private void initListener() {
-        mBinding.dismissVoicebarSpace.setOnClickListener(this);
-        mBinding.btnPlay.setOnClickListener(this);
-        mBinding.btnCutterSure.setOnClickListener(this);
-        mBinding.rangeSeekbar.setThumbListener(mThumbListener);
-        mBinding.rangeSeekbar.setEnabled(false);
-        mBinding.voiceSeekbar.setOnSeekBarChangeListener(mVoiceChangeListener);
-        mBinding.btnSwitch.setOnClickListener(this);
+        mDataBinding.dismissVoicebarSpace.setOnClickListener(this);
+        mDataBinding.btnPlay.setOnClickListener(this);
+        mDataBinding.btnCutterSure.setOnClickListener(this);
+        mDataBinding.rangeSeekbar.setThumbListener(mThumbListener);
+        mDataBinding.rangeSeekbar.setEnabled(false);
+        mDataBinding.voiceSeekbar.setOnSeekBarChangeListener(mVoiceChangeListener);
+        mDataBinding.btnSwitch.setOnClickListener(this);
     }
 
     @Override
     public void setVisualizerViewEnaled(boolean enabled) {
-        mBinding.visualView.setEnabled(enabled);
+        mDataBinding.visualView.setEnabled(enabled);
     }
 
     @Override
@@ -223,37 +217,37 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
 
     @Override
     public int getSeekbarSelectedMaxValue() {
-        Number number = mBinding.rangeSeekbar.getSelectedAbsoluteMaxValue();
+        Number number = mDataBinding.rangeSeekbar.getSelectedAbsoluteMaxValue();
         return number.intValue();
     }
 
     @Override
     public float getSeekBarAbsoluteMaxValue() {
-        return mBinding.rangeSeekbar.getAbsoluteMaxValue();
+        return mDataBinding.rangeSeekbar.getAbsoluteMaxValue();
     }
 
     @Override
     public int getSeekbarSelectedMinValue() {
-        Number number = mBinding.rangeSeekbar.getSelectedAbsoluteMinValue();
+        Number number = mDataBinding.rangeSeekbar.getSelectedAbsoluteMinValue();
         return number.intValue();
     }
 
     @Override
     public void setPlayBtnWithStatus(boolean isPlayingStatus) {
         if (isPlayingStatus) {
-            mBinding.btnPlay.setBackgroundResource(R.drawable.selector_pause_btn);
+            mDataBinding.btnPlay.setBackgroundResource(R.drawable.selector_pause_btn);
         } else {
-            mBinding.btnPlay.setBackgroundResource(R.drawable.selector_play_btn);
+            mDataBinding.btnPlay.setBackgroundResource(R.drawable.selector_play_btn);
         }
     }
 
     public void setSeekBarEnable(boolean isClickable) {
-        mBinding.rangeSeekbar.setEnabled(isClickable);
+        mDataBinding.rangeSeekbar.setEnabled(isClickable);
     }
 
     @NeedsPermission(Manifest.permission.RECORD_AUDIO)
     public void linkMediaPlayerForVisualView(MediaPlayer player) {
-        mBinding.visualView.link(player);
+        mDataBinding.visualView.link(player);
     }
 
     /**
@@ -268,16 +262,16 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
         // BarGraphRenderer barGraphRendererTop = new BarGraphRenderer(4,
         // paint2, false);
         CircleBarRenderer barGraphRendererTop = new CircleBarRenderer(paint2, 4);
-        mBinding.visualView.clearRenderers();
-        mBinding.visualView.addRenderer(barGraphRendererTop);
+        mDataBinding.visualView.clearRenderers();
+        mDataBinding.visualView.addRenderer(barGraphRendererTop);
     }
 
     @Override
     public boolean setSeekBarProgressValue(int value, boolean isMin) {
         if (isMin) {
-            return mBinding.rangeSeekbar.setSelectedAbsoluteMinValue(value);
+            return mDataBinding.rangeSeekbar.setSelectedAbsoluteMinValue(value);
         } else {
-            return mBinding.rangeSeekbar.setSelectedAbsoluteMaxValue(value);
+            return mDataBinding.rangeSeekbar.setSelectedAbsoluteMaxValue(value);
         }
     }
 
@@ -286,13 +280,13 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
      */
     @Override
     public void resetSeekBarSelValue() {
-        mBinding.rangeSeekbar.restorePercentSelectedMinValue();
-        mBinding.rangeSeekbar.restorePercentSelectedMaxValue();
+        mDataBinding.rangeSeekbar.restorePercentSelectedMinValue();
+        mDataBinding.rangeSeekbar.restorePercentSelectedMaxValue();
     }
 
     @Override
     public void setSeekBarMaxValue(int value) {
-        mBinding.rangeSeekbar.setAbsoluteMaxValue(value);
+        mDataBinding.rangeSeekbar.setAbsoluteMaxValue(value);
     }
 
     @Override
@@ -325,8 +319,8 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
      * 剪切提示弹出窗口
      */
     public void showCutterPromptDialog() {
-        final Number minNumber = mBinding.rangeSeekbar.getSelectedAbsoluteMinValue();
-        final Number maxNumber = mBinding.rangeSeekbar.getSelectedAbsoluteMaxValue();
+        final Number minNumber = mDataBinding.rangeSeekbar.getSelectedAbsoluteMinValue();
+        final Number maxNumber = mDataBinding.rangeSeekbar.getSelectedAbsoluteMaxValue();
         if (maxNumber.intValue() <= minNumber.longValue()) {
             Toast.makeText(getActivity(),
                     getString(R.string.dialog_cutter_warning_length),
@@ -352,12 +346,12 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
      * 声音seekbar显示和隐藏
      */
     public void voicePanelAnimation() {
-        if (mBinding.rlPlayerVoice.getVisibility() == View.GONE) {
-            mBinding.rlPlayerVoice.startAnimation(showVoicePanelAnimation);
-            mBinding.rlPlayerVoice.setVisibility(View.VISIBLE);
+        if (mDataBinding.rlPlayerVoice.getVisibility() == View.GONE) {
+            mDataBinding.rlPlayerVoice.startAnimation(showVoicePanelAnimation);
+            mDataBinding.rlPlayerVoice.setVisibility(View.VISIBLE);
         } else {
-            mBinding.rlPlayerVoice.startAnimation(hiddenVoicePanelAnimation);
-            mBinding.rlPlayerVoice.setVisibility(View.GONE);
+            mDataBinding.rlPlayerVoice.startAnimation(hiddenVoicePanelAnimation);
+            mDataBinding.rlPlayerVoice.setVisibility(View.GONE);
         }
     }
 
@@ -365,9 +359,9 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
      * 隐藏声音大小seekbar
      */
     private void hidenVoicePanel() {
-        if (mBinding.rlPlayerVoice.getVisibility() == View.VISIBLE) {
-            mBinding.rlPlayerVoice.startAnimation(hiddenVoicePanelAnimation);
-            mBinding.rlPlayerVoice.setVisibility(View.GONE);
+        if (mDataBinding.rlPlayerVoice.getVisibility() == View.VISIBLE) {
+            mDataBinding.rlPlayerVoice.startAnimation(hiddenVoicePanelAnimation);
+            mDataBinding.rlPlayerVoice.setVisibility(View.GONE);
         }
     }
 
