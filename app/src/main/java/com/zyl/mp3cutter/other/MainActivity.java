@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -19,6 +20,7 @@ import com.zyl.mp3cutter.common.base.BasePresenter;
 import com.zyl.mp3cutter.common.base.IBaseView;
 import com.zyl.mp3cutter.databinding.ActivityMainBinding;
 import com.zyl.mp3cutter.home.ui.HomeFragment;
+import com.zyl.mp3cutter.skin.ThemeColorSelectDialog;
 
 
 public class MainActivity extends BaseActivity<IBaseView, BasePresenter<IBaseView>, ActivityMainBinding> {
@@ -58,6 +60,8 @@ public class MainActivity extends BaseActivity<IBaseView, BasePresenter<IBaseVie
     private void initToolBar() {
         mDataBinding.toolbar.setTitle(getResources().getString(R.string.main_tab_home));
         mDataBinding.toolbar.setTitleTextColor(Color.parseColor("#ffffff"));
+        mDataBinding.toolbar.setBackgroundResource(R.color.theme_color);
+
         setSupportActionBar(mDataBinding.toolbar);
     }
 
@@ -73,9 +77,18 @@ public class MainActivity extends BaseActivity<IBaseView, BasePresenter<IBaseVie
         mDataBinding.navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                boolean isNeedChecked = true;
                 switch (menuItem.getItemId()) {
                     case R.id.item_about:
                         switchToAbout();
+                        break;
+                    case R.id.item_theme:
+                        isNeedChecked = false;
+                        //主题设置
+                        ThemeColorSelectDialog mdf = new ThemeColorSelectDialog();
+                        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+                        mdf.show(ft, "df");
                         break;
                     case R.id.item_home:
                         switchToHomePage();
@@ -85,7 +98,7 @@ public class MainActivity extends BaseActivity<IBaseView, BasePresenter<IBaseVie
                         break;
                 }
                 invalidateOptionsMenu();
-                menuItem.setChecked(true);
+                menuItem.setChecked(isNeedChecked);
                 mDataBinding.drawerlayout.closeDrawers();
                 return true;
             }
@@ -120,15 +133,14 @@ public class MainActivity extends BaseActivity<IBaseView, BasePresenter<IBaseVie
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
 //        mCurFragment = getSupportFragmentManager().findFragmentById(R.id.frame_content);
-        if(mCurFragment instanceof HomeFragment){
+        if (mCurFragment instanceof HomeFragment) {
             menu.findItem(R.id.home_item_open).setVisible(true);
             menu.findItem(R.id.home_item_voice).setVisible(true);
-        }
-        else{
+        } else {
             menu.findItem(R.id.home_item_open).setVisible(false);
             menu.findItem(R.id.home_item_voice).setVisible(false);
         }
-        Logger.d("onPrepareOptionsMenu: visible"+ (mCurFragment instanceof HomeFragment));
+        Logger.d("onPrepareOptionsMenu: visible" + (mCurFragment instanceof HomeFragment));
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -136,13 +148,13 @@ public class MainActivity extends BaseActivity<IBaseView, BasePresenter<IBaseVie
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.home_item_voice:
-                if(mCurFragment instanceof HomeFragment){
-                    ((HomeFragment)mCurFragment).voicePanelAnimation();
+                if (mCurFragment instanceof HomeFragment) {
+                    ((HomeFragment) mCurFragment).voicePanelAnimation();
                 }
                 break;
             case R.id.home_item_open:
-                if(mCurFragment instanceof HomeFragment){
-                    ((HomeFragment)mCurFragment).openFile();
+                if (mCurFragment instanceof HomeFragment) {
+                    ((HomeFragment) mCurFragment).openFile();
                 }
                 break;
         }

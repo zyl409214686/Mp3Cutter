@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 默认主题颜色 -->
+    <color name="theme_color">#000000</color>
+
+    <!-- theme array -->
+    <color name="theme_color_redbase">#FB5B81</color>
+    <color name="theme_color_blue">#0077D9</color>
+    <color name="theme_color_bluelight">#03A9F4</color>
+    <color name="theme_color_balck">#000000</color>
+    <color name="theme_color_teal">#009688</color>
+    <color name="theme_color_brown">#795548</color>
+    <color name="theme_color_green">#4CAF50</color>
+    <color name="theme_color_red">#FF5252</color>
+
+    <!-- 主题颜色， 用于换肤， 例如：@color/xx_redbase -->
+    <string-array name="theme_colors">
+        <item>@color/theme_color_redbase</item>
+        <item>@color/theme_color_blue</item>
+        <item>@color/theme_color_bluelight</item>
+        <item>@color/theme_color_balck</item>
+        <item>@color/theme_color_teal</item>
+        <item>@color/theme_color_brown</item>
+        <item>@color/theme_color_green</item>
+        <item>@color/theme_color_red</item>
+    </string-array>
+
+    <!-- 主题名称， 用于换肤， 例如：@color/xx_redbase -->
+    <string-array name="theme_names">
+        <item>redbase</item>
+        <item>blue</item>
+        <item>bluelight</item>
+        <item>balck</item>
+        <item>teal</item>
+        <item>brown</item>
+        <item>green</item>
+        <item>red</item>
+    </string-array>
+</resources>

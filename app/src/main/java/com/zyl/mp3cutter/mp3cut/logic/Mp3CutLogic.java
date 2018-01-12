@@ -101,10 +101,12 @@ public class Mp3CutLogic {
         float frameSize = sampleCount * header.getBitRateAsNumber() / 8f / sampleRate * 1000 + paddingLength;
         //获取音轨时长
         int trackLengthMs = header.getTrackLength() * 1000;
-        float p = (float) beginTime / (float) trackLengthMs;
-        float pe = (float) endTime / (float) trackLengthMs;
-        long startFrameSize = (long) (p * frameCount * frameSize);
-        long endFrameSize = (long) (pe * frameCount * frameSize);
+        //开始时间与总时间的比值
+        float beginRatio = (float) beginTime / (float) trackLengthMs;
+        //结束时间与总时间的比值
+        float endRatio = (float) endTime / (float) trackLengthMs;
+        long startFrameSize = (long) (beginRatio * frameCount * frameSize);
+        long endFrameSize = (long) (endRatio * frameCount * frameSize);
         //返回音乐数据的第一个字节
         long firstFrameByte = header.getMp3StartByte();
         generateTargetMp3File(targetFileStr, startFrameSize, endFrameSize, firstFrameByte);

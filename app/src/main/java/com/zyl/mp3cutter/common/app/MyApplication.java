@@ -13,6 +13,9 @@ import com.zyl.mp3cutter.common.utils.LogUtils;
 import com.zyl.mp3cutter.home.bean.DaoMaster;
 import com.zyl.mp3cutter.home.bean.DaoSession;
 
+import skin.support.SkinCompatManager;
+import skin.support.design.app.SkinMaterialViewInflater;
+
 //import com.zyl.mp3cutter.DaoMaster;
 //import com.zyl.mp3cutter.DaoSession;
 
@@ -45,6 +48,11 @@ public class MyApplication extends Application {
         }
         //umeng analytics
         MobclickAgent.setScenarioType(this, MobclickAgent.EScenarioType.E_UM_NORMAL);
+        SkinCompatManager.withoutActivity(this)                         // 基础控件换肤初始化
+                .addInflater(new SkinMaterialViewInflater())            // material design 控件换肤初始化[可选]
+                .setSkinStatusBarColorEnable(false)                     // 关闭状态栏换肤，默认打开[可选]
+                .setSkinWindowBackgroundEnable(false)                   // 关闭windowBackground换肤，默认打开[可选]
+                .loadSkin();
     }
 
     public AppComponent getAppComponent() {

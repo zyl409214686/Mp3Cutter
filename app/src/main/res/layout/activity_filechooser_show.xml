@@ -8,11 +8,10 @@
         android:orientation="vertical"
         android:fitsSystemWindows="true">
 
-        <android.support.v7.widget.Toolbar
+        <skin.support.widget.SkinCompatToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/Indigo_colorPrimary"
             app:navigationIcon="@mipmap/toolbar_back"
             app:title="选择音乐"
             app:titleTextColor="#ffffff" />

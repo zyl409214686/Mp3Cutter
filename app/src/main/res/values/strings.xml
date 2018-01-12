@@ -3,7 +3,8 @@
 
     <!-- MainActivity -->
     <string name="main_tab_home">主页</string>
-    <string name="main_tab_setting">个人设置</string>
+    <string name="main_tab_setting">设置</string>
+    <string name="main_tab_subject">主题</string>
     <string name="main_tab_about">关于</string>
     <string name="main_menu_voice">声音</string>
     <string name="main_menu_open">打开</string>

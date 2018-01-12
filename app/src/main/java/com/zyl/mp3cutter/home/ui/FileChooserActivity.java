@@ -11,7 +11,6 @@ import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.Toolbar;
 import android.transition.TransitionInflater;
 import android.view.KeyEvent;
 import android.view.View;
@@ -48,6 +47,7 @@ import io.reactivex.schedulers.Schedulers;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.OnNeverAskAgain;
 import permissions.dispatcher.RuntimePermissions;
+import skin.support.widget.SkinCompatToolbar;
 
 
 /**
@@ -124,7 +124,8 @@ public class FileChooserActivity extends BaseActivity<IBaseView, BasePresenter<I
     }
 
     private void initToolbar() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        SkinCompatToolbar toolbar = (SkinCompatToolbar) findViewById(R.id.toolbar);
+        toolbar.setBackgroundResource(R.color.theme_color);
         setSupportActionBar(toolbar);
         toolbar.setNavigationOnClickListener(new OnClickListener() {
             @Override

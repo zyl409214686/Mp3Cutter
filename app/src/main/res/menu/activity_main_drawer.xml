@@ -6,6 +6,10 @@
             android:icon="@mipmap/navigation_icon_home"
             android:title="@string/main_tab_home" />
         <item
+            android:id="@+id/item_theme"
+            android:icon="@mipmap/navigation_icon_theme"
+            android:title="@string/main_tab_subject" />
+        <item
             android:id="@+id/item_setting"
             android:icon="@mipmap/navigation_icon_setting"
             android:title="@string/main_tab_setting" />
