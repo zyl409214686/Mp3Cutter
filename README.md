@@ -7,6 +7,7 @@
 
 
 ```
+1.0.2:  增加换肤功能
 1.0.1:  对可变比特率mp3格式文件进行支持
 1.0.0:  第一版本提交
 ```
@@ -39,14 +40,18 @@
 * [baseAdapter](https://github.com/hongyangAndroid/baseAdapter)
 * [CustomRangeSeekBar](https://github.com/zyl409214686/CustomRangeSeekBar)
 * [lottie-android](https://github.com/airbnb/lottie-android)
-
+* [Android-skin-support](https://github.com/ximsfei/Android-skin-support)
 ## TODO
-- 增加主题颜色设置
 - 增加频谱的样式设置
 - 增加闹铃的设置
 - 增加对音乐文件的处理如分享等
 - 国际化支持
 - 增加滑块当前状态绘制
+
+
+## DONE
+- 增加主题颜色设置
+
 
 
 ## 联系我
