@@ -10,6 +10,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.jaeger.library.StatusBarUtil;
 import com.orhanobut.logger.Logger;
@@ -28,6 +29,7 @@ public class MainActivity extends BaseActivity<IBaseView, BasePresenter<IBaseVie
     private Fragment mSettingFragment;
     private Fragment mHomeFragment;
     private Fragment mAboutFragment;
+    private long time = 0;
     private static final String TAG = "MainActivity";
 
     @Override
@@ -171,8 +173,17 @@ public class MainActivity extends BaseActivity<IBaseView, BasePresenter<IBaseVie
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
-            moveTaskToBack(false);
+            if ((System.currentTimeMillis() - time > 1000)) {
+                Toast.makeText(this, getResources().getString(R.string.main_finish_tip),
+                        Toast.LENGTH_SHORT).show();
+                time = System.currentTimeMillis();
+            } else {
+                moveTaskToBack(false);
+            }
+            return true;
         }
-        return super.onKeyDown(keyCode, event);
+        else {
+            return super.onKeyDown(keyCode, event);
+        }
     }
 }

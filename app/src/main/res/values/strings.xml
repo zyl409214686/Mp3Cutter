@@ -8,6 +8,7 @@
     <string name="main_tab_about">关于</string>
     <string name="main_menu_voice">声音</string>
     <string name="main_menu_open">打开</string>
+    <string name="main_finish_tip">再按一次返回桌面</string>
     <!-- 通用弹出窗口 -->
     <string name="dialog_title">提示</string>
     <string name="dialog_exit_msg">是否要退出？</string>
