@@ -12,7 +12,7 @@ import com.zyl.mp3cutter.common.base.IBaseView;
 import com.zyl.mp3cutter.common.ui.view.CommonDialog;
 import com.zyl.mp3cutter.common.utils.FileUtils;
 import com.zyl.mp3cutter.databinding.FragmentSettingBinding;
-import com.zyl.mp3cutter.home.bean.MusicInfoDao;
+import com.zyl.mp3cutter.home.bean.MusicInfo;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
@@ -81,9 +81,7 @@ public class SettingFragment extends BaseFragment <IBaseView, BasePresenter<IBas
         Observable.create(new ObservableOnSubscribe<Object>() {
             @Override
             public void subscribe(ObservableEmitter<Object> e) throws Exception {
-                MusicInfoDao dao = MyApplication.getInstances().
-                        getDaoSession().getMusicInfoDao();
-                dao.deleteAll();
+                MyApplication.getInstances().getBoxStore().boxFor(MusicInfo.class).removeAll();
                 FileUtils.delAllFile(RING_FOLDER);
             }
         }).subscribeOn(Schedulers.io()).subscribe();

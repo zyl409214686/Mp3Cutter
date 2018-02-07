@@ -7,43 +7,38 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
+import android.text.TextUtils;
 import android.transition.TransitionInflater;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.jaeger.library.StatusBarUtil;
 import com.zhy.adapter.recyclerview.CommonAdapter;
 import com.zhy.adapter.recyclerview.base.ViewHolder;
 import com.zyl.mp3cutter.R;
-import com.zyl.mp3cutter.common.app.MyApplication;
 import com.zyl.mp3cutter.common.app.di.AppComponent;
 import com.zyl.mp3cutter.common.base.BaseActivity;
-import com.zyl.mp3cutter.common.base.BasePresenter;
-import com.zyl.mp3cutter.common.base.IBaseView;
 import com.zyl.mp3cutter.common.utils.DensityUtils;
 import com.zyl.mp3cutter.common.utils.FileUtils;
 import com.zyl.mp3cutter.common.utils.ScreenUtils;
 import com.zyl.mp3cutter.databinding.ActivityFilechooserShowBinding;
-import com.zyl.mp3cutter.home.bean.FileInfo;
 import com.zyl.mp3cutter.home.bean.MusicInfo;
-import com.zyl.mp3cutter.home.bean.MusicInfoDao;
+import com.zyl.mp3cutter.home.di.DaggerFileChooseComponent;
+import com.zyl.mp3cutter.home.di.FileChooseModule;
+import com.zyl.mp3cutter.home.presenter.FileChooseContract;
+import com.zyl.mp3cutter.home.presenter.FileChoosePresenter;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.OnNeverAskAgain;
 import permissions.dispatcher.RuntimePermissions;
@@ -56,13 +51,13 @@ import skin.support.widget.SkinCompatToolbar;
  * Person in charge :  zouyulong
  */
 @RuntimePermissions
-public class FileChooserActivity extends BaseActivity<IBaseView, BasePresenter<IBaseView>, ActivityFilechooserShowBinding> implements OnClickListener {
+public class FileChooserActivity extends BaseActivity<FileChooseContract.View, FileChoosePresenter, ActivityFilechooserShowBinding> implements OnClickListener,
+FileChooseContract.View{
 
     private CommonAdapter mAdapter;
-    private String mSdcardRootPath;
     private ArrayList<MusicInfo> mMusicList = new ArrayList<>();
+    public static final String EXTRA_FILEPATH_CHOOSER = "filepath_chooser";
     public static final String EXTRA_FILE_CHOOSER = "file_chooser";
-    private MusicInfoDao mDao;
     private ObjectAnimator mMoveAnim;
     private int mUpdateBtnLeft;
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,14 +72,21 @@ public class FileChooserActivity extends BaseActivity<IBaseView, BasePresenter<I
         mUpdateBtnLeft = ScreenUtils.getScreenSize(this)[0] -
                 mDataBinding.btnUpdate.getMeasuredWidth() - DensityUtils.dp2px(this ,10);
         initToolbar();
-        mSdcardRootPath = Environment.getExternalStorageDirectory()
-                .getAbsolutePath();
         mDataBinding.rlMusice.setLayoutManager(new LinearLayoutManager(this));
         mAdapter = new CommonAdapter<MusicInfo>(this, R.layout.item_musicfile, mMusicList) {
             @Override
             protected void convert(ViewHolder holder, final MusicInfo musicInfo, int position) {
-                holder.setText(R.id.tv_name, musicInfo.getFilename());
-                holder.setText(R.id.tv_size, musicInfo.getFileSize());
+                holder.setText(R.id.tv_name, musicInfo.getTitle());
+                holder.setText(R.id.tv_size, FileUtils.formetFileSize(musicInfo.getFileSize()));
+                if(TextUtils.isEmpty(musicInfo.getCoverPath())){
+                    holder.setImageDrawable(R.id.iv_icon, getResources().getDrawable(R.mipmap.music_icon));
+                }
+                else {
+                    RequestOptions options = new RequestOptions().placeholder(R.mipmap.music_icon);
+                    Glide.with(FileChooserActivity.this).load(musicInfo.getCoverPath())
+                            .apply(options).into((ImageView) holder.getView(R.id.iv_icon));
+                }
+//                holder.setImageBitmap(R.id.iv_icon, CoverLoader.getInstance().loadThumbnail(musicInfo));
                 holder.itemView.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -96,14 +98,17 @@ public class FileChooserActivity extends BaseActivity<IBaseView, BasePresenter<I
         mDataBinding.rlMusice.setAdapter(mAdapter);
         mDataBinding.rlMusice.addItemDecoration(new DividerItemDecoration(this,
                 DividerItemDecoration.VERTICAL));
-        mDao = MyApplication.getInstances().
-                getDaoSession().getMusicInfoDao();
         FileChooserActivityPermissionsDispatcher.refreshDataWithPermissionCheck(this, false);
     }
 
     @Override
     protected void ComponentInject(AppComponent appComponent) {
-
+        DaggerFileChooseComponent
+                .builder()
+                .appComponent(appComponent)
+                .fileChooseModule(new FileChooseModule(this))
+                .build()
+                .inject(this);
     }
 
     @Override
@@ -118,7 +123,8 @@ public class FileChooserActivity extends BaseActivity<IBaseView, BasePresenter<I
 
     private void clickItem(MusicInfo info) {
         Intent intent = new Intent();
-        intent.putExtra(EXTRA_FILE_CHOOSER, info.getFilepath());
+        intent.putExtra(EXTRA_FILEPATH_CHOOSER, info.getFilepath());
+        intent.putExtra(EXTRA_FILE_CHOOSER, info);
         setResult(RESULT_OK, intent);
         finish();
     }
@@ -141,37 +147,7 @@ public class FileChooserActivity extends BaseActivity<IBaseView, BasePresenter<I
         if (mDataBinding.aviLoading.isShown())
             return;
         startLoadingAnim();
-        loadFile(isforce);
-    }
-
-    private void loadFile(final boolean isforce){
-        Observable.create(new ObservableOnSubscribe() {
-            @Override
-            public void subscribe(ObservableEmitter e) throws Exception {
-                List<MusicInfo> datas = mDao.loadAll();
-                if (datas.size() > 0 && !isforce) {
-                } else {
-                    datas = new ArrayList<>();
-                    updateFileItems(datas, mSdcardRootPath);
-                    mDao.deleteAll();
-                    if(datas!=null) {
-                        mDao.insertInTx(datas);
-                    }
-                }
-                e.onNext(datas);
-            }
-        }).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.newThread())
-                .subscribe(new Consumer<List<MusicInfo>>() {
-                    @Override
-                    public void accept(List<MusicInfo> datas) throws Exception {
-                        mMusicList.clear();
-                        mMusicList.addAll(datas);
-                        stopLoadingAnim();
-                        if (mAdapter != null) {
-                            mAdapter.notifyDataSetChanged();
-                        }
-                    }
-                });
+        mPresenter.loadFile(isforce);
     }
 
     private void startLoadingAnim() {
@@ -185,41 +161,6 @@ public class FileChooserActivity extends BaseActivity<IBaseView, BasePresenter<I
     private void stopLoadingAnim(){
         mMoveAnim.cancel();
         mDataBinding.aviLoading.setVisibility(View.GONE);
-    }
-
-    private void updateFileItems(List<MusicInfo> list, String filePath) {
-        File[] files = folderScan(filePath);
-        if (files == null)
-            return;
-        File file;
-        for (int i = 0; i < files.length; i++) {
-            if (files[i].isHidden())
-                continue;
-            String fileAbsolutePath = files[i].getAbsolutePath();
-            String fileName = files[i].getName();
-            boolean isDirectory = false;
-            if (files[i].isDirectory()) {
-                isDirectory = true;
-            }
-            FileInfo fileInfo = new FileInfo(fileAbsolutePath, fileName,
-                    isDirectory);
-            if (fileInfo.isDirectory())
-                updateFileItems(list, fileInfo.getFilePath());
-            else if (fileInfo.isMUSICFile()) {
-                String path = fileInfo.getFilePath();
-                file = new File(path);
-                String size = FileUtils.getFormatFileSizeForFile(file);
-                MusicInfo music = new MusicInfo(null, fileInfo.getFilePath(),
-                        fileInfo.getFileName(), size);
-                list.add(music);
-            }
-        }
-    }
-
-    private File[] folderScan(String path) {
-        File file = new File(path);
-        File[] files = file.listFiles();
-        return files;
     }
 
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -262,5 +203,15 @@ public class FileChooserActivity extends BaseActivity<IBaseView, BasePresenter<I
     void onRecordNeverAskAgain() {
         Toast.makeText(FileChooserActivity.this, getResources().getString(R.string.filechoose_permission_denied),
                 Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void getMusicList(List<MusicInfo> musiclist) {
+        mMusicList.clear();
+        mMusicList.addAll(musiclist);
+        stopLoadingAnim();
+        if (mAdapter != null) {
+            mAdapter.notifyDataSetChanged();
+        }
     }
 }

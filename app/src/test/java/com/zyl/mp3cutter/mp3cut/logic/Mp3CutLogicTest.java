@@ -1,5 +1,8 @@
 package com.zyl.mp3cutter.mp3cut.logic;
 
+import com.zyl.mp3cutter.home.bean.MusicInfo;
+
+import org.jaudiotagger.tag.FieldKey;
 import org.junit.Test;
 
 import java.io.File;
@@ -35,6 +38,19 @@ public class Mp3CutLogicTest {
         long endTime = 216 * 1000; //剪切的结束时间（毫秒）
         Mp3CutLogic helper = new Mp3CutLogic(new File("app/src/test/java/com/zyl/mp3cutter/mp3cut/logic/cbr.mp3"));
         helper.generateNewMp3ByTime(targetMp3FilePath, startTime, endTime);
+    }
+
+    @Test
+    public void testGetMp3Info(){
+        MusicInfo mp3Info = Mp3InfoUtils.readMp3Info("app/src/test/java/com/zyl/mp3cutter/mp3cut/logic/cankuyueguang.mp3");
+        if(mp3Info!=null)
+            System.out.print(mp3Info.toString());
+    }
+
+    @Test
+    public void testWriteMp3Info(){
+        Mp3InfoUtils.writeMp3Info("app/src/test/java/com/zyl/mp3cutter/mp3cut/logic/cankuyueguang.mp3",
+                FieldKey.TITLE, "大龙");
     }
 
 //    @Test

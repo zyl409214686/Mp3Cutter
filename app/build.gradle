@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 //apply plugin: 'com.antfortune.freeline' //freeline
-apply plugin: 'org.greenrobot.greendao' //greendao
+//apply plugin: 'org.greenrobot.greendao' //greendao
+apply plugin: 'io.objectbox'
 android {
     compileSdkVersion rootProject.compileSdkVersion
     buildToolsVersion rootProject.buildToolsVersion
@@ -8,8 +9,8 @@ android {
         applicationId "com.zyl.mp3cutter"
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
-        versionCode 3
-        versionName "1.0.2"
+        versionCode 4
+        versionName "1.0.3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -36,9 +37,9 @@ android {
     dataBinding {
         enabled = true
     }
-    greendao {
-        schemaVersion 1
-    }
+//    greendao {
+//        schemaVersion 1
+//    }
 }
 
 def increasedVersionCode() {
@@ -55,6 +56,8 @@ dependencies {
     compile 'com.android.support:design:25.3.1'
     compile 'com.android.support:support-v4:25.3.1'
     testCompile 'junit:junit:4.12'
+    testCompile "org.robolectric:robolectric:3.5.1"
+    testCompile 'org.robolectric:shadows-support-v4:3.4-rc2'
 
     //lottie
     compile 'com.airbnb.android:lottie:2.0.0-beta4'
@@ -72,7 +75,7 @@ dependencies {
     provided 'org.glassfish:javax.annotation:10.0-b28'
 
     //greendao
-    compile 'org.greenrobot:greendao:3.2.2' // add library
+//    compile 'org.greenrobot:greendao:3.2.2' // add library
     //通用recyclerview
     compile 'com.zhy:base-rvadapter:3.0.3'
     //水波纹效果
@@ -91,5 +94,12 @@ dependencies {
     compile 'skin.support:skin-support-design:2.2.3'            // skin-support-design material design 控件支持[可选]
     //圆形imageview
     compile 'de.hdodenhof:circleimageview:2.2.0'
+    //glide
+//    implementation 'com.github.bumptech.glide:glide:4.6.1'
+//    annotationProcessor 'com.github.bumptech.glide:compiler:4.6.1'
+    compile ("com.github.bumptech.glide:glide:4.6.1") {
+        exclude group: "com.android.support"
+    }
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.6.1'
 }
 

@@ -15,6 +15,8 @@ import com.zyl.mp3cutter.common.utils.FileUtils;
 import com.zyl.mp3cutter.home.bean.MusicInfo;
 import com.zyl.mp3cutter.home.ui.FileChooserActivity;
 import com.zyl.mp3cutter.mp3cut.logic.Mp3CutLogic;
+import com.zyl.mp3cutter.mp3cut.logic.Mp3InfoUtils;
+import com.zyl.mp3cutter.mp3cut.util.Mp3NameConvertUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,7 +36,6 @@ import io.reactivex.schedulers.Schedulers;
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 import static com.zyl.mp3cutter.common.constant.CommonConstant.RING_FOLDER;
-import static com.zyl.mp3cutter.common.constant.CommonConstant.RING_FORMAT;
 import static com.zyl.mp3cutter.home.ui.HomeFragment.REQUEST_CODE;
 
 /**
@@ -44,7 +45,8 @@ import static com.zyl.mp3cutter.home.ui.HomeFragment.REQUEST_CODE;
  */
 public class HomePresenter extends BasePresenter<HomeContract.View> implements HomeContract.Presenter {
     public MediaPlayer mMediaPlayer;
-    private String mSelMusicPath = "";
+    private String mSelMp3Path = "";
+    private MusicInfo mSelMp3Info;
     // 标识当前播放的滑块为min or max
     private boolean mIsMinFlag = true;
     // 获取系统音频对象
@@ -92,18 +94,18 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
      * 剪切音乐
      */
     @Override
-    public void doCutter(final String fileName, final long minValue, final long maxValue) {
+    public void doCutter(final String mp3Title, final long minValue, final long maxValue) {
         Observable.create(new ObservableOnSubscribe() {
             @Override
             public void subscribe(ObservableEmitter e) throws Exception {
-                Mp3CutLogic helper = new Mp3CutLogic(new File(mSelMusicPath));
+                Mp3CutLogic helper = new Mp3CutLogic(new File(mSelMp3Path));
                 if (FileUtils.bFolder(RING_FOLDER)) {
-                    if (!TextUtils.isEmpty(fileName)) {
-                        String targetMp3FilePath = RING_FOLDER + "/" + fileName + RING_FORMAT;
+                    if (!TextUtils.isEmpty(mp3Title)) {
+                        String targetMp3FilePath = RING_FOLDER + "/" + mp3Title +".mp3";
 
                         try {
                             helper.generateNewMp3ByTime(targetMp3FilePath, minValue, maxValue);
-                            addMp3ToDb(targetMp3FilePath);
+                            addMp3ToDb(mp3Title, targetMp3FilePath);
                             e.onNext(targetMp3FilePath);
                         } catch (Exception e1) {
                             e.onError(e1);
@@ -145,13 +147,22 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
      *
      * @param cutterPath
      */
-    private void addMp3ToDb(String cutterPath) {
+    private void addMp3ToDb(String title, String cutterPath) throws CloneNotSupportedException {
         File file = new File(cutterPath);
-        String size = FileUtils.getFormatFileSizeForFile(file);
-        MusicInfo music = new MusicInfo(null, cutterPath,
-                file.getName(), size);
+        MusicInfo info = new MusicInfo();
+        info.setStorageType(MusicInfo.Type.LOCAL);
+        info.setFilepath(cutterPath);
+        info.setFilename(Mp3NameConvertUtils.titleConvertName(title));
+        info.setTitle(title);
+        info.setCoverPath(Mp3InfoUtils.getCoverPath(cutterPath, title));
+        try {
+            info.setFileSize(FileUtils.getFileSizes(file));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         MyApplication.getInstances().
-                getDaoSession().getMusicInfoDao().insert(music);
+                getBoxStore().boxFor(MusicInfo.class).put(info);
+//        Mp3Utils.saveMusic(MyApplication.instances, info);
     }
 
     @Override
@@ -182,7 +193,7 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
     @Override
     public void play(Activity activity) {
         // 播放
-        if (TextUtils.isEmpty(mSelMusicPath)) {
+        if (TextUtils.isEmpty(mSelMp3Path)) {
             Toast.makeText(activity,
                     activity.getString(R.string.dialog_cutter_warning_sel),
                     Toast.LENGTH_SHORT).show();
@@ -239,7 +250,7 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
      */
     @Override
     public boolean isSelectedMp3(Context context) {
-        if (TextUtils.isEmpty(mSelMusicPath)) {
+        if (TextUtils.isEmpty(mSelMp3Path)) {
             Toast.makeText(context,
                     context.getString(R.string.dialog_cutter_warning_sel),
                     Toast.LENGTH_SHORT).show();
@@ -306,16 +317,18 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
         }
         // 文件选择返回结果
         if (resultCode == RESULT_OK && requestCode == REQUEST_CODE) {
-            mSelMusicPath = data
-                    .getStringExtra(FileChooserActivity.EXTRA_FILE_CHOOSER);
+            mSelMp3Path = data
+                    .getStringExtra(FileChooserActivity.EXTRA_FILEPATH_CHOOSER);
+            mSelMp3Info = data
+                    .getParcelableExtra(FileChooserActivity.EXTRA_FILE_CHOOSER);
             try {
-                if (!TextUtils.isEmpty(mSelMusicPath)) {
+                if (!TextUtils.isEmpty(mSelMp3Path)) {
                     mView.resetSeekBarSelValue();
                     mView.setPlayBtnWithStatus(false);
                     mView.setSeekBarEnable(true);
                     pause();
                     reset();
-                    setDataSource(mSelMusicPath);
+                    setDataSource(mSelMp3Path);
                     prepare();
                     mView.setSeekBarMaxValue(getDuration());
                     mView.checkRecordPermission(getMediaPlayer());

@@ -17,4 +17,10 @@ public class ScreenUtils {
         wm.getDefaultDisplay().getMetrics(outMetrics);
         return new int[]{outMetrics.widthPixels, outMetrics.heightPixels};
     }
+
+    public static int getScreenWidth(Context context) {
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        return wm.getDefaultDisplay().getWidth();
+    }
+
 }

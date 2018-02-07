@@ -5,8 +5,8 @@
 
     <ImageView
         android:id="@+id/iv_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:src="@mipmap/music_icon"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"

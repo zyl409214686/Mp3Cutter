@@ -28,7 +28,7 @@ import com.zyl.mp3cutter.common.constant.CommonConstant;
 import com.zyl.mp3cutter.common.ui.view.CommonDialog;
 import com.zyl.mp3cutter.common.ui.view.visualizer.renderer.CircleBarRenderer;
 import com.zyl.mp3cutter.common.utils.FileUtils;
-import com.zyl.mp3cutter.common.utils.SystemTools;
+import com.zyl.mp3cutter.common.utils.RingTools;
 import com.zyl.mp3cutter.databinding.FragmentHomeBinding;
 import com.zyl.mp3cutter.home.di.DaggerHomeComponent;
 import com.zyl.mp3cutter.home.di.HomeModule;
@@ -150,7 +150,7 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter,
     @NeedsPermission(Manifest.permission.WRITE_SETTINGS)
     public void setRing(final String path) {
         if (FileUtils.bFolder(RING_FOLDER)) {
-            SystemTools.setRing(getActivity(), RingtoneManager.TYPE_RINGTONE, path);
+            RingTools.setRing(getActivity(), RingtoneManager.TYPE_RINGTONE, path);
         }
     }
 
@@ -332,10 +332,10 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter,
                 .setIsShowInput(true)
                 .setOnDialogListener(new CommonDialog.OnDialogClickListener() {
                     @Override
-                    public void doOk(String text) {
+                    public void doOk(String filename) {
                         mProgressDialog = ProgressDialog.show(getActivity(), getResources().getString(R.string.homefragment_cutting_tip),
                                 getResources().getString(R.string.homefragment_cutting));
-                        mPresenter.doCutter(text, minNumber.longValue(),
+                        mPresenter.doCutter(filename, minNumber.longValue(),
                                 maxNumber.longValue());
                     }
                 })

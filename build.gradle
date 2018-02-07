@@ -3,12 +3,16 @@
 buildscript {
     repositories {
         jcenter()
+        maven { url "http://objectbox.net/beta-repo/" }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.3.3'
-        classpath 'com.antfortune.freeline:gradle:0.8.7'
+//        classpath 'com.antfortune.freeline:gradle:0.8.7'
+        classpath "io.objectbox:objectbox-gradle-plugin:1.4.1"
+
+
         //greendao
-        classpath 'org.greenrobot:greendao-gradle-plugin:3.2.2' // add plugin
+//        classpath 'org.greenrobot:greendao-gradle-plugin:3.2.2' // add plugin
     }
 }
 
@@ -16,6 +20,8 @@ allprojects {
     repositories {
         jcenter()
         maven { url 'https://jitpack.io' }
+        maven { url "http://objectbox.net/beta-repo/" }
+        maven { url 'https://maven.google.com' }
         mavenCentral()
     }
 }
@@ -35,7 +41,5 @@ ext {
     //permissiondispatcher
     permissionsdispatcher = 'com.github.hotchemi:permissionsdispatcher:3.0.1'
     permissionsdispatcher_processor = 'com.github.hotchemi:permissionsdispatcher-processor:3.0.1'
-
-    //
 }
 

@@ -1,5 +1,7 @@
 package com.zyl.mp3cutter.common.utils;
 
+import android.text.TextUtils;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -149,6 +151,20 @@ public class FileUtils {
             System.out.println("文件不存在");
         }
         return s;
+    }
+
+    /**
+     * 获取文件title, 无后缀的名称
+     * @return
+     * @throws Exception
+     */
+    public static String getFileTitle(String fileName) {
+        if (TextUtils.isEmpty(fileName)) {
+            return null;
+        } else {
+            int indexDot = fileName.lastIndexOf(".");
+            return fileName.substring(0, indexDot);
+        }
     }
 
     /**

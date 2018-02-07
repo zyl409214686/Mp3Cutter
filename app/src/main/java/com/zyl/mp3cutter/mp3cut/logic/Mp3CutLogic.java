@@ -1,13 +1,9 @@
 package com.zyl.mp3cutter.mp3cut.logic;
 
 import com.zyl.mp3cutter.common.utils.FileUtils;
-import com.zyl.mp3cutter.mp3cut.bean.Mp3Info;
-import com.zyl.mp3cutter.mp3cut.util.StringUtil;
 
 import org.jaudiotagger.audio.mp3.MP3AudioHeader;
 import org.jaudiotagger.audio.mp3.MP3File;
-import org.jaudiotagger.tag.FieldKey;
-import org.jaudiotagger.tag.id3.ID3v1Tag;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,7 +21,6 @@ public class Mp3CutLogic {
     private static final int BUFFER_SIZE = 1024 * 1024;
     //mp3源文件
     private File mSourceMp3File;
-    private Mp3Info mp3Info;
 
     public Mp3CutLogic(File mp3File) {
         this.mSourceMp3File = mp3File;
@@ -37,31 +32,6 @@ public class Mp3CutLogic {
 
     public void setmSourceMp3File(File mSourceMp3File) {
         this.mSourceMp3File = mSourceMp3File;
-    }
-
-    /**
-     * 获取mp3信息
-     *
-     * @return
-     */
-    public Mp3Info getMp3Info() {
-        if (this.mp3Info == null) {
-            try {
-                MP3File mp3 = new MP3File(this.mSourceMp3File);
-                ID3v1Tag v1 = mp3.getID3v1Tag();
-                String encoding = v1.getEncoding();
-                MP3AudioHeader header = (MP3AudioHeader) mp3.getAudioHeader();
-                this.mp3Info = new Mp3Info();
-                this.mp3Info.setTitle(StringUtil.convertEncode(v1.getFirst(FieldKey.TITLE), encoding));
-                this.mp3Info.setArtist(StringUtil.convertEncode(v1.getFirst(FieldKey.ARTIST), encoding));
-                this.mp3Info.setAlbum(StringUtil.convertEncode(v1.getFirst(FieldKey.ALBUM), encoding));
-                this.mp3Info.setTrackLength(header.getTrackLength());
-                this.mp3Info.setBiteRate(header.getBitRate());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return this.mp3Info;
     }
 
     /**
@@ -242,4 +212,5 @@ public class Mp3CutLogic {
         }
         return 0;
     }
+
 }

@@ -1,0 +1,70 @@
+{
+  "_note1": "KEEP THIS FILE! Check it into a version control system (VCS) like git.",
+  "_note2": "ObjectBox manages crucial IDs for your object model. See docs for details.",
+  "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
+  "entities": [
+    {
+      "id": "1:6590637799012052514",
+      "lastPropertyId": "13:3333864057267739917",
+      "name": "MusicInfo",
+      "properties": [
+        {
+          "id": "1:8233689480678645574",
+          "name": "id"
+        },
+        {
+          "id": "2:6260769912714851591",
+          "name": "filepath"
+        },
+        {
+          "id": "3:6901313240889179725",
+          "name": "filename"
+        },
+        {
+          "id": "4:7426081347817347157",
+          "name": "fileSize"
+        },
+        {
+          "id": "6:8739706929597901822",
+          "name": "coverPath"
+        },
+        {
+          "id": "9:206069695517265326",
+          "name": "title"
+        },
+        {
+          "id": "11:7526415859060798553",
+          "name": "album"
+        },
+        {
+          "id": "12:9176998285096250934",
+          "name": "artist"
+        },
+        {
+          "id": "13:3333864057267739917",
+          "name": "storageType"
+        }
+      ],
+      "relations": []
+    }
+  ],
+  "lastEntityId": "1:6590637799012052514",
+  "lastIndexId": "0:0",
+  "lastRelationId": "0:0",
+  "lastSequenceId": "0:0",
+  "modelVersion": 4,
+  "modelVersionParserMinimum": 4,
+  "newUidPool": [
+    4334275402792990953
+  ],
+  "retiredEntityUids": [],
+  "retiredIndexUids": [],
+  "retiredPropertyUids": [
+    1319417555477078784,
+    5997437703592413012,
+    6977209893811787079,
+    4419284014941249413
+  ],
+  "retiredRelationUids": [],
+  "version": 1
+}
