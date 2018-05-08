@@ -5,6 +5,7 @@
     <string name="main_tab_home">主页</string>
     <string name="main_tab_setting">设置</string>
     <string name="main_tab_subject">主题</string>
+    <string name="main_tab_music">音乐</string>
     <string name="main_tab_about">关于</string>
     <string name="main_menu_voice">声音</string>
     <string name="main_menu_open">打开</string>
@@ -53,4 +54,7 @@
     <!-- 设置页面 -->
     <string name="setting_prompt_clearcache">确定清空缓存？</string>
     <string name="setting_clearcache">清空缓存</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

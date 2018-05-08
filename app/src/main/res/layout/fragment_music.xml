@@ -1,0 +1,150 @@
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <com.zyl.mp3cutter.common.ui.view.ScrollInterceptScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:id="@+id/ll_recommend"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#ffffff"
+            android:orientation="vertical">
+
+            <!-- 推荐歌单 -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp">
+
+                <ImageView
+                    android:id="@+id/r_dujia"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginLeft="10dp"
+                    android:layout_centerInParent="true"
+                    android:src="@mipmap/icon_recommend"
+                    android:scaleType="fitXY" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@+id/r_dujia"
+                    android:layout_marginLeft="5dp"
+                    android:layout_centerInParent="true"
+                    android:textSize="15sp"
+                    android:textColor="#FF000000"
+                    android:text="推荐歌单" />
+
+                <TextView
+                    android:id="@+id/more"
+                    android:layout_marginRight="7dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:layout_alignParentRight="true"
+                    android:textSize="12sp"
+                    android:textColor="#FF000000"
+                    android:text="更多>" />
+            </RelativeLayout>
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rl_recommend"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:layout_marginRight="7dp"/>
+
+
+
+            <!-- 最新专辑 -->
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp">
+
+                <ImageView
+                    android:id="@+id/r_new"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginLeft="10dp"
+                    android:layout_centerInParent="true"
+                    android:src="@mipmap/icon_new"
+                    android:scaleType="fitXY" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@+id/r_new"
+                    android:layout_marginLeft="5dp"
+                    android:layout_centerInParent="true"
+                    android:textSize="15sp"
+                    android:textColor="#FF000000"
+                    android:text="推荐歌单" />
+
+                <TextView
+                    android:id="@+id/tv_new_more"
+                    android:layout_marginRight="7dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:layout_alignParentRight="true"
+                    android:textSize="12sp"
+                    android:textColor="#FF000000"
+                    android:text="更多>" />
+            </RelativeLayout>
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rl_new"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:layout_marginRight="7dp"/>
+
+            <!-- 主播电台 -->
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp">
+
+                <ImageView
+                    android:id="@+id/r_radio"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginLeft="10dp"
+                    android:layout_centerInParent="true"
+                    android:src="@mipmap/icon_radio"
+                    android:scaleType="fitXY" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@+id/r_radio"
+                    android:layout_marginLeft="5dp"
+                    android:layout_centerInParent="true"
+                    android:textSize="15sp"
+                    android:textColor="#FF000000"
+                    android:text="推荐歌单" />
+
+                <TextView
+                    android:id="@+id/tv_radio_more"
+                    android:layout_marginRight="7dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:layout_alignParentRight="true"
+                    android:textSize="12sp"
+                    android:textColor="#FF000000"
+                    android:text="更多>" />
+            </RelativeLayout>
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rl_radio"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:layout_marginRight="7dp"/>
+        </LinearLayout>
+    </com.zyl.mp3cutter.common.ui.view.ScrollInterceptScrollView>
+</layout>

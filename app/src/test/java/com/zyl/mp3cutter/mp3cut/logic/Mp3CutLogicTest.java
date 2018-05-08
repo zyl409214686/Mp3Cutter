@@ -20,10 +20,10 @@ public class Mp3CutLogicTest {
      */
     @Test
     public void generateMp3ByVBR() throws Exception {
-        String targetMp3FilePath = "app/src/test/java/com/zyl/mp3cutter/mp3cut/logic/new_vbr" + RING_FORMAT;
+        String targetMp3FilePath = "app/src/requestData/java/com/zyl/mp3cutter/mp3cut/logic/new_vbr" + RING_FORMAT;
         long startTime = 20 * 1000; //剪切的开始时间（毫秒）
         long endTime = 120 * 1000; //剪切的结束时间（毫秒）
-        Mp3CutLogic helper = new Mp3CutLogic(new File("app/src/test/java/com/zyl/mp3cutter/mp3cut/logic/vbr.mp3"));
+        Mp3CutLogic helper = new Mp3CutLogic(new File("app/src/requestData/java/com/zyl/mp3cutter/mp3cut/logic/vbr.mp3"));
         helper.generateNewMp3ByTime(targetMp3FilePath, startTime, endTime);
     }
 
@@ -33,32 +33,32 @@ public class Mp3CutLogicTest {
      */
     @Test
     public void generateNewMp3ByCBR() throws Exception {
-        String targetMp3FilePath = "app/src/test/java/com/zyl/mp3cutter/mp3cut/logic/new_cbr" + RING_FORMAT;
+        String targetMp3FilePath = "app/src/requestData/java/com/zyl/mp3cutter/mp3cut/logic/new_cbr" + RING_FORMAT;
         long startTime = 68 * 1000; //剪切的开始时间（毫秒） （眼前的-阅读浩瀚的书海）
         long endTime = 216 * 1000; //剪切的结束时间（毫秒）
-        Mp3CutLogic helper = new Mp3CutLogic(new File("app/src/test/java/com/zyl/mp3cutter/mp3cut/logic/cbr.mp3"));
+        Mp3CutLogic helper = new Mp3CutLogic(new File("app/src/requestData/java/com/zyl/mp3cutter/mp3cut/logic/cbr.mp3"));
         helper.generateNewMp3ByTime(targetMp3FilePath, startTime, endTime);
     }
 
     @Test
     public void testGetMp3Info(){
-        MusicInfo mp3Info = Mp3InfoUtils.readMp3Info("app/src/test/java/com/zyl/mp3cutter/mp3cut/logic/cankuyueguang.mp3");
+        MusicInfo mp3Info = Mp3InfoUtils.readMp3Info("app/src/requestData/java/com/zyl/mp3cutter/mp3cut/logic/cankuyueguang.mp3");
         if(mp3Info!=null)
             System.out.print(mp3Info.toString());
     }
 
     @Test
     public void testWriteMp3Info(){
-        Mp3InfoUtils.writeMp3Info("app/src/test/java/com/zyl/mp3cutter/mp3cut/logic/cankuyueguang.mp3",
+        Mp3InfoUtils.writeMp3Info("app/src/requestData/java/com/zyl/mp3cutter/mp3cut/logic/cankuyueguang.mp3",
                 FieldKey.TITLE, "大龙");
     }
 
 //    @Test
 //    public void getFrameCount(){
-//        String targetMp3FilePath = "app/src/test/java/com/zyl/mp3cutter/mp3cut/logic/test" + RING_FORMAT;
+//        String targetMp3FilePath = "app/src/requestData/java/com/zyl/mp3cutter/mp3cut/logic/requestData" + RING_FORMAT;
 //        long startTime = 20 * 1000; //剪切的开始时间（毫秒）
 //        long endTime = 50 * 1000; //剪切的结束时间（毫秒）
-//        Mp3CutLogic helper = new Mp3CutLogic(new File("app/src/test/java/com/zyl/mp3cutter/mp3cut/logic/vbr.mp3"));
+//        Mp3CutLogic helper = new Mp3CutLogic(new File("app/src/requestData/java/com/zyl/mp3cutter/mp3cut/logic/vbr.mp3"));
 //        helper.
 //    }
 }

@@ -13,7 +13,6 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.jaeger.library.StatusBarUtil;
-import com.orhanobut.logger.Logger;
 import com.zyl.mp3cutter.R;
 import com.zyl.mp3cutter.common.app.di.AppComponent;
 import com.zyl.mp3cutter.common.base.BaseActivity;
@@ -29,6 +28,7 @@ public class MainActivity extends BaseActivity<IBaseView, BasePresenter<IBaseVie
     private Fragment mSettingFragment;
     private Fragment mHomeFragment;
     private Fragment mAboutFragment;
+    private Fragment mMusicFragment;
     private long time = 0;
     private static final String TAG = "MainActivity";
 
@@ -48,6 +48,7 @@ public class MainActivity extends BaseActivity<IBaseView, BasePresenter<IBaseVie
         mSettingFragment = new SettingFragment();
         mHomeFragment = new HomeFragment();
         mAboutFragment = new AboutFragment();
+        mMusicFragment = new MusicFragment();
         switchToHomePage();
         StatusBarUtil.setColorForDrawerLayout(MainActivity.this,
                 mDataBinding.drawerlayout, Color.TRANSPARENT);
@@ -84,13 +85,23 @@ public class MainActivity extends BaseActivity<IBaseView, BasePresenter<IBaseVie
                     case R.id.item_about:
                         switchToAbout();
                         break;
+                    case R.id.item_music:
+                        switchToMusic();
+                        break;
                     case R.id.item_theme:
                         isNeedChecked = false;
                         //主题设置
-                        ThemeColorSelectDialog mdf = new ThemeColorSelectDialog();
+                        ThemeColorSelectDialog themeDialog = new ThemeColorSelectDialog();
+                        themeDialog.setLoadSkinListener(new ThemeColorSelectDialog.LoadSkinListener() {
+                            @Override
+                            public void loadSkinSucess() {
+                                //为解决换肤导致navigation icon tint 颜色变灰问题
+                                mDataBinding.navigationView.setItemIconTintList(null);
+                            }
+                        });
                         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-                        mdf.show(ft, "df");
+                        themeDialog.show(ft, "df");
                         break;
                     case R.id.item_home:
                         switchToHomePage();
@@ -125,6 +136,12 @@ public class MainActivity extends BaseActivity<IBaseView, BasePresenter<IBaseVie
         mDataBinding.toolbar.setTitle(getResources().getString(R.string.main_tab_about));
     }
 
+    private void switchToMusic() {
+        mCurFragment = mMusicFragment;
+        getSupportFragmentManager().beginTransaction().replace(R.id.frame_content, mMusicFragment).commit();
+        mDataBinding.toolbar.setTitle(getResources().getString(R.string.main_tab_music));
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -142,7 +159,7 @@ public class MainActivity extends BaseActivity<IBaseView, BasePresenter<IBaseVie
             menu.findItem(R.id.home_item_open).setVisible(false);
             menu.findItem(R.id.home_item_voice).setVisible(false);
         }
-        Logger.d("onPrepareOptionsMenu: visible" + (mCurFragment instanceof HomeFragment));
+//        Logger.d("onPrepareOptionsMenu: visible" + (mCurFragment instanceof HomeFragment));
         return super.onPrepareOptionsMenu(menu);
     }
 

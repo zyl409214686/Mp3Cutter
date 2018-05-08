@@ -30,7 +30,7 @@ public class ScanMp3UtilsTest {
 
     @Test
     public void testScan() {
-        Log.d("test", "testScan");
+        Log.d("requestData", "testScan");
         Application application = RuntimeEnvironment.application;
 //        Mp3ScanUtils.scanMusic(application);
     }

@@ -45,7 +45,7 @@ public class SplashActivity extends AppCompatActivity {
 
             @Override
             public void onAnimationEnd(Animator animation) {
-                Logger.d("onAnimationEnd");
+//                Logger.d("onAnimationEnd");
                 goToMainActivity();
             }
 

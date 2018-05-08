@@ -2,6 +2,7 @@ package com.zyl.mp3cutter.common.app;
 
 import android.app.Application;
 
+import com.google.gson.Gson;
 import com.orhanobut.logger.AndroidLogAdapter;
 import com.orhanobut.logger.Logger;
 import com.umeng.analytics.MobclickAgent;
@@ -71,5 +72,15 @@ public class MyApplication extends Application {
 
     public BoxStore getBoxStore(){
         return mBoxStore;
+    }
+
+
+    private static Gson gson;
+
+    public static Gson gsonInstance() {
+        if (gson == null) {
+            gson = new Gson();
+        }
+        return gson;
     }
 }

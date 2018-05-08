@@ -31,7 +31,7 @@ import skin.support.SkinCompatManager;
 public class ThemeColorSelectDialog extends DialogFragment {
     private ThemeColorAdapter mThemeColorAdapter = new ThemeColorAdapter();
     private ArrayList<ThemeColor> mThemeColorList = new ArrayList<>();
-
+    private LoadSkinListener mListener;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -77,9 +77,33 @@ public class ThemeColorSelectDialog extends DialogFragment {
             public void onClick(View v) {
                 SkinCompatManager.getInstance().loadSkin(
                         mThemeColorList.get(mThemeColorAdapter.getPosition()).getName(),
-                        null, SkinCompatManager.SKIN_LOADER_STRATEGY_BUILD_IN);
+                        new SkinCompatManager.SkinLoaderListener() {
+                            @Override
+                            public void onStart() {
+
+                            }
+
+                            @Override
+                            public void onSuccess() {
+                                if(mListener!=null)
+                                    mListener.loadSkinSucess();
+                            }
+
+                            @Override
+                            public void onFailed(String errMsg) {
+
+                            }
+                        }, SkinCompatManager.SKIN_LOADER_STRATEGY_BUILD_IN);
                 dismiss();
             }
         });
+    }
+
+    public void setLoadSkinListener(LoadSkinListener listener){
+        mListener = listener;
+    }
+
+    public interface LoadSkinListener{
+        void loadSkinSucess();
     }
 }
