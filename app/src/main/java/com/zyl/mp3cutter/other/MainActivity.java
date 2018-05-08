@@ -92,13 +92,6 @@ public class MainActivity extends BaseActivity<IBaseView, BasePresenter<IBaseVie
                         isNeedChecked = false;
                         //主题设置
                         ThemeColorSelectDialog themeDialog = new ThemeColorSelectDialog();
-                        themeDialog.setLoadSkinListener(new ThemeColorSelectDialog.LoadSkinListener() {
-                            @Override
-                            public void loadSkinSucess() {
-                                //为解决换肤导致navigation icon tint 颜色变灰问题
-                                mDataBinding.navigationView.setItemIconTintList(null);
-                            }
-                        });
                         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
                         themeDialog.show(ft, "df");
@@ -198,9 +191,9 @@ public class MainActivity extends BaseActivity<IBaseView, BasePresenter<IBaseVie
                 moveTaskToBack(false);
             }
             return true;
-        }
-        else {
+        } else {
             return super.onKeyDown(keyCode, event);
         }
     }
+
 }
