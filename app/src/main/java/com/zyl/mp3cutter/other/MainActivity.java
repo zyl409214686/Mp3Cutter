@@ -20,6 +20,7 @@ import com.zyl.mp3cutter.common.base.BasePresenter;
 import com.zyl.mp3cutter.common.base.IBaseView;
 import com.zyl.mp3cutter.databinding.ActivityMainBinding;
 import com.zyl.mp3cutter.home.ui.HomeFragment;
+import com.zyl.mp3cutter.music.ui.MusicFragment;
 import com.zyl.mp3cutter.skin.ThemeColorSelectDialog;
 
 

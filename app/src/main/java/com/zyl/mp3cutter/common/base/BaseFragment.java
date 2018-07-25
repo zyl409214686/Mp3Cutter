@@ -4,7 +4,10 @@ import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +29,10 @@ public abstract class BaseFragment<V extends IBaseView,T extends BasePresenter<V
     public T mPresenter;
 
     protected  B mDataBinding;
+
+    protected MyLoadingDialog mLoadingDialog;
+
+    private static final String TAG_LOADING_DIALOG = "loadingdialog";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -52,6 +59,41 @@ public abstract class BaseFragment<V extends IBaseView,T extends BasePresenter<V
 
     protected abstract int initLayoutResId();
 
+    public void showLoadingDialogForFragment(Fragment fragment) {
+        show(fragment.getFragmentManager());
+
+    }
+
+    public void showLoadingDialogForActicity(FragmentActivity activity) {
+        show(activity.getSupportFragmentManager());
+    }
+
+    private void show(FragmentManager fm){
+        if (mLoadingDialog == null) {
+            mLoadingDialog = new MyLoadingDialog();
+        } else if (mLoadingDialog.isShowing()) {
+            mLoadingDialog.dismiss();
+        }
+        mLoadingDialog.show(fm, TAG_LOADING_DIALOG);
+    }
+
+    public void dismissLoadingDelay(){
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if(mLoadingDialog!=null ){//&& mLoadingDialog.isShowing()
+                    mLoadingDialog.dismiss();
+                }
+            }
+        }, 1000);
+
+    }
+
+    public void dismissLoading() {
+        if (mLoadingDialog != null) {//&& mLoadingDialog.isShowing()
+            mLoadingDialog.dismiss();
+        }
+    }
 
 //    public  <T> T getInstance(Object o, int i) {
 //            try {

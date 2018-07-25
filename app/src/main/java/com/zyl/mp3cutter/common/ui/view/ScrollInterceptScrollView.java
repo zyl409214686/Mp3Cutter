@@ -43,7 +43,6 @@ public class ScrollInterceptScrollView extends ScrollView {
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         int action = ev.getAction();
-        com.orhanobut.logger.Logger.d(action);
         return true;
 //        switch (action) {
 //            case MotionEvent.ACTION_DOWN:
@@ -66,7 +65,6 @@ public class ScrollInterceptScrollView extends ScrollView {
 
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
-        com.orhanobut.logger.Logger.d("onTouchEvent" + ev.getAction());
         switch (ev.getAction()) {
             case MotionEvent.ACTION_DOWN:
             case MotionEvent.ACTION_MOVE:

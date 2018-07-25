@@ -21,7 +21,7 @@ import javax.inject.Inject;
 public abstract class BaseActivity<V extends IBaseView,T extends BasePresenter<V>, B extends ViewDataBinding>
         extends AppCompatActivity implements IBaseView {
     protected MyApplication myApplication;
-
+    protected MyLoadingDialog mLoadingDialog;
     @Inject
     public T mPresenter;
 
@@ -33,6 +33,16 @@ public abstract class BaseActivity<V extends IBaseView,T extends BasePresenter<V
         myApplication = (MyApplication) getApplication();
         ComponentInject(myApplication.getAppComponent());//依赖注入
         initData(savedInstanceState);
+    }
+
+    public void showLoadingDialog() {
+        if (mLoadingDialog == null) {
+            mLoadingDialog = new MyLoadingDialog();
+        } else if (mLoadingDialog.isVisible()) {
+            mLoadingDialog.dismiss();
+        }
+
+        mLoadingDialog.show(getSupportFragmentManager(), "loadingdialog");
     }
 
     @Override

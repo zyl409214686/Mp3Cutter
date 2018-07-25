@@ -1,4 +1,4 @@
-package com.zyl.mp3cutter.other;
+package com.zyl.mp3cutter.music.ui;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -98,25 +98,21 @@ public class MusicFragment extends BaseFragment<IBaseView, BasePresenter<IBaseVi
         super.onDetach();
     }
 
-    private void initRecommendAdapter(){
+    private void initRecommendAdapter() {
         mRecommendAdapter = new CommonAdapter<RecommendListRecommendInfo>(getActivity(), R.layout.item_recommend_playlist, mRecomendList) {
 
             @Override
             protected void convert(ViewHolder holder, final RecommendListRecommendInfo musicInfo, int position) {
                 holder.setText(R.id.playlist_name, musicInfo.getTitle());
-                holder.setText(R.id.playlist_listen_count, "1000");
-                if(TextUtils.isEmpty(musicInfo.getPic())){
-                    holder.setImageDrawable(R.id.playlist_art, getResources().getDrawable(R.mipmap.music_icon));
-                }
-                else {
-                    RequestOptions options = new RequestOptions().placeholder(R.mipmap.music_icon);
-                    Glide.with(getActivity()).load(musicInfo.getPic())
-                            .apply(options).into((ImageView) holder.getView(R.id.playlist_art));
-                }
+                holder.setText(R.id.playlist_listen_count, musicInfo.getCollectnum());
+                holder.setImageDrawable(R.id.playlist_art, getResources().getDrawable(R.mipmap.placeholder_disk));
+                RequestOptions options = new RequestOptions().placeholder(R.mipmap.placeholder_disk);
+                Glide.with(getActivity()).load(musicInfo.getPic())
+                        .apply(options).into((ImageView) holder.getView(R.id.playlist_art));
                 holder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                     }
+                    }
                 });
             }
         };
@@ -127,18 +123,17 @@ public class MusicFragment extends BaseFragment<IBaseView, BasePresenter<IBaseVi
 //        mDataBinding.rlRecommend.setNestedScrollingEnabled(false);
     }
 
-    private void initNewAdapter(){
+    private void initNewAdapter() {
         mNewAdapter = new CommonAdapter<RecommendListNewAlbumInfo>(getActivity(), R.layout.item_recommend_playlist, mNewList) {
 
             @Override
             protected void convert(ViewHolder holder, final RecommendListNewAlbumInfo musicInfo, int position) {
                 holder.setText(R.id.playlist_name, musicInfo.getTitle());
                 holder.setText(R.id.playlist_listen_count, "1000");
-                if(TextUtils.isEmpty(musicInfo.getPic())){
-                    holder.setImageDrawable(R.id.playlist_art, getResources().getDrawable(R.mipmap.music_icon));
-                }
-                else {
-                    RequestOptions options = new RequestOptions().placeholder(R.mipmap.music_icon);
+                if (TextUtils.isEmpty(musicInfo.getPic())) {
+                    holder.setImageDrawable(R.id.playlist_art, getResources().getDrawable(R.mipmap.placeholder_disk));
+                } else {
+                    RequestOptions options = new RequestOptions().placeholder(R.mipmap.placeholder_disk);
                     Glide.with(getActivity()).load(musicInfo.getPic())
                             .apply(options).into((ImageView) holder.getView(R.id.playlist_art));
                 }
@@ -157,18 +152,17 @@ public class MusicFragment extends BaseFragment<IBaseView, BasePresenter<IBaseVi
 
     }
 
-    private void initRadioAdapter(){
+    private void initRadioAdapter() {
         mRadioAdapter = new CommonAdapter<RecommendListRadioInfo>(getActivity(), R.layout.item_recommend_playlist, mRadioList) {
 
             @Override
             protected void convert(ViewHolder holder, final RecommendListRadioInfo musicInfo, int position) {
                 holder.setText(R.id.playlist_name, musicInfo.getTitle());
                 holder.setText(R.id.playlist_listen_count, "1000");
-                if(TextUtils.isEmpty(musicInfo.getPic())){
-                    holder.setImageDrawable(R.id.playlist_art, getResources().getDrawable(R.mipmap.music_icon));
-                }
-                else {
-                    RequestOptions options = new RequestOptions().placeholder(R.mipmap.music_icon);
+                if (TextUtils.isEmpty(musicInfo.getPic())) {
+                    holder.setImageDrawable(R.id.playlist_art, getResources().getDrawable(R.mipmap.placeholder_disk));
+                } else {
+                    RequestOptions options = new RequestOptions().placeholder(R.mipmap.placeholder_disk);
                     Glide.with(getActivity()).load(musicInfo.getPic())
                             .apply(options).into((ImageView) holder.getView(R.id.playlist_art));
                 }
@@ -190,6 +184,10 @@ public class MusicFragment extends BaseFragment<IBaseView, BasePresenter<IBaseVi
     public void requestData() {
         new AsyncTask<Void, Void, Void>() {
 
+            @Override
+            protected void onPreExecute() {
+                showLoadingDialogForFragment(MusicFragment.this);
+            }
 
             @Override
             protected Void doInBackground(Void... params) {
@@ -206,7 +204,7 @@ public class MusicFragment extends BaseFragment<IBaseView, BasePresenter<IBaseVi
                                 addConverterFactory(new Converter.Factory() {
                                     @Override
                                     public Converter<ResponseBody, RecommendCollectionData> responseBodyConverter(Type type, Annotation[] annotations,
-                                                                                            Retrofit retrofit) {
+                                                                                                                  Retrofit retrofit) {
                                         return new Converter<ResponseBody, RecommendCollectionData>() {
                                             @Override
                                             public RecommendCollectionData convert(ResponseBody value) throws IOException {
@@ -242,24 +240,32 @@ public class MusicFragment extends BaseFragment<IBaseView, BasePresenter<IBaseVi
                 });
                 return null;
             }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                dismissLoadingDelay();
+            }
         }.execute();
 
     }
 
 
-    private RecommendCollectionData parseData(String jsonStr){
+    private RecommendCollectionData parseData(String jsonStr) {
         JsonParser parser = new JsonParser();
         JsonElement el = parser.parse(jsonStr);
         JsonObject object = el.getAsJsonObject().get("result").getAsJsonObject();
         JsonArray radioArray = object.get("radio").getAsJsonObject().get("result").getAsJsonArray();
-        JsonArray recommendArray = object.get("diy").getAsJsonObject().get("result").getAsJsonArray();
+        JsonArray recommendArray = null;
+        if(object.get("diy").getAsJsonObject().get("result")!=null)
+             recommendArray = object.get("diy").getAsJsonObject().get("result").getAsJsonArray();
         JsonArray newAlbumArray = object.get("mix_1").getAsJsonObject().get("result").getAsJsonArray();
         RecommendCollectionData data = new RecommendCollectionData();
         ArrayList<RecommendListNewAlbumInfo> newAlbumsList = new ArrayList();
         ArrayList<RecommendListRadioInfo> radioList = new ArrayList();
         ArrayList<RecommendListRecommendInfo> recommendList = new ArrayList();
         for (int i = 0; i < 6; i++) {
-            recommendList.add(MyApplication.gsonInstance().fromJson(recommendArray.get(i), RecommendListRecommendInfo.class));
+            if(recommendArray!=null)
+                recommendList.add(MyApplication.gsonInstance().fromJson(recommendArray.get(i), RecommendListRecommendInfo.class));
             newAlbumsList.add(MyApplication.gsonInstance().fromJson(newAlbumArray.get(i), RecommendListNewAlbumInfo.class));
             radioList.add(MyApplication.gsonInstance().fromJson(radioArray.get(i), RecommendListRadioInfo.class));
         }

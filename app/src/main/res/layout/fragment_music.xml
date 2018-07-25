@@ -47,6 +47,7 @@
                     android:layout_centerInParent="true"
                     android:layout_alignParentRight="true"
                     android:textSize="12sp"
+                    android:visibility="gone"
                     android:textColor="#FF000000"
                     android:text="更多>" />
             </RelativeLayout>
@@ -83,7 +84,7 @@
                     android:layout_centerInParent="true"
                     android:textSize="15sp"
                     android:textColor="#FF000000"
-                    android:text="推荐歌单" />
+                    android:text="新专辑" />
 
                 <TextView
                     android:id="@+id/tv_new_more"
@@ -93,6 +94,7 @@
                     android:layout_centerInParent="true"
                     android:layout_alignParentRight="true"
                     android:textSize="12sp"
+                    android:visibility="gone"
                     android:textColor="#FF000000"
                     android:text="更多>" />
             </RelativeLayout>
@@ -127,7 +129,7 @@
                     android:layout_centerInParent="true"
                     android:textSize="15sp"
                     android:textColor="#FF000000"
-                    android:text="推荐歌单" />
+                    android:text="主播电台" />
 
                 <TextView
                     android:id="@+id/tv_radio_more"
@@ -137,6 +139,7 @@
                     android:layout_centerInParent="true"
                     android:layout_alignParentRight="true"
                     android:textSize="12sp"
+                    android:visibility="gone"
                     android:textColor="#FF000000"
                     android:text="更多>" />
             </RelativeLayout>
@@ -144,7 +147,8 @@
                 android:id="@+id/rl_radio"
                 android:layout_width="match_parent"
                 android:layout_height="300dp"
-                android:layout_marginRight="7dp"/>
+                android:layout_marginRight="7dp"
+                android:layout_marginBottom="10dp"/>
         </LinearLayout>
     </com.zyl.mp3cutter.common.ui.view.ScrollInterceptScrollView>
 </layout>
