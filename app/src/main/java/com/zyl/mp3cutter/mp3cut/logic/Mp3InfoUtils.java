@@ -164,8 +164,10 @@ public class Mp3InfoUtils {
             MP3File mp3file = new MP3File(mp3File);
             AbstractID3v2Tag tag = mp3file.getID3v2Tag();
             AbstractID3v2Frame frame = (AbstractID3v2Frame) tag.getFrame("APIC");
-            FrameBodyAPIC body = (FrameBodyAPIC) frame.getBody();
-            imageData = body.getImageData();
+            if(frame!=null) {
+                FrameBodyAPIC body = (FrameBodyAPIC) frame.getBody();
+                imageData = body.getImageData();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
